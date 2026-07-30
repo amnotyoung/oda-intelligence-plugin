@@ -13,6 +13,8 @@ Use the smallest set of tools that can support the claim.
 
 Call `oda_map_projects` with pagination until the relevant population is complete. Deduplicate by stable project or activity identifier, not by displayed map point.
 
+For a map, spatial comparison, or project-location request, include `locations` and set `include_coordinates: true`. Preserve `coordinate_provenance` and `coordinate_scope` with every coordinate. Treat `reported_project_location` as a source-reported project position; treat city, area, country-reference, and generic map-display points only at their stated scope, even though the response contains numeric latitude and longitude. The gateway returns the public map's effective final position, not a correction history.
+
 Use the reference date consistently when recalculating project status. Keep source observation dates distinct when sources describe different periods.
 
 When a gateway source is unavailable, continue only with claims supported by the remaining sources and identify the affected section as evidence-limited.

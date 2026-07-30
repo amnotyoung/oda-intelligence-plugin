@@ -73,6 +73,54 @@ test("new required inputs, missing outputs, and write capability fail", () => {
   assert.match(failures, /readOnlyHint is no longer true/);
 });
 
+test("reviewed coordinate tools require true input and bounded coordinate output", () => {
+  const coordinateContract = structuredClone(contract);
+  coordinateContract.tools.search.input_properties.include_coordinates =
+    "boolean";
+  coordinateContract.tools.search.input_true_allowed = [
+    "include_coordinates",
+  ];
+  coordinateContract.tools.search.requires_coordinate_output = true;
+
+  const observed = observedSearch();
+  observed.tools[0].inputSchema.properties.include_coordinates = {
+    type: "boolean",
+  };
+  observed.tools[0].outputSchema.properties.result = {
+    type: "object",
+    properties: {
+      locations: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            coordinates: {
+              type: "object",
+              properties: {
+                lat: { type: "number", minimum: -90, maximum: 90 },
+                lon: { type: "number", minimum: -180, maximum: 180 },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+  assert.deepEqual(
+    validateGatewayCompatibility(coordinateContract, observed),
+    [],
+  );
+
+  observed.tools[0].inputSchema.properties.include_coordinates.const = false;
+  observed.tools[0].outputSchema.properties.result = { type: "object" };
+  const failures = validateGatewayCompatibility(
+    coordinateContract,
+    observed,
+  ).join("\n");
+  assert.match(failures, /include_coordinates no longer allows true/);
+  assert.match(failures, /coordinates output schema is missing or invalid/);
+});
+
 test("observed lock excludes repositories and source implementation details", () => {
   const lock = buildObservedLock(contract, observedSearch());
   assert.equal(lock.gateway.server_name, "oda-intelligence");

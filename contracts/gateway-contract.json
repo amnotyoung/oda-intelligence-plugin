@@ -214,6 +214,7 @@
     },
     "oda_map_country_context": {
       "allowed_required_inputs": ["country"],
+      "input_true_allowed": ["include_coordinates"],
       "input_properties": {
         "as_of": "string",
         "country": "string",
@@ -222,6 +223,7 @@
         "sections": "array"
       },
       "output_required": ["data", "summary"],
+      "requires_coordinate_output": true,
       "read_only": true
     },
     "oda_map_data_status": {
@@ -234,6 +236,7 @@
     },
     "oda_map_project_detail": {
       "allowed_required_inputs": ["project_id"],
+      "input_true_allowed": ["include_coordinates"],
       "input_properties": {
         "as_of": "string",
         "country": "string",
@@ -241,10 +244,12 @@
         "project_id": "string"
       },
       "output_required": ["data", "summary"],
+      "requires_coordinate_output": true,
       "read_only": true
     },
     "oda_map_projects": {
       "allowed_required_inputs": ["country"],
+      "input_true_allowed": ["include_coordinates"],
       "input_properties": {
         "agency": "string",
         "as_of": "string",
@@ -259,6 +264,7 @@
         "status": "string"
       },
       "output_required": ["data", "summary"],
+      "requires_coordinate_output": true,
       "read_only": true
     },
     "search_development_trends": {

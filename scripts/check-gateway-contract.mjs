@@ -51,6 +51,38 @@ function matchesExpectedTypes(schema, expected) {
   return expected.split("|").every((type) => actual.has(type));
 }
 
+function schemaAllowsBooleanTrue(schema) {
+  if (!schema || typeof schema !== "object") return false;
+  if (Object.hasOwn(schema, "const")) return schema.const === true;
+  if (Array.isArray(schema.enum)) return schema.enum.includes(true);
+  if (schema.type === "boolean") return true;
+  return [...(schema.anyOf ?? []), ...(schema.oneOf ?? [])].some(
+    schemaAllowsBooleanTrue,
+  );
+}
+
+function hasPublicCoordinateSchema(schema) {
+  if (!schema || typeof schema !== "object") return false;
+  const coordinates = schema.properties?.coordinates;
+  const latitude = coordinates?.properties?.lat;
+  const longitude = coordinates?.properties?.lon;
+  if (
+    coordinates?.type === "object" &&
+    latitude?.type === "number" &&
+    latitude.minimum === -90 &&
+    latitude.maximum === 90 &&
+    longitude?.type === "number" &&
+    longitude.minimum === -180 &&
+    longitude.maximum === 180
+  ) {
+    return true;
+  }
+  return Object.values(schema).some((value) => {
+    if (Array.isArray(value)) return value.some(hasPublicCoordinateSchema);
+    return hasPublicCoordinateSchema(value);
+  });
+}
+
 export function validateGatewayCompatibility(contract, observed) {
   const failures = [];
   if (observed.serverInfo?.name !== contract.gateway.server_name) {
@@ -115,6 +147,22 @@ export function validateGatewayCompatibility(contract, observed) {
           `${toolName}: input property ${property} is incompatible with ${expectedTypes}`,
         );
       }
+    }
+
+    for (const property of expectedTool.input_true_allowed ?? []) {
+      const schema = actual.inputSchema?.properties?.[property];
+      if (!schemaAllowsBooleanTrue(schema)) {
+        failures.push(`${toolName}: input property ${property} no longer allows true`);
+      }
+    }
+
+    if (
+      expectedTool.requires_coordinate_output &&
+      !hasPublicCoordinateSchema(actual.outputSchema)
+    ) {
+      failures.push(
+        `${toolName}: public coordinates output schema is missing or invalid`,
+      );
     }
 
     if (
