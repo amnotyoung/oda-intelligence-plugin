@@ -18,6 +18,10 @@ The plugin does not change the license, privacy terms, or reuse conditions of
 data returned by an upstream source. Follow the original source URL and the
 source operator's terms before redistributing data or documents.
 
+Korean ODA Map coordinate responses contain the effective final positions
+already published by the public map. They do not include pre-correction
+positions, correction-review history, or submitter identity fields.
+
 Report a privacy or security concern through GitHub private vulnerability
 reporting for this repository, without including sensitive material in a public
 issue.

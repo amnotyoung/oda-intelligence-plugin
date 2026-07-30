@@ -84,6 +84,9 @@ version must be reviewed and refreshed by a workspace administrator.
   graphs are not exposed by the public profile.
 - IATI and other international-source credentials are managed by the server
   and are never included in the plugin or returned to users.
+- Korean ODA Map tools can return the effective final coordinates already
+  shown on the public map. Coordinate provenance and scope must be retained;
+  pre-correction coordinates, review history, and submitter data are excluded.
 
 ## Data-use notice
 

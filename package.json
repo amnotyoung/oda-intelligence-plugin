@@ -1,6 +1,6 @@
 {
   "name": "oda-intelligence-plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Public Claude, Codex, and ChatGPT integration for the ODA Intelligence read-only MCP gateway.",
   "private": true,
   "type": "module",
