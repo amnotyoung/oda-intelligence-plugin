@@ -14,6 +14,7 @@ const expectedPublicFiles = [
   ".gitignore",
   "LICENSE",
   "PRIVACY.md",
+  "README.ko.md",
   "README.md",
   "SECURITY.md",
   "TERMS.md",

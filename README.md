@@ -1,5 +1,7 @@
 # ODA Intelligence Plugin
 
+[English](README.md) | [한국어](README.ko.md)
+
 Public Claude, Codex, and ChatGPT packaging for evidence-based development
 cooperation research.
 
