@@ -1,0 +1,13 @@
+interface:
+  display_name: "KOICA Regulation Research"
+  short_description: "Search and verify KOICA internal regulations"
+  default_prompt: "Use $koica-regulation-research to research and verify a KOICA regulation question."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "oda-intelligence"
+      description: "Read-only gateway for bounded KOICA regulation search, references, source metadata, and citation verification"
+      transport: "streamable_http"
+      url: "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp"
+policy:
+  allow_implicit_invocation: true

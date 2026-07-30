@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "protocol_version": "2025-06-18",
+  "compatibility_policy": {
+    "allow_additional_tools": false,
+    "allow_additional_optional_inputs": true,
+    "reject_new_required_inputs": true,
+    "require_read_only": true,
+    "forbidden_tools": [
+      "compliance_radar",
+      "get_article",
+      "get_attachment",
+      "get_trend_document",
+      "list_attachments",
+      "search_entity_relationships"
+    ]
+  },
+  "gateway": {
+    "id": "oda-intelligence",
+    "url": "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp",
+    "server_name": "oda-intelligence",
+    "authentication": "none"
+  },
+  "tools": {
+    "country_data_status": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "countryCode": "string",
+        "refresh": "boolean"
+      },
+      "output_required": [
+        "available_sources",
+        "checked_at",
+        "country",
+        "decision_gate",
+        "error_sources",
+        "methodology_version",
+        "missing_is_zero",
+        "overall_status",
+        "sources",
+        "stale_sources",
+        "total_sources"
+      ],
+      "read_only": true
+    },
+    "country_hazard_snapshot": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "countryCode": "string",
+        "fields": "array",
+        "includeEvents": "boolean",
+        "refresh": "boolean",
+        "sampleSize": "integer"
+      },
+      "output_required": [
+        "country",
+        "data_status",
+        "generated_at",
+        "hazard_signal",
+        "methodology_version",
+        "record_count",
+        "risk_judgement",
+        "risk_score",
+        "sample",
+        "sources"
+      ],
+      "read_only": true
+    },
+    "country_humanitarian_context": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "countryCode": "string",
+        "fields": "array",
+        "refresh": "boolean",
+        "sampleSize": "integer"
+      },
+      "output_required": [
+        "country",
+        "data_status",
+        "generated_at",
+        "methodology_version",
+        "missing_is_zero",
+        "samples",
+        "source_status",
+        "summary"
+      ],
+      "read_only": true
+    },
+    "country_list": {
+      "allowed_required_inputs": [],
+      "input_properties": {},
+      "output_required": [
+        "count",
+        "countries",
+        "office_count",
+        "registry_as_of"
+      ],
+      "read_only": true
+    },
+    "country_report_context": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "countryCode": "string",
+        "fields": "array",
+        "refresh": "boolean",
+        "sampleSize": "integer"
+      },
+      "output_required": [
+        "country",
+        "data_status",
+        "generated_at",
+        "methodology_version",
+        "missing_is_zero",
+        "profile",
+        "risk_judgement",
+        "risk_score",
+        "samples",
+        "source_status",
+        "summary"
+      ],
+      "read_only": true
+    },
+    "find_references": {
+      "allowed_required_inputs": ["article", "source"],
+      "input_properties": {
+        "article": "string",
+        "include_mermaid": "boolean",
+        "limit": "integer",
+        "source": "string"
+      },
+      "output_required": [
+        "counts",
+        "incoming",
+        "outgoing",
+        "target"
+      ],
+      "read_only": true
+    },
+    "iati_query_country": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "activityStatusCode": "string",
+        "collection": "string",
+        "countryCode": "string",
+        "fields": "array",
+        "iatiIdentifier": "string",
+        "lastUpdatedAfter": "string",
+        "reportingOrganisation": "string",
+        "rows": "integer",
+        "sectorCode": "string",
+        "start": "integer",
+        "startDate": "string",
+        "summary": "boolean"
+      },
+      "output_required": [
+        "caveats",
+        "collection",
+        "country_code",
+        "coverage",
+        "data",
+        "methodology_version",
+        "ok",
+        "returned",
+        "source",
+        "stale",
+        "start",
+        "status",
+        "summary",
+        "total_found"
+      ],
+      "read_only": true
+    },
+    "iati_status": {
+      "allowed_required_inputs": [],
+      "input_properties": {},
+      "output_required": [
+        "configured",
+        "credentialMode",
+        "nextStep",
+        "ok"
+      ],
+      "read_only": true
+    },
+    "iati_test_connection": {
+      "allowed_required_inputs": [],
+      "input_properties": {},
+      "output_required": [
+        "countryCode",
+        "credentialMode",
+        "ok",
+        "returned",
+        "sampleIdentifier",
+        "testedAt",
+        "totalFound"
+      ],
+      "read_only": true
+    },
+    "list_available_corpora": {
+      "allowed_required_inputs": [],
+      "input_properties": {},
+      "output_required": [
+        "corpora",
+        "office_registry"
+      ],
+      "read_only": true
+    },
+    "list_sources": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "category": "null|string"
+      },
+      "output_required": ["result"],
+      "read_only": true
+    },
+    "oda_map_country_context": {
+      "allowed_required_inputs": ["country"],
+      "input_properties": {
+        "as_of": "string",
+        "country": "string",
+        "include_coordinates": "boolean",
+        "sample_limit": "integer",
+        "sections": "array"
+      },
+      "output_required": ["data", "summary"],
+      "read_only": true
+    },
+    "oda_map_data_status": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "country": "string"
+      },
+      "output_required": ["data", "summary"],
+      "read_only": true
+    },
+    "oda_map_project_detail": {
+      "allowed_required_inputs": ["project_id"],
+      "input_properties": {
+        "as_of": "string",
+        "country": "string",
+        "include_coordinates": "boolean",
+        "project_id": "string"
+      },
+      "output_required": ["data", "summary"],
+      "read_only": true
+    },
+    "oda_map_projects": {
+      "allowed_required_inputs": ["country"],
+      "input_properties": {
+        "agency": "string",
+        "as_of": "string",
+        "country": "string",
+        "fields": "array",
+        "include_coordinates": "boolean",
+        "layers": "array",
+        "limit": "integer",
+        "offset": "integer",
+        "query": "string",
+        "sector": "string",
+        "status": "string"
+      },
+      "output_required": ["data", "summary"],
+      "read_only": true
+    },
+    "search_development_trends": {
+      "allowed_required_inputs": ["office", "query"],
+      "input_properties": {
+        "country": "string",
+        "kinds": "array",
+        "limit": "integer",
+        "month_from": "string",
+        "month_to": "string",
+        "office": "string",
+        "office_role": "string",
+        "query": "string",
+        "sector": "string"
+      },
+      "output_required": [
+        "caveat",
+        "corpus",
+        "documents",
+        "result_count"
+      ],
+      "read_only": true
+    },
+    "search_regulation": {
+      "allowed_required_inputs": ["query"],
+      "input_properties": {
+        "category": "null|string",
+        "fuzzy": "boolean",
+        "include_attachments": "boolean",
+        "limit": "integer",
+        "query": "string",
+        "source": "null|string"
+      },
+      "output_required": ["result"],
+      "read_only": true
+    },
+    "verify_citation": {
+      "allowed_required_inputs": ["text"],
+      "input_properties": {
+        "text": "string"
+      },
+      "output_required": ["result"],
+      "read_only": true
+    }
+  }
+}

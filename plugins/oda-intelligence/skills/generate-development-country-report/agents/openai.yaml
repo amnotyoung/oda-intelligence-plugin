@@ -1,0 +1,13 @@
+interface:
+  display_name: "Development Country Report"
+  short_description: "Evidence-based ODA country reports and source routing"
+  default_prompt: "Use $generate-development-country-report to prepare an evidence-based development cooperation country report."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "oda-intelligence"
+      description: "Read-only gateway for international aid, Korean projects, development documents, and KOICA regulations"
+      transport: "streamable_http"
+      url: "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp"
+policy:
+  allow_implicit_invocation: true

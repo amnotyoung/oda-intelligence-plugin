@@ -1,0 +1,40 @@
+{
+  "name": "oda-intelligence",
+  "version": "0.1.0",
+  "description": "Evidence-based development cooperation research across international aid, Korean projects, development documents, and KOICA regulations.",
+  "author": {
+    "name": "Nomad Research",
+    "url": "https://github.com/amnotyoung"
+  },
+  "homepage": "https://github.com/amnotyoung/oda-intelligence-plugin/tree/main/plugins/oda-intelligence",
+  "repository": "https://github.com/amnotyoung/oda-intelligence-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ODA",
+    "development-cooperation",
+    "IATI",
+    "KOICA",
+    "MCP"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ODA Intelligence",
+    "shortDescription": "ODA evidence, projects, documents, and regulations",
+    "longDescription": "Uses one public read-only MCP gateway for development cooperation research across international aid, Korean projects, development documents, and KOICA regulations.",
+    "developerName": "Nomad Research",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/amnotyoung/oda-intelligence-plugin",
+    "privacyPolicyURL": "https://github.com/amnotyoung/oda-intelligence-plugin/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/amnotyoung/oda-intelligence-plugin/blob/main/TERMS.md",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Prepare an evidence-based development cooperation country report.",
+      "Compare Korean ODA projects with international aid evidence.",
+      "Find and verify the KOICA regulation governing a procedure."
+    ],
+    "brandColor": "#176B87"
+  },
+  "mcpServers": "./.mcp.json"
+}

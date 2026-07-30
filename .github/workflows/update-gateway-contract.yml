@@ -1,0 +1,79 @@
+name: Update gateway contract observation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 1 * * *"
+
+concurrency:
+  group: oda-intelligence-contract-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - id: contract
+        name: Inspect public ODA Intelligence gateway
+        run: npm run contracts:update
+
+      - name: Bump plugin patch version
+        if: steps.contract.outputs.changed == 'true'
+        run: node scripts/bump-plugin-version.mjs
+
+      - name: Test updated public package
+        if: steps.contract.outputs.changed == 'true'
+        run: |
+          npm test
+          npm audit --omit=dev
+
+      - id: branch
+        if: steps.contract.outputs.changed == 'true'
+        name: Resolve deterministic update branch
+        run: |
+          digest="$(sha256sum contracts/observed.lock.json | cut -c1-12)"
+          echo "name=automation/gateway-contract-$digest" >> "$GITHUB_OUTPUT"
+
+      - name: Create review pull request
+        if: steps.contract.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          if gh pr list --state open --head "$BRANCH" --json number --jq 'length > 0' | grep -q true; then
+            echo "Gateway contract update PR already exists for $BRANCH"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add contracts/observed.lock.json
+          git add package.json
+          git add package-lock.json
+          git add plugins/oda-intelligence/.codex-plugin/plugin.json
+          git add plugins/oda-intelligence/.claude-plugin/plugin.json
+          git add .claude-plugin/marketplace.json
+          git commit -m "Update observed ODA Intelligence gateway contract"
+          git push --set-upstream origin "$BRANCH"
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Review ODA Intelligence gateway contract drift" \
+            --body "Compatible public gateway metadata drift was detected. Review the changed tool hashes and update the accepted contract or Skills when routing behavior changed."

@@ -1,0 +1,29 @@
+{
+  "gateway": {
+    "instructions_sha256": "c2d8593c2ca3ff1f63d5c1705461cdb4d74478ef873d2ebc1aa88284d43d059a",
+    "server_name": "oda-intelligence",
+    "tool_count": 18,
+    "tools": {
+      "country_data_status": "6c0653c6317e6b7bfd2e51cbbdd65a08ecc37649eaef55ba68053fa46cc8868a",
+      "country_hazard_snapshot": "aba5810c917fd2efa1e6630154b25181a42e943b3fda5589b783880ef5225f66",
+      "country_humanitarian_context": "2d43e5875966b56785f5d82863603d1d624023cded4dbdf2b6ca6da2913343cc",
+      "country_list": "08572a061dd3e66fa1e1b619bf7bca8a90f190777ed2289059c3e2c6d5e1bc5e",
+      "country_report_context": "1fec93657ae8f02c49074ea60d0b9fa5b9a580f190f4a7df8cc6201917ab805a",
+      "find_references": "c5225eee668e36ded01d7f03889a14ebf2aa4ab6b3fcf86d9229aec56e3e7e67",
+      "iati_query_country": "3983c8513da36110741f716accaee01d20423f0061e0ba7e35f4f88e1b88ae45",
+      "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
+      "iati_test_connection": "8aa708a1fd1f8e53fa9713d35c95f7096b6c86742ed50f07d0b16fd9e1164027",
+      "list_available_corpora": "e7540d105680587b402d4a1e9e142ed38109d1e3ffda48a917ff5c7cf92bf5d8",
+      "list_sources": "ff0afbed7f4288f16444883cd57b8eca75882a8cea307c107fe2f9dd93fbde52",
+      "oda_map_country_context": "def92f3bd98807a63eb1c2e6df264e02155a1806f458cafded8daa86a77eb0f0",
+      "oda_map_data_status": "8bd40ed544ac2960e5c8a5635a2aeeb7b410f3221eca8cc8a1a12f44c2214815",
+      "oda_map_project_detail": "d017c53cb9e32ec1fc2fe814a95cd368d2f60f8d8138c695bb84f2f093702f9d",
+      "oda_map_projects": "b5ac7a931e33bfb58ad26ae42687bd077331c13683adc3d3f0fb7e8fd00c4fb6",
+      "search_development_trends": "6abdc7ef30dab5a0e2eb05b36635d9244e91aca7681d90fbbf3e0522c8734ec0",
+      "search_regulation": "848b31535a4b8d46ee9599575042eda39cb9a059d987a651f877e7babeef71b0",
+      "verify_citation": "05f0c8cff12c8db2ae3e7d82114e4db979e8b609774ed3ac72d8e74ae0c7fd7f"
+    },
+    "url": "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp"
+  },
+  "schema_version": 1
+}

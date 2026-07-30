@@ -1,0 +1,20 @@
+{
+  "name": "oda-intelligence-plugin",
+  "interface": {
+    "displayName": "ODA Intelligence"
+  },
+  "plugins": [
+    {
+      "name": "oda-intelligence",
+      "source": {
+        "source": "local",
+        "path": "./plugins/oda-intelligence"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

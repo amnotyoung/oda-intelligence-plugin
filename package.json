@@ -1,0 +1,20 @@
+{
+  "name": "oda-intelligence-plugin",
+  "version": "0.1.0",
+  "description": "Public Claude, Codex, and ChatGPT integration for the ODA Intelligence read-only MCP gateway.",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "contracts:check": "node scripts/check-gateway-contract.mjs",
+    "contracts:update": "node scripts/check-gateway-contract.mjs --update-lock",
+    "plugin:version-check": "node scripts/check-plugin-version.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}
