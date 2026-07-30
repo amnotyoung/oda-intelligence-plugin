@@ -31,6 +31,7 @@ export function requiresVersionBump(paths) {
   return paths.some(
     (path) =>
       path === "plugins/oda-intelligence/.mcp.json" ||
+      path === "plugins/oda-intelligence/.app.json" ||
       path === "plugins/oda-intelligence/.codex-plugin/plugin.json" ||
       path === "plugins/oda-intelligence/.claude-plugin/plugin.json" ||
       path === "contracts/gateway-contract.json" ||

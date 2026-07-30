@@ -22,6 +22,7 @@ const expectedPublicFiles = [
   "package-lock.json",
   "package.json",
   "plugins/oda-intelligence/.claude-plugin/plugin.json",
+  "plugins/oda-intelligence/.app.json",
   "plugins/oda-intelligence/.codex-plugin/plugin.json",
   "plugins/oda-intelligence/.mcp.json",
   "plugins/oda-intelligence/skills/generate-development-country-report/SKILL.md",
@@ -114,6 +115,27 @@ test("plugin and both Skills depend on one credential-free gateway", async () =>
     assert.match(text, /value: "oda-intelligence"/);
     assert.ok(text.includes(`url: "${gatewayUrl}"`));
   }
+});
+
+test("ChatGPT compatibility maps the registered gateway app without a secret", async () => {
+  const codex = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".codex-plugin",
+    "plugin.json",
+  );
+  const app = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".app.json",
+  );
+
+  assert.equal(codex.apps, "./.app.json");
+  assert.deepEqual(Object.keys(app.apps), ["oda-intelligence"]);
+  assert.deepEqual(app.apps["oda-intelligence"], {
+    id: "asdk_app_6a6adfc09994819187cca37e0a256e7e",
+  });
+  assert.doesNotMatch(JSON.stringify(app), /plugin_asdk_app|authorization|token/i);
 });
 
 test("public repository contains exactly the reviewed file allowlist", async () => {

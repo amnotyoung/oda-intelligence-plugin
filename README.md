@@ -46,9 +46,17 @@ MCP configuration.
 
 ## ChatGPT
 
-Create an MCP app named `ODA Intelligence`, use the gateway URL above, select no
-authentication, and scan the available tools. ChatGPT installs the remote MCP
-app; it does not install the Claude/Codex Skill files in this repository.
+The complete plugin combines the two bundled Skills with the registered
+`ODA Intelligence` MCP app. The committed `.app.json` contains the app's
+technical identifier, not a credential or authentication token.
+
+For maintainer testing, enable ChatGPT developer mode, add this repository as a
+personal marketplace source, and install `ODA Intelligence`. The registered app
+uses the gateway URL above with no authentication.
+
+This developer-mode package is not yet a public directory release. Universal
+ChatGPT distribution requires a **With MCP** directory submission of the same
+gateway; a Skills-only submission would intentionally omit the app mapping.
 
 ChatGPT keeps an approved snapshot of tool definitions. Compatible data and
 server behavior changes are available at the same URL, while a new tool-contract
