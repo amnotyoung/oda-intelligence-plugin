@@ -66,6 +66,17 @@ version must be reviewed and refreshed by a workspace administrator.
 - Skill routing and accepted contract changes require a versioned plugin
   update.
 
+## Public content boundary
+
+- KOICA regulation tools expose bounded search snippets, source metadata,
+  cross-references, and citation verification. Complete articles, attachments,
+  annex files, and bulk text are not exposed by the public profile.
+- Development-document tools expose corpus discovery, bounded summaries, and
+  public original URLs. Complete indexed documents and extracted relationship
+  graphs are not exposed by the public profile.
+- IATI and other international-source credentials are managed by the server
+  and are never included in the plugin or returned to users.
+
 ## Data-use notice
 
 The plugin routes requests to external data services. Source availability,
