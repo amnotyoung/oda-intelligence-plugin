@@ -97,11 +97,30 @@ test("Claude and Codex manifests point only to the public plugin repository", as
 });
 
 test("plugin and both Skills depend on one credential-free gateway", async () => {
+  const claude = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".claude-plugin",
+    "plugin.json",
+  );
+  const codex = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".codex-plugin",
+    "plugin.json",
+  );
   const mcp = await readJson(
     "plugins",
     "oda-intelligence",
     ".mcp.json",
   );
+
+  // Claude discovers standard root-level skills/ and .mcp.json automatically.
+  // Keep its manifest metadata-only to match Anthropic's web/Cowork examples.
+  assert.equal(claude.skills, undefined);
+  assert.equal(claude.mcpServers, undefined);
+  assert.equal(codex.skills, "./skills/");
+  assert.equal(codex.mcpServers, "./.mcp.json");
   assert.deepEqual(Object.keys(mcp.mcpServers), ["oda-intelligence"]);
   assert.equal(mcp.mcpServers["oda-intelligence"].url, gatewayUrl);
   assert.doesNotMatch(JSON.stringify(mcp), /authorization|token/i);

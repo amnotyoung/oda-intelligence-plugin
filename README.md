@@ -14,6 +14,12 @@ The gateway provides controlled tools for international aid and country
 context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
+The four data domains are not installed as four separate Claude connectors.
+Claude should show one `oda-intelligence` connector whose 18 read-only tools
+route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
+Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
+legacy/direct connections and are independent of this plugin.
+
 This repository contains no source-server implementation, deployment secret,
 private Git history, or local credential store. Its only runtime dependency is
 the public MCP contract.
@@ -22,6 +28,18 @@ the public MCP contract.
 
 Add `amnotyoung/oda-intelligence-plugin` as a personal plugin marketplace, then
 install `ODA Intelligence`.
+
+After a marketplace sync or plugin update, start a new Claude conversation.
+Existing conversations can retain the tool snapshot they had when they were
+created. In the plugin details, the expected installed components are:
+
+- two Skills;
+- one connector named `oda-intelligence`;
+- 18 read-only tools supplied by that connector.
+
+If only the two Skills appear, sync the marketplace, update or reinstall the
+plugin, and create another new conversation. The Skills do not call a hidden
+backend on their own; they require the bundled connector.
 
 Claude Code:
 
