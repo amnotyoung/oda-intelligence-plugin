@@ -36,6 +36,9 @@
 | Activity discovery | IATI | Counts are records, not unique projects |
 | Korean portfolio | ODA Map Lab | Deduplicate by activity ID; inspect project details |
 | Korean project documents | Development-cooperation document corpus | Cite the exact title and direct original URL when present; keep internal IDs in the technical snapshot |
+| ODA project-formation route | `procurement_model_detail` with `axis: "pipeline"` | In Korean prose call it `사업 발굴·형성 절차`; inspect `verification` and `unresolved`; verify material claims from the linked primary sources |
+| Procurement governance and oversight | `procurement_model_detail` with `axis: "governance"` | Distinguish domestic and external funding routes, responsible authorities, contracting bodies, and oversight; retain provisional or unresolved legal details |
+| Bidding system | `procurement_model_detail` with `axis: "bidding"` | Covers advertisement, submission, evaluation, and award; belongs in section 6.3 after governance and is normally prose or a table rather than a diagram |
 | Procurement route when no country model is available | National procurement law and portal, financing agreements, donor procurement rules | Verify only what the sources support; separate confirmed law from unresolved institutional handoffs; a missing model is not evidence that no formal process exists |
 | Disaster signals | USGS, GDACS, NASA EONET | Deduplicate comparable events; a bounding-box hit is not a site risk rating |
 
@@ -52,10 +55,13 @@ Use the first four tools from the pinned country-data MCP contract and the remai
 7. `oda_map_projects`
 8. `oda_map_project_detail`
 9. development-cooperation document and relationship search
+10. `procurement_model_status`, then `procurement_country_context` or `procurement_model_detail`
 
 If a named tool is unavailable, use an equivalent authoritative source. Do not silently replace an unavailable value with zero.
 
 ACLED is intentionally disabled in the country-data MCP contract. Do not request ACLED credentials, call an undeclared ACLED tool, or interpret the disabled source as zero conflict events.
+
+For section 6, call `procurement_model_status` first, then retrieve the axes the section needs. Follow [procurement-model-integration.md](procurement-model-integration.md). A missing model is `no_data`, not evidence that no formal route or governance system exists.
 
 ## Status semantics
 
@@ -90,6 +96,7 @@ An overall `sufficient` result can coexist with an insufficient section. Preserv
 - Never expose credentials, credential identifiers, subscription values, or raw error bodies.
 - Keep document IDs, corpus IDs, and search-result identifiers in technical snapshots, not reader-facing prose.
 - Cite direct original URLs beside material claims.
+- Treat a procurement model page as a visual synthesis and the model itself as a structured secondary source. Cite the model used for the diagram and the underlying official or primary sources used for material factual claims.
 - Link an interactive map at the first map-derived count and state the country filter when no stable deep link exists.
 - Mark an inference as an inference.
 

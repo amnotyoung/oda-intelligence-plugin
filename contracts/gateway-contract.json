@@ -17,7 +17,7 @@
   },
   "gateway": {
     "id": "oda-intelligence",
-    "url": "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp",
+    "url": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp",
     "server_name": "oda-intelligence",
     "authentication": "none"
   },
@@ -121,7 +121,10 @@
       "read_only": true
     },
     "find_references": {
-      "allowed_required_inputs": ["article", "source"],
+      "allowed_required_inputs": [
+        "article",
+        "source"
+      ],
       "input_properties": {
         "article": "string",
         "include_mermaid": "boolean",
@@ -209,12 +212,18 @@
       "input_properties": {
         "category": "null|string"
       },
-      "output_required": ["result"],
+      "output_required": [
+        "result"
+      ],
       "read_only": true
     },
     "oda_map_country_context": {
-      "allowed_required_inputs": ["country"],
-      "input_true_allowed": ["include_coordinates"],
+      "allowed_required_inputs": [
+        "country"
+      ],
+      "input_true_allowed": [
+        "include_coordinates"
+      ],
       "input_properties": {
         "as_of": "string",
         "country": "string",
@@ -222,7 +231,10 @@
         "sample_limit": "integer",
         "sections": "array"
       },
-      "output_required": ["data", "summary"],
+      "output_required": [
+        "data",
+        "summary"
+      ],
       "requires_coordinate_output": true,
       "read_only": true
     },
@@ -231,25 +243,39 @@
       "input_properties": {
         "country": "string"
       },
-      "output_required": ["data", "summary"],
+      "output_required": [
+        "data",
+        "summary"
+      ],
       "read_only": true
     },
     "oda_map_project_detail": {
-      "allowed_required_inputs": ["project_id"],
-      "input_true_allowed": ["include_coordinates"],
+      "allowed_required_inputs": [
+        "project_id"
+      ],
+      "input_true_allowed": [
+        "include_coordinates"
+      ],
       "input_properties": {
         "as_of": "string",
         "country": "string",
         "include_coordinates": "boolean",
         "project_id": "string"
       },
-      "output_required": ["data", "summary"],
+      "output_required": [
+        "data",
+        "summary"
+      ],
       "requires_coordinate_output": true,
       "read_only": true
     },
     "oda_map_projects": {
-      "allowed_required_inputs": ["country"],
-      "input_true_allowed": ["include_coordinates"],
+      "allowed_required_inputs": [
+        "country"
+      ],
+      "input_true_allowed": [
+        "include_coordinates"
+      ],
       "input_properties": {
         "agency": "string",
         "as_of": "string",
@@ -263,12 +289,65 @@
         "sector": "string",
         "status": "string"
       },
-      "output_required": ["data", "summary"],
+      "output_required": [
+        "data",
+        "summary"
+      ],
       "requires_coordinate_output": true,
       "read_only": true
     },
+    "procurement_country_context": {
+      "allowed_required_inputs": [
+        "country"
+      ],
+      "input_properties": {
+        "country": "string"
+      },
+      "output_required": [
+        "caveats",
+        "country",
+        "dataset",
+        "models",
+        "status"
+      ],
+      "read_only": true
+    },
+    "procurement_model_detail": {
+      "allowed_required_inputs": [
+        "axis",
+        "country"
+      ],
+      "input_properties": {
+        "axis": "string",
+        "country": "string"
+      },
+      "output_required": [
+        "axis",
+        "caveats",
+        "country",
+        "dataset",
+        "status"
+      ],
+      "read_only": true
+    },
+    "procurement_model_status": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "country": "string"
+      },
+      "output_required": [
+        "axes",
+        "caveats",
+        "dataset",
+        "status"
+      ],
+      "read_only": true
+    },
     "search_development_trends": {
-      "allowed_required_inputs": ["office", "query"],
+      "allowed_required_inputs": [
+        "office",
+        "query"
+      ],
       "input_properties": {
         "country": "string",
         "kinds": "array",
@@ -289,7 +368,9 @@
       "read_only": true
     },
     "search_regulation": {
-      "allowed_required_inputs": ["query"],
+      "allowed_required_inputs": [
+        "query"
+      ],
       "input_properties": {
         "category": "null|string",
         "fuzzy": "boolean",
@@ -298,15 +379,21 @@
         "query": "string",
         "source": "null|string"
       },
-      "output_required": ["result"],
+      "output_required": [
+        "result"
+      ],
       "read_only": true
     },
     "verify_citation": {
-      "allowed_required_inputs": ["text"],
+      "allowed_required_inputs": [
+        "text"
+      ],
       "input_properties": {
         "text": "string"
       },
-      "output_required": ["result"],
+      "output_required": [
+        "result"
+      ],
       "read_only": true
     }
   }

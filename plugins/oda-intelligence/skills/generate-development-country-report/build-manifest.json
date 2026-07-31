@@ -6,9 +6,10 @@
     "assets/country-report-template.md",
     "references/data-source-routing.md",
     "references/docx-generation.md",
+    "references/procurement-model-integration.md",
     "references/report-standard.md",
     "scripts/validate-report.mjs"
   ],
-  "excluded_count": 4,
-  "source_skill_bytes": 18033
+  "excluded_count": 3,
+  "source_skill_bytes": 17734
 }

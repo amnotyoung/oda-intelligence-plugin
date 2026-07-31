@@ -8,7 +8,7 @@
 한 개에 연결합니다.
 
 ```text
-https://oda-mcp.fly.dev/oda-intelligence/v1/mcp
+https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
 
 게이트웨이는 국제원조 및 국가 현황, 한국 ODA 사업, 개발협력 문서, KOICA 규정
@@ -17,7 +17,7 @@ https://oda-mcp.fly.dev/oda-intelligence/v1/mcp
 
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-18개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
+21개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
 `koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
 `koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
 작동합니다.
@@ -37,7 +37,7 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 
 - Skill 두 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 18개
+- 해당 커넥터가 제공하는 읽기 전용 도구 21개
 
 Skill 두 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,

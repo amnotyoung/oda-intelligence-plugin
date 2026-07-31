@@ -112,7 +112,16 @@ Use these subsections:
 - 파트너 실사
 - 조달·계약 통제
 
+When supported country models exist, place two simplified process visuals in this section:
+
+1. Under `현실적인 참여경로`, show the ODA project-formation route across recipient institutions, grant/loan coordination, the development partner, and Korean review or approval stages.
+2. Under `조달·계약 통제`, show the procurement-governance route across funding-source classification, responsible procurement authority, contracting entity, donor rules, and oversight.
+
+Use the model page as a design and synthesis source, but rebuild only the decision-relevant relationships. Do not paste a full-page screenshot. Cite the model beside the visual and cite the underlying official or primary sources beside material claims. Mark provisional law, unverified internal procedures, and unresolved field details explicitly.
+
 Visualize a participation or procurement route only when official sources support the specific handoffs being drawn, and apply the visualization utility gate. When the sources support the rule but not the sequence, keep prose or a compact table.
+
+Do not add a bidding-process diagram by default. Use a compact table or prose for thresholds, required documents, and other simple comparisons unless a branching path cannot be understood readily without a visual.
 
 ### 7. 주요 위험과 Go/No-Go 조건
 

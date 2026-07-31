@@ -5,7 +5,7 @@ import test from "node:test";
 
 const root = resolve(import.meta.dirname, "..");
 const pluginRoot = resolve(root, "plugins", "oda-intelligence");
-const gatewayUrl = "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp";
+const gatewayUrl = "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp";
 const expectedPublicFiles = [
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json",
@@ -33,6 +33,7 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/generate-development-country-report/build-manifest.json",
   "plugins/oda-intelligence/skills/generate-development-country-report/references/data-source-routing.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/references/docx-generation.md",
+  "plugins/oda-intelligence/skills/generate-development-country-report/references/procurement-model-integration.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/references/report-standard.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate-report.mjs",
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
@@ -223,9 +224,9 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 18 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 21 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 18);
+  assert.equal(Object.keys(contract.tools).length, 21);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   assert.deepEqual(
@@ -241,13 +242,13 @@ test("minimal accepted gateway contract contains 18 approved read-only tools", a
   );
 });
 
-test("observed lock pins exactly the 18 approved tool definitions", async () => {
+test("observed lock pins exactly the 21 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 18);
+  assert.equal(lock.gateway.tool_count, 21);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

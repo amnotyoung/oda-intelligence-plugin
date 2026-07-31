@@ -8,6 +8,6 @@ dependencies:
       value: "oda-intelligence"
       description: "Read-only gateway for international aid, Korean projects, development documents, and KOICA regulations"
       transport: "streamable_http"
-      url: "https://oda-mcp.fly.dev/oda-intelligence/v1/mcp"
+      url: "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
 policy:
   allow_implicit_invocation: true
