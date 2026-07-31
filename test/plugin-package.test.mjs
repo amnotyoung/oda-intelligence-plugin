@@ -11,6 +11,7 @@ const expectedPublicFiles = [
   ".claude-plugin/marketplace.json",
   ".github/workflows/ci.yml",
   ".github/workflows/update-gateway-contract.yml",
+  ".github/workflows/sync-public-skill.yml",
   ".gitignore",
   "LICENSE",
   "PRIVACY.md",
@@ -29,14 +30,18 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/generate-development-country-report/SKILL.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/agents/openai.yaml",
   "plugins/oda-intelligence/skills/generate-development-country-report/assets/country-report-template.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/citation-policy.md",
+  "plugins/oda-intelligence/skills/generate-development-country-report/build-manifest.json",
+  "plugins/oda-intelligence/skills/generate-development-country-report/references/data-source-routing.md",
+  "plugins/oda-intelligence/skills/generate-development-country-report/references/docx-generation.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/references/report-standard.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/source-routing.md",
+  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate-report.mjs",
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
   "plugins/oda-intelligence/skills/koica-regulation-research/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/references/research-protocol.md",
+  "contracts/public-skill.lock.json",
   "scripts/bump-plugin-version.mjs",
   "scripts/check-gateway-contract.mjs",
+  "scripts/sync-public-skill.mjs",
   "scripts/check-plugin-version.mjs",
   "test/gateway-contract.test.mjs",
   "test/plugin-package.test.mjs",
@@ -161,6 +166,38 @@ test("ChatGPT compatibility maps the registered gateway app without a secret", a
 test("public repository contains exactly the reviewed file allowlist", async () => {
   const files = await listFiles(root);
   assert.deepEqual(files.toSorted(), expectedPublicFiles.toSorted());
+});
+
+// URL 검사만으로는 부족하다. `vendor/koica-project-map`이나 `oda-mcp` 같은 맨
+// 이름은 github.com URL이 아니어서 그대로 통과한다. SECURITY.md의 저장소 경계
+// 조항이 배제하는 것은 URL이 아니라 비공개 저장소의 이름 자체다.
+const forbiddenNames = [
+  "overseas-procurement-100",
+  "koica-project-map",
+  "country-report-skill",
+  "oda-map-lab",
+  "devcoop-kg",
+  "amnotyoung/oda-mcp",
+  "io-mcp",
+  ".dependency-source",
+  "dependency-locks",
+];
+
+// 상류에서 동기화되는 스킬 본문과 계약 파일이 대상이다. README는 네 백엔드
+// 식별자를 의도적으로 설명하고 있어 이 검사와 별개로 다룬다.
+test("synced skill text contains no non-public repository or internal path name", async () => {
+  const files = (await listFiles(root)).filter(
+    (file) => file.startsWith("plugins/") || file.startsWith("contracts/"),
+  );
+  for (const file of files) {
+    const text = await readFile(resolve(root, file), "utf8");
+    for (const name of forbiddenNames) {
+      assert.ok(
+        !text.includes(name),
+        `${file} names a non-public asset: ${name}`,
+      );
+    }
+  }
 });
 
 test("public text contains no local path or unrelated owner repository URL", async () => {

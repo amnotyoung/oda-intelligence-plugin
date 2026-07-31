@@ -1,0 +1,14 @@
+{
+  "generated_from": "skills/generate-development-country-report",
+  "files": [
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/country-report-template.md",
+    "references/data-source-routing.md",
+    "references/docx-generation.md",
+    "references/report-standard.md",
+    "scripts/validate-report.mjs"
+  ],
+  "excluded_count": 4,
+  "source_skill_bytes": 17974
+}
