@@ -74,6 +74,8 @@ For section 6, call `procurement_model_status` first, then retrieve the axes the
 | `disabled` | Source is not configured or available | `판단 불충분`; seek an official substitute |
 | `error` | Retrieval failed | Use dated fallback if valid; otherwise `판단 불충분` |
 
+`PUBLIC_RESPONSE_BLOCKED` is not a status in that table. It means the gateway withheld one response, and it says nothing about whether the evidence exists — the source status for the same country is often `fresh`. Narrow the request (fewer sections, smaller sample, a different tool covering the same field) before recording anything as `판단 불충분`, and record only the fields still missing after that. When the source status is `fresh` and a response stays blocked, tell the reader it is a gateway limitation rather than a data gap.
+
 ## Section-level sufficiency gate
 
 Do not use the overall source status as the report decision. Save this gate in technical evidence before drafting:
