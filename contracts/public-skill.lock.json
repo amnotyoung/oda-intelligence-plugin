@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "source_ref": "main",
-  "source_sha": "738609a22f1377291364d6e353cf502660d4f499",
+  "source_sha": "e8884d43f7f9ebbd659883c892cba09f3984f20b",
   "build_script": "scripts/build-public-skill.mjs",
   "files": 7,
-  "fingerprint": "256b234ee67fcea6f9cab7916a9a977249cbf1c486d814d59b5f369d95ba82af"
+  "fingerprint": "ef518a176b1e4b77d364995cc42ac93bd3f00d67be38c7ed5299cb6dea490969"
 }

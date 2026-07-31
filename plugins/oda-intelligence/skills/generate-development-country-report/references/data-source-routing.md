@@ -36,6 +36,7 @@
 | Activity discovery | IATI | Counts are records, not unique projects |
 | Korean portfolio | ODA Map Lab | Deduplicate by activity ID; inspect project details |
 | Korean project documents | Development-cooperation document corpus | Cite the exact title and direct original URL when present; keep internal IDs in the technical snapshot |
+| Procurement route when no country model is available | National procurement law and portal, financing agreements, donor procurement rules | Verify only what the sources support; separate confirmed law from unresolved institutional handoffs; a missing model is not evidence that no formal process exists |
 | Disaster signals | USGS, GDACS, NASA EONET | Deduplicate comparable events; a bounding-box hit is not a site risk rating |
 
 ## Tool sequence
