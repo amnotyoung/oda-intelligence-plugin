@@ -135,6 +135,30 @@
       ],
       "read_only": true
     },
+    "country_travel_alert": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "countryCode": "string",
+        "refresh": "boolean"
+      },
+      "output_required": [
+        "alert_signal",
+        "alerts",
+        "caveats",
+        "country",
+        "data_status",
+        "generated_at",
+        "highest_alarm_label",
+        "highest_alarm_level",
+        "methodology_version",
+        "missing_is_zero",
+        "record_count",
+        "risk_judgement",
+        "risk_score",
+        "source_status"
+      ],
+      "read_only": true
+    },
     "find_references": {
       "allowed_required_inputs": [
         "article",

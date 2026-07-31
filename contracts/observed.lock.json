@@ -2,7 +2,7 @@
   "gateway": {
     "instructions_sha256": "c2d8593c2ca3ff1f63d5c1705461cdb4d74478ef873d2ebc1aa88284d43d059a",
     "server_name": "oda-intelligence",
-    "tool_count": 22,
+    "tool_count": 23,
     "tools": {
       "country_data_status": "b2bfef6ef463cfbf3caeb964a5b5806d590f8583601dfe0e37175154a02e0e1b",
       "country_hazard_snapshot": "6d2f77e5db16824fdcbf423c2a4cb5783a4320939adabf175e8815d6770d467c",
@@ -10,6 +10,7 @@
       "country_list": "08572a061dd3e66fa1e1b619bf7bca8a90f190777ed2289059c3e2c6d5e1bc5e",
       "country_map_outline": "d2524188225b838c8c4b489c5a9d0534fe09de80da00f17d4099968d641fd170",
       "country_report_context": "0a48fb4a9140fe14116f08a4422c0be6e3be92ffe88fb639a69bb8964b66cbad",
+      "country_travel_alert": "2e98df3eaacc3063c03fcd190d641940f6938ac54bada0554ed4e1cd74773ffd",
       "find_references": "712be7cb9afdab93594ba1817090187d602fb9a3f8bf831086234ce195f56ed3",
       "iati_query_country": "453a570e83e0ed5bf2d78146937b864d254cf5a37c75c51a6ace1505050f0acf",
       "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
