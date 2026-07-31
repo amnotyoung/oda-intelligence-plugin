@@ -112,7 +112,7 @@ Use these subsections:
 - 파트너 실사
 - 조달·계약 통제
 
-Do not add a bidding-process diagram by default. Use a compact table or prose for thresholds, required documents, and other simple comparisons unless a branching path cannot be understood readily without a visual.
+Visualize a participation or procurement route only when official sources support the specific handoffs being drawn, and apply the visualization utility gate. When the sources support the rule but not the sequence, keep prose or a compact table.
 
 ### 7. 주요 위험과 Go/No-Go 조건
 
