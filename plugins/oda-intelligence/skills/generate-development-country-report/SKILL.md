@@ -100,6 +100,14 @@ When ODA Map tools are available, call them in this order:
 
 Deduplicate repeated map locations by stable activity identifier. Do not aggregate a budget whose currency is missing or conflicting. Do not treat country fallback points or geocoded city centroids as project sites.
 
+A blocked call is not an absent portfolio. When `oda_map_country_context` returns `PUBLIC_RESPONSE_BLOCKED`, the gateway refused one response; it did not report that the country has no Korean projects. Narrow the request before concluding anything:
+
+1. Retry section by section — `portfolio`, `agencies`, `sectors`, `map_layers`, `locations`, `samples`, `source_status` — because the block usually comes from one section, not the tool.
+2. Recover a blocked `portfolio` from `oda_map_projects`: the per-status `total` for `active`, `planned`, `unknown`, and `ended` reconstructs the status counts and their sum is the unique-project count.
+3. Record only the fields still missing after those attempts as `판단 불충분`, and name them. Do not mark the whole Korean portfolio section insufficient because the first call failed.
+
+If `oda_map_data_status` reports `fresh` while a context section stays blocked, say so: the evidence exists and the public gateway withheld this response. That is a gateway limitation, not a data gap, and the distinction changes what a reader should do next.
+
 Use development-cooperation document search for project and institutional evidence. For every adopted document, cite:
 
 - exact title
