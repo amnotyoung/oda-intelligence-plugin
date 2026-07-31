@@ -10,7 +10,7 @@
       "name": "oda-intelligence",
       "source": "./plugins/oda-intelligence",
       "description": "Evidence-based development cooperation research using one public, read-only MCP gateway.",
-      "version": "0.2.4"
+      "version": "0.2.5"
     }
   ]
 }

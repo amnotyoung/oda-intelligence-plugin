@@ -41,6 +41,9 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
   "plugins/oda-intelligence/skills/koica-regulation-research/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/references/research-protocol.md",
+  "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/SKILL.md",
+  "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/agents/openai.yaml",
+  "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/references/portfolio-lookup-protocol.md",
   "contracts/public-skill.lock.json",
   "scripts/bump-plugin-version.mjs",
   "scripts/check-gateway-contract.mjs",
@@ -105,7 +108,7 @@ test("Claude and Codex manifests point only to the public plugin repository", as
   assert.equal(marketplace.plugins[0].version, codex.version);
 });
 
-test("plugin and both Skills depend on one credential-free gateway", async () => {
+test("plugin and every Skill depend on one credential-free gateway", async () => {
   const claude = await readJson(
     "plugins",
     "oda-intelligence",
@@ -137,6 +140,7 @@ test("plugin and both Skills depend on one credential-free gateway", async () =>
   for (const relative of [
     "skills/generate-development-country-report/agents/openai.yaml",
     "skills/koica-regulation-research/agents/openai.yaml",
+    "skills/korean-oda-portfolio-lookup/agents/openai.yaml",
   ]) {
     const text = await readFile(resolve(pluginRoot, relative), "utf8");
     assert.equal((text.match(/type: "mcp"/g) ?? []).length, 1);

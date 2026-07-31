@@ -5,7 +5,7 @@
 Public Claude, Codex, and ChatGPT packaging for evidence-based development
 cooperation research.
 
-The plugin installs two Skills and connects exactly one public, read-only MCP
+The plugin installs three Skills and connects exactly one public, read-only MCP
 gateway:
 
 ```text
@@ -35,11 +35,11 @@ After a marketplace sync or plugin update, start a new Claude conversation.
 Existing conversations can retain the tool snapshot they had when they were
 created. In the plugin details, the expected installed components are:
 
-- two Skills;
+- three Skills;
 - one connector named `oda-intelligence`;
 - 22 read-only tools supplied by that connector.
 
-If only the two Skills appear, sync the marketplace, update or reinstall the
+If only the three Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
 backend on their own; they require the bundled connector.
 
@@ -66,7 +66,7 @@ MCP configuration.
 
 ## ChatGPT
 
-The complete plugin combines the two bundled Skills with the registered
+The complete plugin combines the three bundled Skills with the registered
 `ODA Intelligence` MCP app. The committed `.app.json` contains the app's
 technical identifier, not a credential or authentication token.
 

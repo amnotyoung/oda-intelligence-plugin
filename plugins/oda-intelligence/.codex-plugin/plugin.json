@@ -1,6 +1,6 @@
 {
   "name": "oda-intelligence",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Evidence-based development cooperation research across international aid, Korean projects, development documents, and KOICA regulations.",
   "author": {
     "name": "amnotyoung",
@@ -31,6 +31,7 @@
     ],
     "defaultPrompt": [
       "Prepare an evidence-based development cooperation country report.",
+      "List the Korean and KOICA projects running in a country.",
       "Compare Korean ODA projects with international aid evidence.",
       "Find and verify the KOICA regulation governing a procedure."
     ],
