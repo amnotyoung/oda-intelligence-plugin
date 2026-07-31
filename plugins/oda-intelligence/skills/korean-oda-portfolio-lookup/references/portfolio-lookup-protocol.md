@@ -1,0 +1,85 @@
+# Portfolio lookup protocol
+
+## Source boundary
+
+| Question | Source | Tool |
+|---|---|---|
+| What Korean agencies fund and implement in a country | ODA Map | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` |
+| Comparable country-level ODA totals across donors | OECD DAC2A behind international data | `country_report_context` |
+| Multi-donor activity discovery | IATI | `iati_query_country` |
+| Responsible KOICA office and jurisdiction role | Development documents | `country_list` |
+| KOICA internal rules governing a procedure | Regulation index | `koica-regulation-research` Skill |
+
+The ODA Map row is the only row that answers a Korean project-inventory question. The other rows
+cannot confirm or deny a Korean project.
+
+## The absence trap
+
+This is the failure this protocol exists to prevent:
+
+1. A user asks what KOICA does in a country.
+2. The assistant queries international context and IATI.
+3. Neither returns Korean agency projects, because neither carries them.
+4. The assistant reports that the gateway holds no KOICA project information.
+
+Step 4 is wrong even when steps 1 to 3 are executed correctly. Korea publishes to IATI only
+partially, so an IATI miss measures IATI coverage. The correct move at step 3 is to call
+`oda_map_data_status` for the country and route to the ODA Map tools.
+
+Before writing that Korean or KOICA project evidence is unavailable, confirm all three:
+
+- `oda_map_data_status` was called for this country and its `status` is `no_data`, `disabled`, or
+  `error`.
+- The country name was passed as the source expects — the Korean or English official name — and the
+  response did not resolve to a different canonical country.
+- The statement names the ODA Map source and its status, rather than claiming the country has no
+  Korean projects.
+
+## Status semantics
+
+| Status | Meaning | Answer treatment |
+|---|---|---|
+| `fresh` | Within the freshness window | Use with the observation time |
+| `stale` | Valid but older than the window | Use with the observation date and the limitation stated |
+| `no_data` | Query succeeded, evidence absent | `판단 불충분`; never zero |
+| `disabled` | Source not configured | `판단 불충분`; say the source is unavailable |
+| `error` | Retrieval failed | `판단 불충분` unless a dated fallback with clear provenance exists |
+
+`PUBLIC_RESPONSE_BLOCKED` is not a row in that table. It says the gateway withheld one response and
+says nothing about whether the evidence exists — the source status for the same country is often
+`fresh`. Narrow the request before recording anything as `판단 불충분`: fewer sections, a smaller
+sample, or a different tool covering the same field. Record only the fields still missing after
+that, and tell the reader it is a gateway limitation rather than a data gap.
+
+`observed_at` on the ODA Map source is the map asset build time, not the observation time of each
+underlying project record. Say so when the age of an individual project matters.
+
+## Filtering and paging
+
+- `agency` matches the agency label the source returns, such as `한국국제협력단(KOICA)`. Confirm the
+  label from the `agencies` section of `oda_map_country_context` before filtering, and prefer the
+  `koica_project_count` field over a hand-rolled count. The labels are not normalised: one country
+  carries `산업통상자원부` and `산업통상부` as separate entries, so filtering on one variant silently
+  drops the other. The same holds for Korean and English sector labels.
+- `status` accepts `active`, `ended`, `planned`, and `unknown`. Requesting one status narrows the
+  answer; it does not make the others zero.
+- `layers` selects map layers and is a different axis from recomputed status. Do not present a layer
+  count as a status count.
+- The public profile caps `limit` on `oda_map_projects` and `sample_limit` on
+  `oda_map_country_context` at different values; read each tool's schema rather than assuming one
+  cap. When `has_more` is true, either page through with `offset` or say explicitly that the list is
+  a sample of a stated total.
+- `fields` controls the returned shape. Request `locations` with `include_coordinates` only when the
+  answer needs geography, and carry the `coordinate_provenance` and `coordinate_scope` caveats with
+  any location claim.
+
+## What not to infer
+
+- Do not infer a budget figure, a currency, or a total spend from the map dataset.
+- Do not infer that an `active` project has an approved current-year budget, a solicitation, or a
+  contract.
+- Do not infer sector priority from a sector count alone; the counts include activities of very
+  different size and duration.
+- Do not infer an entry opportunity, an open procurement, or a partner relationship from the
+  presence of a project.
+- Do not merge ODA Map project counts with IATI activity counts into one number.
