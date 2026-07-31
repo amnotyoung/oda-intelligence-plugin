@@ -30,6 +30,7 @@ Use the validated Markdown report as the content source for DOCX generation unle
 Read [references/report-standard.md](references/report-standard.md) before drafting.
 Read [references/data-source-routing.md](references/data-source-routing.md) before collecting data.
 Read [references/procurement-model-integration.md](references/procurement-model-integration.md) before writing section 6.
+Read [references/chart-rendering.md](references/chart-rendering.md) before producing any chart image.
 Read [references/docx-generation.md](references/docx-generation.md) before creating or revising a DOCX.
 Start from [assets/country-report-template.md](assets/country-report-template.md) when creating a new report.
 
@@ -190,7 +191,9 @@ Include at least two decision-useful visualizations when the supporting data all
 - When a visual merely repeats the conclusion of adjacent text or a table, keep the clearer text or table and omit the visual.
 - Use Mermaid for portable Markdown, or an embedded SVG/PNG with descriptive alt text when the target renderer does not support Mermaid.
 - Put the source, unit, observation period, and population covered beside each visualization.
-- Keep exact values in an adjacent table or concise text fallback.
+- Render every chart image through `assets/render-chart.py` as described in [references/chart-rendering.md](references/chart-rendering.md). Do not draw a chart with an ad-hoc plotting call; the validator rejects an image without the renderer's sidecar.
+- Give every series one carrier. A chart labels every bar or point with its value and the adjacent prose states only the top three items, the trend, or the turning point; when the reader needs every exact value, use a table alone and omit the chart. Never publish a chart and a prose restatement of the same series.
+- Write a `<image>.meta.json` sidecar for every map and diagram image as well, declaring `kind` and the evidence fields.
 - Do not visualize mixed observation periods as one contemporaneous comparison.
 - Do not add decorative images that do not carry evidence.
 - Hyperlink the public source at the first claim derived from an interactive map. If a stable country deep link is unavailable, link the map and state the country filter to apply.
@@ -244,6 +247,8 @@ Then verify:
 
 - every quantitative value has a source, unit, and observation year
 - every visualization has an adjacent evidence caption with its source, unit, observation period or reference date, and coverage
+- every chart was rendered through `assets/render-chart.py`, and its category labels, axis titles, and value labels are legible and unclipped in the final image
+- no chart is accompanied by a prose restatement of the same series
 - the first substantive section is the standard country profile
 - source dates are not visually presented as one common date
 - adopted development-cooperation documents include the exact title and available original URL, without internal IDs

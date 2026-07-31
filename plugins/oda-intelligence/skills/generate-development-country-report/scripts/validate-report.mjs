@@ -177,6 +177,14 @@ for (const [index, visualization] of visualizations.entries()) {
 const localImages = [
   ...report.matchAll(/!\[([^\]]+)\]\((?!https?:\/\/|data:)([^)]+)\)/gu),
 ];
+
+// Every image declares what it is and what it rests on. A chart must also name
+// the deterministic renderer: a hand-drawn chart passes every prose check while
+// its Korean labels collide, so the only reliable gate is the sidecar the
+// renderer writes.
+const VISUAL_KINDS = new Set(["chart", "map", "diagram"]);
+const CHART_RENDERER = "render-chart.py";
+
 for (const match of localImages) {
   const relativePath = match[2].replace(/^<|>$/gu, "");
   const imagePath = resolve(dirname(reportPath), decodeURIComponent(relativePath));
@@ -184,6 +192,47 @@ for (const match of localImages) {
     await access(imagePath);
   } catch {
     errors.push(`Reader-facing report references a missing image: ${relativePath}`);
+    continue;
+  }
+
+  const sidecarPath = `${imagePath}.meta.json`;
+  let sidecar;
+  try {
+    sidecar = JSON.parse(await readFile(sidecarPath, "utf8"));
+  } catch {
+    errors.push(
+      `Image ${relativePath} has no readable ${relativePath}.meta.json sidecar declaring its kind and evidence.`,
+    );
+    continue;
+  }
+
+  if (sidecar?.schema_version !== 1 || !VISUAL_KINDS.has(sidecar?.kind)) {
+    errors.push(
+      `Image sidecar for ${relativePath} must use schema_version 1 and kind chart, map, or diagram.`,
+    );
+    continue;
+  }
+
+  const missing = ["source", "unit", "period", "coverage"].filter(
+    (field) => String(sidecar[field] ?? "").trim() === "",
+  );
+  if (missing.length > 0) {
+    errors.push(
+      `Image sidecar for ${relativePath} is missing ${missing.join(", ")}.`,
+    );
+  }
+
+  if (sidecar.kind === "chart") {
+    if (sidecar.renderer !== CHART_RENDERER) {
+      errors.push(
+        `Chart ${relativePath} was not produced by ${CHART_RENDERER}; render it through the chart script instead of drawing it by hand.`,
+      );
+    }
+    if (!/^[a-f0-9]{64}$/u.test(String(sidecar.spec_sha256 ?? ""))) {
+      errors.push(
+        `Chart ${relativePath} has no chart-spec digest, so its rendered layout cannot be reproduced.`,
+      );
+    }
   }
 }
 
