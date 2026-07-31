@@ -17,7 +17,7 @@ context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
 The four data domains are not installed as four separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose 21 read-only tools
+Claude should show one `oda-intelligence` connector whose 22 read-only tools
 route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
 Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
 legacy/direct connections and are independent of this plugin.
@@ -37,7 +37,7 @@ created. In the plugin details, the expected installed components are:
 
 - two Skills;
 - one connector named `oda-intelligence`;
-- 21 read-only tools supplied by that connector.
+- 22 read-only tools supplied by that connector.
 
 If only the two Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden

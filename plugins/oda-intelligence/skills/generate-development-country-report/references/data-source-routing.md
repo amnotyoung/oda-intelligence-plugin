@@ -40,6 +40,7 @@
 | Procurement governance and oversight | `procurement_model_detail` with `axis: "governance"` | Distinguish domestic and external funding routes, responsible authorities, contracting bodies, and oversight; retain provisional or unresolved legal details |
 | Bidding system | `procurement_model_detail` with `axis: "bidding"` | Covers advertisement, submission, evaluation, and award; belongs in section 6.3 after governance and is normally prose or a table rather than a diagram |
 | Procurement route when no country model is available | National procurement law and portal, financing agreements, donor procurement rules | Verify only what the sources support; separate confirmed law from unresolved institutional handoffs; a missing model is not evidence that no formal process exists |
+| Sketch map background | `country_map_outline` | Simplified outer rings for a report figure; scale to the returned bounds and never use them for area, distance, or boundary judgements |
 | Disaster signals | USGS, GDACS, NASA EONET | Deduplicate comparable events; a bounding-box hit is not a site risk rating |
 
 ## Tool sequence

@@ -172,9 +172,16 @@ test("public repository contains exactly the reviewed file allowlist", async () 
 // URL 검사만으로는 부족하다. `vendor/koica-project-map`이나 `oda-mcp` 같은 맨
 // 이름은 github.com URL이 아니어서 그대로 통과한다. SECURITY.md의 저장소 경계
 // 조항이 배제하는 것은 URL이 아니라 비공개 저장소의 이름 자체다.
+// 공개 저장소만 링크할 수 있다. 사용자가 직접 설치해야 하는 것은 이름을 밝혀야
+// 하지만, 비공개 저장소는 그 존재조차 드러내지 않는다.
+const allowedRepositoryPaths = new Set([
+  "/amnotyoung",
+  "/amnotyoung/oda-intelligence-plugin",
+  "/amnotyoung/koica-project-map",
+]);
+
 const forbiddenNames = [
   "overseas-procurement-100",
-  "koica-project-map",
   "country-report-skill",
   "oda-map-lab",
   "devcoop-kg",
@@ -216,17 +223,16 @@ test("public text contains no local path or unrelated owner repository URL", asy
     )) {
       const url = new URL(match[0]);
       assert.ok(
-        url.pathname === "/amnotyoung" ||
-          url.pathname === "/amnotyoung/oda-intelligence-plugin",
+        allowedRepositoryPaths.has(url.pathname),
         `unrelated owner repository URL in ${file}`,
       );
     }
   }
 });
 
-test("minimal accepted gateway contract contains 21 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 22 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 21);
+  assert.equal(Object.keys(contract.tools).length, 22);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   assert.deepEqual(
@@ -242,13 +248,13 @@ test("minimal accepted gateway contract contains 21 approved read-only tools", a
   );
 });
 
-test("observed lock pins exactly the 21 approved tool definitions", async () => {
+test("observed lock pins exactly the 22 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 21);
+  assert.equal(lock.gateway.tool_count, 22);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

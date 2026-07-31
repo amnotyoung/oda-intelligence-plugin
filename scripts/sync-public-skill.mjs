@@ -28,7 +28,6 @@ const BUILD_OUTPUT = "dist/public-skill";
 // 공개인 이상 받는 쪽에서도 확인한다. 한쪽 검사만 믿지 않는다.
 const FORBIDDEN = [
   "overseas-procurement-100",
-  "koica-project-map",
   "country-report-skill",
   "oda-map-lab",
   "devcoop-kg",

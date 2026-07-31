@@ -2,12 +2,13 @@
   "gateway": {
     "instructions_sha256": "c2d8593c2ca3ff1f63d5c1705461cdb4d74478ef873d2ebc1aa88284d43d059a",
     "server_name": "oda-intelligence",
-    "tool_count": 21,
+    "tool_count": 22,
     "tools": {
       "country_data_status": "6c0653c6317e6b7bfd2e51cbbdd65a08ecc37649eaef55ba68053fa46cc8868a",
       "country_hazard_snapshot": "85e615ba7e325b91583131c88259fde822cd8d83ab06fbf02be130a969f9d2dc",
       "country_humanitarian_context": "65e55d8d8c3e7adf60069500190af49a7fd109826b251a4e8c18ccbe2285a122",
       "country_list": "08572a061dd3e66fa1e1b619bf7bca8a90f190777ed2289059c3e2c6d5e1bc5e",
+      "country_map_outline": "d2524188225b838c8c4b489c5a9d0534fe09de80da00f17d4099968d641fd170",
       "country_report_context": "e7947d5c3d38bd592ee62c58a30a29a85416074baac7bdce34d429463fdd60cd",
       "find_references": "dd6d94fd3e9e8a98f461036aded5e44a949a921d9dfe60cf3a80f907ef85784f",
       "iati_query_country": "88fe3d28552b2d709ba85d6dd43e1e330a9a513fcf9b9b05870d32f220a82ae4",

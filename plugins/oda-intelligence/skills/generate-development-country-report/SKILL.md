@@ -116,7 +116,31 @@ Before including a project map, test every period-active KOICA project for coord
 - If no project has an eligible location, omit the map and report `0/<active denominator>` with the exclusion reasons.
 - If eligible locations exist, apply the visualization utility gate before rendering. Render only locations supported by a source-reported project location, the project title, a verified official document, or human verification.
 
-When no map renderer is available, omit the map and state the mapped numerator, active-project denominator, reference date, and limitations in prose or a table. Absence of a renderer is not absence of projects.
+When the eligibility and utility gates pass, choose the map by what the workspace can actually run.
+
+**Full renderer.** Use it when the [`koica-project-map`](https://github.com/amnotyoung/koica-project-map)
+skill is installed and its Python environment is available. It draws project cards and leader lines
+over a tile basemap.
+
+- Follow that skill's own instructions for invoking it, and do not fetch a second live project list.
+- Insert the cropped content image beside the exact project table; never attach the renderer's full page canvas.
+- Open the cropped image and confirm that the map frame, markers, leader lines, labels, and project cards are intact while the title block, legend, page number, footer, and unused canvas are absent.
+
+**Sketch map.** Use it when that skill is not installed. Call `country_map_outline` for the country,
+draw an inline SVG, and plot the eligible project locations on it. No renderer, Python, or tile
+service is involved.
+
+- Scale the outline rings to the returned `bounds`; do not reproject or crop them.
+- Distinguish `reported_project_location` points from country-reference and city-display points by
+  shape or colour, and say which is which in the legend.
+- Carry the outline caveat into the figure: simplified coordinates, not a boundary or territorial claim.
+- **State in the report that the sketch map was used because the full renderer skill is not
+  installed, and name the skill.** A reader must be able to tell a deliberate simplification from
+  the finished product.
+
+Either way, state the mapped numerator, active-project denominator, reference date, and limitations.
+When no eligible location exists at all, omit the map entirely — absence of a renderer is not
+absence of projects, and neither is absence of eligible coordinates.
 
 ### 6. Derive priorities and participation routes
 
