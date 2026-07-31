@@ -18,7 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # GITHUB_TOKEN이 만든 PR은 추가 워크플로를 발동시키지 않아 CI가 붙지 않는다.
+      # PAT로 밀고 열어야 pull_request 이벤트가 정상적으로 잡힌다. 시크릿이
+      # 없으면 기본 토큰으로 떨어지되, 그 경우 자동 PR에는 CI가 없다.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          token: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -52,7 +57,7 @@ jobs:
       - name: Create review pull request
         if: steps.contract.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
           BRANCH: ${{ steps.branch.outputs.name }}
         run: |
           if gh pr list --state open --head "$BRANCH" --json number --jq 'length > 0' | grep -q true; then
