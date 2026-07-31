@@ -105,14 +105,14 @@ Use development-cooperation document search for project and institutional eviden
 
 Keep corpus IDs and search identifiers in the technical snapshot only. Never expose them in the reader-facing report. Treat extracted relationships as documentary signals, not independently verified current relationships.
 
-Before invoking a map renderer, test every period-active KOICA project for coordinate eligibility using the same dated ODA Map snapshot:
+Before including a project map, test every period-active KOICA project for coordinate eligibility using the same dated ODA Map snapshot:
 
 - Account for every period-active KOICA project in a technical selection file.
 - Exclude national fallback points, country reference points, and unverified city display points.
 - Evaluate location evidence independently of the map coordinate scope: check source-reported locations, the Korean and English project titles, verified official documents, and human verification before excluding a project. A display point is not location evidence, but a title may still identify an eligible target area.
 - For title-based evidence, record the exact target-area phrase from the title. Do not use a map display label alone, and do not mark a title-based location eligible when the title does not name it.
 - Add English place names and known transliterations as resolver aliases. If one activity names multiple target areas, represent every supported area without distortion or exclude it with that reason.
-- If no project has an eligible location, omit the map, report `0/<active denominator>` and the exclusion reasons, and do not invoke the renderer.
+- If no project has an eligible location, omit the map and report `0/<active denominator>` with the exclusion reasons.
 - If eligible locations exist, apply the visualization utility gate before rendering. Render only locations supported by a source-reported project location, the project title, a verified official document, or human verification.
 
 When no map renderer is available, omit the map and state the mapped numerator, active-project denominator, reference date, and limitations in prose or a table. Absence of a renderer is not absence of projects.
@@ -130,7 +130,7 @@ Describe structural participation routes such as technical services, consortium 
 
 Separate confirmed project or partner evidence from recommendations. Never imply that an existing partnership creates an open opportunity.
 
-When a country model is absent or insufficient, omit the unsupported diagram but continue section 6 from official law, regulations, procurement portals, financing agreements, and donor rules. Present verified funding-source, registration, method, publication, complaint, and oversight rules in prose or a compact table. Mark only the unresolved handoffs or institutional powers as `판단 불충분`.
+Section 6 rests on official law, regulations, procurement portals, financing agreements, and donor rules. Present verified funding-source, registration, method, publication, complaint, and oversight rules in prose or a compact table. Omit any diagram those sources do not support, and mark only the unresolved handoffs or institutional powers as `판단 불충분`.
 
 ### 7. Set Go/No-Go conditions
 
@@ -216,9 +216,7 @@ Then verify:
 - source dates are not visually presented as one common date
 - adopted development-cooperation documents include the exact title and available original URL, without internal IDs
 - at least two evidence-bearing visualizations are present when the data supports them; otherwise a specific `시각화 예외:` note explains the evidence limitation
-- when supported country models exist, section 6.1 contains the ODA project-formation diagram and section 6.3 contains the procurement-governance diagram, with model and underlying-source links
 - claims derived from an interactive map link to that map at the point of use
-- an included project map uses the cropped content PNG and does not contain the renderer's full-page title, legend, footer, or unused canvas
 - an included project map states the mapped numerator, active-project denominator, exclusion count and reasons, period-derived status caveat, and target-area-not-site-coordinate caveat, and is followed by the exact mapped-project table
 - a technical map selection with one or more included projects cannot pass validation when the reader-facing map is absent, and its included/excluded counts match the report
 - unavailable evidence remains `판단 불충분`
