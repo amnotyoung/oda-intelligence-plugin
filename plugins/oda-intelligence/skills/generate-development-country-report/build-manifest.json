@@ -4,6 +4,8 @@
     "SKILL.md",
     "agents/openai.yaml",
     "assets/country-report-template.md",
+    "assets/render-chart.py",
+    "references/chart-rendering.md",
     "references/data-source-routing.md",
     "references/docx-generation.md",
     "references/procurement-model-integration.md",
@@ -11,5 +13,5 @@
     "scripts/validate-report.mjs"
   ],
   "excluded_count": 3,
-  "source_skill_bytes": 18790
+  "source_skill_bytes": 19744
 }

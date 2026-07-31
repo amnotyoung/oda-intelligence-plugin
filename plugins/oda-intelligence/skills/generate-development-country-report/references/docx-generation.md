@@ -45,6 +45,7 @@ Use the document skill's bundled renderer:
 Open every rendered page at original detail. Check:
 
 - no clipped, overlapping, or missing text
+- inside every chart image: category labels that do not overlap, an unclipped axis title, and a visible value on each bar or point
 - uniform font size within each semantic role and table column
 - no continued numbering where bullets are intended
 - wrapped list lines align under their text

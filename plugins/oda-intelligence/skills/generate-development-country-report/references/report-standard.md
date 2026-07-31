@@ -77,9 +77,16 @@ For document-based claims, write the exact document title and link directly to t
 
 Link the public map at the first sentence that reports a map-derived count. If the service has no stable country deep link, tell the reader which country name to search.
 
-Include at least two evidence-bearing visualizations when the data supports them. Useful defaults are portfolio status, implementing-agency composition, aid trends, sector composition, and geographic distribution. Every visual must state its source, unit, observation period, and coverage, and retain exact values in adjacent text or a table.
+Include at least two evidence-bearing visualizations when the data supports them. Useful defaults are portfolio status, implementing-agency composition, aid trends, sector composition, and geographic distribution. Every visual must state its source, unit, observation period, and coverage.
 
-A visualization must materially reduce interpretation effort. Do not chart one or two observations, visualize a small comparison that is already obvious from a compact table or sentence, or duplicate the same conclusion in both a visual and adjacent text. Prefer a visual only when it exposes a distribution, trend, composition, geography, concentration, outlier, or relationship that otherwise takes meaningful effort to infer.
+A visualization must materially reduce interpretation effort. Do not chart one or two observations, or visualize a small comparison that is already obvious from a compact table or sentence. Prefer a visual only when it exposes a distribution, trend, composition, geography, concentration, outlier, or relationship that otherwise takes meaningful effort to infer.
+
+Choose exactly one carrier for a series, and never both:
+
+- **Chart.** The chart carries the full series and every bar or point is labelled with its value. Adjacent prose states only the top three items, the trend, or the turning point the argument depends on. Do not restate the remaining categories in text.
+- **Table.** When the reader needs every exact value — because a later section, a budget, or a Go condition depends on it — use a table alone and omit the chart.
+
+Render charts through [chart-rendering.md](chart-rendering.md).
 
 When a Korean project-location map is available, place it beside the period-active KOICA project table. State how many projects were mapped out of the active-project denominator. Omit projects whose target location cannot be verified, explain the exclusion count, and never plot fallback or reference coordinates as project sites.
 
@@ -162,6 +169,7 @@ List only sources used in the report. Prefer direct document pages over search p
 - Distinguish confirmed facts, source assessments, and recommendations.
 - Use visualizations to clarify material comparisons, not as decoration.
 - Do not combine values from different observation periods into one apparently contemporaneous visual.
+- Do not pair a chart with a prose restatement of the same series; keep the chart with a top-three summary, or the table alone.
 - Use Mermaid for portable Markdown or an embedded SVG/PNG with descriptive alt text.
 - Keep sentences direct and avoid tool or implementation jargon.
 - Translate source-system status labels into plain reader-facing language; preserve the original code or label only in technical evidence unless it is needed for interpretation.
