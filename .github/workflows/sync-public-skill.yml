@@ -47,9 +47,10 @@ jobs:
         run: |
           echo "sha=$(git -C .skill-source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+      # 빌드 스크립트는 자기 파일 위치를 기준으로 경로를 잡으므로 어디서 실행해도
+      # 된다. working-directory를 함께 주면 경로가 겹친다.
       - name: Build the public skill upstream
         run: node .skill-source/scripts/build-public-skill.mjs
-        working-directory: .skill-source
 
       - id: sync
         name: Sync the generated public skill
