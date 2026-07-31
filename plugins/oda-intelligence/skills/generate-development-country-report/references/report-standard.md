@@ -121,6 +121,10 @@ Use the model page as a design and synthesis source, but rebuild only the decisi
 
 Visualize a participation or procurement route only when official sources support the specific handoffs being drawn, and apply the visualization utility gate. When the sources support the rule but not the sequence, keep prose or a compact table.
 
+When a project map is a sketch map rather than the full renderer output, say so beside the figure
+and name the skill that would produce the full version. A reader must be able to tell a deliberate
+simplification from the finished product, in the same way `시각화 예외:` marks an omitted visual.
+
 Do not add a bidding-process diagram by default. Use a compact table or prose for thresholds, required documents, and other simple comparisons unless a branching path cannot be understood readily without a visual.
 
 ### 7. 주요 위험과 Go/No-Go 조건

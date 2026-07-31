@@ -97,6 +97,21 @@
       ],
       "read_only": true
     },
+    "country_map_outline": {
+      "allowed_required_inputs": [
+        "countryCode"
+      ],
+      "input_properties": {
+        "countryCode": "string"
+      },
+      "output_required": [
+        "caveats",
+        "country",
+        "rings",
+        "status"
+      ],
+      "read_only": true
+    },
     "country_report_context": {
       "allowed_required_inputs": [],
       "input_properties": {
