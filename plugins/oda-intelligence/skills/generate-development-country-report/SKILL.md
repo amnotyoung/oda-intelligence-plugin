@@ -29,6 +29,7 @@ Use the validated Markdown report as the content source for DOCX generation unle
 
 Read [references/report-standard.md](references/report-standard.md) before drafting.
 Read [references/data-source-routing.md](references/data-source-routing.md) before collecting data.
+Read [references/procurement-model-integration.md](references/procurement-model-integration.md) before writing section 6.
 Read [references/docx-generation.md](references/docx-generation.md) before creating or revising a DOCX.
 Start from [assets/country-report-template.md](assets/country-report-template.md) when creating a new report.
 
@@ -129,6 +130,13 @@ Select priority sectors using four tests:
 Describe structural participation routes such as technical services, consortium delivery, local implementation, supply, research, and third-party monitoring. Do not list live notices unless the user explicitly asks for procurement opportunities.
 
 Separate confirmed project or partner evidence from recommendations. Never imply that an existing partnership creates an open opportunity.
+
+When supported country models exist, follow [references/procurement-model-integration.md](references/procurement-model-integration.md):
+
+- Put a simplified `ODA 사업 발굴·형성 절차` diagram in section 6.1.
+- Put a simplified `조달 거버넌스·감독체계` diagram in section 6.3.
+- Cover the `입찰제도` model in section 6.3 as well, after the governance material. Governance answers who decides and who reviews; bidding answers how a tender is advertised, submitted, evaluated, and awarded. Present it as prose or a compact table.
+- Do not make the bidding-system model a default third diagram. Add a bidding diagram only when the tender procedure cannot be stated accurately in prose, and never merge it into the governance diagram.
 
 Section 6 rests on official law, regulations, procurement portals, financing agreements, and donor rules. Present verified funding-source, registration, method, publication, complaint, and oversight rules in prose or a compact table. Omit any diagram those sources do not support, and mark only the unresolved handoffs or institutional powers as `판단 불충분`.
 
