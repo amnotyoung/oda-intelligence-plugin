@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "source_ref": "main",
+  "source_sha": "PENDING",
+  "build_script": "scripts/build-public-skill.mjs",
+  "files": 7,
+  "fingerprint": "256b234ee67fcea6f9cab7916a9a977249cbf1c486d814d59b5f369d95ba82af"
+}
