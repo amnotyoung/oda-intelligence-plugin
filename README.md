@@ -113,6 +113,11 @@ when this document falls behind.
 | `development-documents` | `list_available_corpora`, `search_development_trends` | No registered public address |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | Per-model address in the `model_url` response field |
 
+`korean-oda-map` is an independent, unofficial compilation of Korean
+development cooperation locations. It rests on Korean ODA project data, but no
+agency published it and it carries no agency's endorsement. Cite it as an
+unofficial map and name no agency as its publisher.
+
 `country_data_status` reports freshness per source key within
 `international-data`. Attribute the key rather than the domain:
 

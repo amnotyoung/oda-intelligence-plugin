@@ -34,7 +34,7 @@
 | Finalized country-level ODA flows | OECD DAC2A | Use the recipient-country aggregate; state measure, currency, price basis, flow type, unit multiplier, and year |
 | Donor, sector, channel, or activity detail | OECD CRS | Use for disaggregated analysis; do not relabel DAC2A as CRS or reconstruct a country total when DAC2A is available |
 | Activity discovery | IATI | Counts are records, not unique projects |
-| Korean portfolio | ODA Map Lab | Deduplicate by activity ID; inspect project details |
+| Korean portfolio | Unofficial Korean ODA location map | Deduplicate by activity ID; inspect project details; cite it as unofficial and name no agency as its publisher |
 | Korean project documents | Development-cooperation document corpus | Cite the exact title and direct original URL when present; keep internal IDs in the technical snapshot |
 | ODA project-formation route | `procurement_model_detail` with `axis: "pipeline"` | In Korean prose call it `사업 발굴·형성 절차`; inspect `verification` and `unresolved`; verify material claims from the linked primary sources |
 | Procurement governance and oversight | `procurement_model_detail` with `axis: "governance"` | Distinguish domestic and external funding routes, responsible authorities, contracting bodies, and oversight; retain provisional or unresolved legal details |

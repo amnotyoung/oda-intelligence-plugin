@@ -113,6 +113,10 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 | `development-documents` | `list_available_corpora`, `search_development_trends` | 공개 주소 미등록 |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | 응답의 `model_url` 필드에 모델별 주소 |
 
+`korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
+한국 ODA 사업 데이터에 기반하지만 어느 기관도 발행하지 않았고 어느 기관의 보증도
+받지 않았습니다. 비공식 지도로 인용하고, 발행 기관을 지어내지 마세요.
+
 `country_data_status`는 `international-data` 안에서 출처 키별로 최신성을
 보고합니다. 도메인이 아니라 그 키를 출처로 제시합니다.
 
