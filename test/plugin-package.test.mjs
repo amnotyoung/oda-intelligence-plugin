@@ -190,6 +190,9 @@ const allowedRepositoryPaths = new Set([
   "/amnotyoung",
   "/amnotyoung/oda-intelligence-plugin",
   "/amnotyoung/koica-project-map",
+  // README "Related tooling"이 가리키는 동반 프레임워크. 이 게이트웨이를
+  // 선택적 증거원으로 쓰는 소비자이며, 역방향 의존은 없다.
+  "/amnotyoung/dev-eval-agents",
 ]);
 
 const forbiddenNames = [

@@ -397,6 +397,16 @@ licensing, confidentiality, and reuse conditions remain governed by the
 relevant source and operator. Do not treat a public MCP endpoint as proof that
 every returned document is cleared for unrestricted redistribution.
 
+## Related tooling
+
+[DevEval Agents](https://github.com/amnotyoung/dev-eval-agents) — a
+multi-agent OECD-DAC evaluation framework by the same maintainer — uses this
+gateway as an optional evidence source: country context for relevance and
+coherence ratings, the Korean ODA map for duplication checks, and
+`verify_citation` for regulation citations in evaluation reports. The
+integration is one-way and optional; this plugin does not depend on it, and
+its tool surface is unchanged by it.
+
 ## Development
 
 ```bash
