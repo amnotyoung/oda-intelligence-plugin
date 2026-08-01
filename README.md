@@ -284,7 +284,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 25 for `oda_map_projects`, 50 for `search_entity_relationships` |
+| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -292,6 +292,7 @@ enforced by the gateway, not by the client:
 | `refresh` | Ignored — the profile serves server-managed caches |
 | `includeEvents` | At most 200 events; `record_count` still states the true total |
 | `list_attachments` result | Truncated to the response budget; `total` always states the true count and a caveat names the narrower filters |
+| `oda_map_projects` items | Heavy field combinations (all fields + coordinates) truncate to the response budget; `returned` and `has_more` stay coherent for paging and a caveat states the drop. Compact default pages return in full |
 
 ## Controlled updates
 
