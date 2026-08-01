@@ -132,6 +132,14 @@ when this document falls behind.
 | `acled` | https://acleddata.com |
 | `mofa_travel_alert` | https://www.0404.go.kr |
 
+Two tools sit in `international-data` without a source key. `country_list`
+returns office jurisdiction drawn from the development-document index, so
+attribute it to that index, which has no registered public address.
+`country_map_outline` names its own source: each response carries the public
+`datasets/geo-countries` GeoJSON address in its `source` field — currently
+https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
+— so cite that field, the way a procurement answer cites `model_url`.
+
 The KOICA regulation index and the development-document corpus have no
 registered public address, and the gateway is their access path. That is the
 answer to give when a reader asks where the indexed text can be seen. A public
