@@ -277,9 +277,9 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 29 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 30 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 29);
+  assert.equal(Object.keys(contract.tools).length, 30);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
@@ -293,19 +293,20 @@ test("minimal accepted gateway contract contains 29 approved read-only tools", a
     "list_attachments",
     "get_trend_document",
     "search_entity_relationships",
+    "get_corpus_overview",
   ]) {
     assert.ok(opened in contract.tools, `${opened} must be an approved tool`);
   }
   assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
 });
 
-test("observed lock pins exactly the 29 approved tool definitions", async () => {
+test("observed lock pins exactly the 30 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 29);
+  assert.equal(lock.gateway.tool_count, 30);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

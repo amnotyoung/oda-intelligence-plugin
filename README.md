@@ -17,7 +17,7 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-29개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
+30개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
 `koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
 `koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
 작동합니다.
@@ -37,7 +37,7 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 
 - Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 29개
+- 해당 커넥터가 제공하는 읽기 전용 도구 30개
 
 Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
@@ -90,7 +90,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 도구
 
-커넥터는 다섯 개 출처 도메인에 걸쳐 29개의 읽기 전용 도구를 제공합니다. 출처에
+커넥터는 다섯 개 출처 도메인에 걸쳐 30개의 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
 번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
@@ -233,7 +233,8 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 |---|---|---|
 | `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
 | `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
-| `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들 | **`office`**, **`document_id`** |
+| `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들, 그리고 관련 동향·사업 각 10건(위키 문서 페이지의 그 목록) | **`office`**, **`document_id`** |
+| `get_corpus_overview` | 사무소 코퍼스의 분야·월·문서종류·기관별 문서 수 — 위키 목차 페이지와 같은 레코드에서 센 집계입니다. 기관 카운트는 문서당 1회 기준 | **`office`** |
 | `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
 > 캄보디아에서 KOICA가 어떤 기관들과 협력하는지, 무슨 근거로 그런지 보여줘.
@@ -243,6 +244,7 @@ list_available_corpora      {}
 search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
 get_trend_document          { "office": "캄보디아", "document_id": "<검색이 준 article_id>" }
 search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
+get_corpus_overview         { "office": "캄보디아" }
 ```
 
 `office`는 국가명 또는 slug(`캄보디아`, `cambodia`)를 받고, `kinds`는 `trend`와
