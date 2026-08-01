@@ -17,7 +17,7 @@ context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
 The four data domains are not installed as four separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose 29 read-only tools
+Claude should show one `oda-intelligence` connector whose 30 read-only tools
 route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
 Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
 legacy/direct connections and are independent of this plugin.
@@ -37,7 +37,7 @@ created. In the plugin details, the expected installed components are:
 
 - three Skills;
 - one connector named `oda-intelligence`;
-- 29 read-only tools supplied by that connector.
+- 30 read-only tools supplied by that connector.
 
 If only the three Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
@@ -84,7 +84,7 @@ version must be reviewed and refreshed by a workspace administrator.
 
 ## Tools
 
-The connector supplies 29 read-only tools across five source domains. No tool
+The connector supplies 30 read-only tools across five source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
 The three bundled Skills route most questions to the right tools on their own,
@@ -233,7 +233,8 @@ evidence.
 |---|---|---|
 | `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
 | `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
-| `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, and the relationships extracted from that document | **`office`**, **`document_id`** |
+| `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, the relationships extracted from that document, and ten related trends and ten related projects — the lists its wiki page shows | **`office`**, **`document_id`** |
+| `get_corpus_overview` | Sector, month, kind, and organization document counts for an office corpus — the same aggregates the wiki catalog page shows. Organization counts are once per document | **`office`** |
 | `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
 > Which organisations does KOICA work with in Cambodia, and on what evidence?
@@ -243,6 +244,7 @@ list_available_corpora      {}
 search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
 get_trend_document          { "office": "캄보디아", "document_id": "<article_id from the search>" }
 search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
+get_corpus_overview         { "office": "캄보디아" }
 ```
 
 `office` takes a country name or slug (`캄보디아`, `cambodia`), `kinds` takes
