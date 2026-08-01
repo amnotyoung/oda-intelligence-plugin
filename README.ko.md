@@ -17,7 +17,7 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-27개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
+29개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
 `koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
 `koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
 작동합니다.
@@ -37,7 +37,7 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 
 - Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 27개
+- 해당 커넥터가 제공하는 읽기 전용 도구 29개
 
 Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
@@ -84,7 +84,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 도구
 
-커넥터는 다섯 개 출처 도메인에 걸쳐 27개의 읽기 전용 도구를 제공합니다. 출처에
+커넥터는 다섯 개 출처 도메인에 걸쳐 29개의 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
 번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
@@ -219,23 +219,32 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 
 ### 개발협력 문서 — `development-documents`
 
-국가사무소 개발협력 문서 탐색입니다. 코퍼스가 사무소 단위이므로 검색 전에
-사무소부터 확인합니다.
+국가사무소 개발협력 문서와 거기서 추출한 관계를 다룹니다 — 동향 위키에 직접
+가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스가 사무소 단위이므로 검색 전에
+사무소부터 확인합니다. 사용 순서는 탐색 → 문서 컨텍스트 → 관계 근거입니다.
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
-| `search_development_trends` | 문서 탐색 메타데이터와 범위가 제한된 요약. 문서 전문과 관계 그래프 근거는 제공하지 않습니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들 | **`office`**, **`document_id`** |
+| `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
-> 캄보디아 사무소 문서에서 올해 보건 분야 동향을 찾아줘.
+> 캄보디아에서 KOICA가 어떤 기관들과 협력하는지, 무슨 근거로 그런지 보여줘.
 
 ```text
-list_available_corpora    {}
-search_development_trends { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+list_available_corpora      {}
+search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+get_trend_document          { "office": "캄보디아", "document_id": "<검색이 준 article_id>" }
+search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
 ```
 
 `office`는 국가명 또는 slug(`캄보디아`, `cambodia`)를 받고, `kinds`는 `trend`와
-`project` 중에서 고르며, `office_role`은 주재국과 겸임국을 구분합니다.
+`project` 중에서 고르며, `office_role`은 주재국과 겸임국을 구분합니다. 관계
+추출은 검증된 사실이 아니라 신호입니다 — 모든 관계에 근거 문서가 동봉되므로,
+주장을 옮기기 전에 그 문서를 확인하세요. 문서 식별자는 도구를 잇는 조회
+키입니다. 독자용 산문에서는 원시 식별자가 아니라 제목·날짜·출처·공식 링크로
+문서를 인용하세요.
 
 ### 협력국 조달 — `partner-country-procurement`
 
@@ -267,7 +276,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `oda_map_projects` 25 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `oda_map_projects` 25, `search_entity_relationships` 50 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -355,9 +364,11 @@ KOICA 규정 색인과 개발협력 문서 코퍼스에는 공개 주소가 없�
   "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)입니다. 대량 일괄
   추출은 여전히 제공하지 않으며, 목록은 응답 예산에 맞춰 잘리되 실제 총계를
   함께 보고합니다.
-- 개발협력 문서 도구는 문서 코퍼스 탐색, 범위가 제한된 요약 및 공개 원문
-  URL을 제공합니다. 색인된 문서 전문과 추출된 관계 그래프는 공개 프로필에서
-  제공하지 않습니다.
+- 개발협력 문서 도구는 코퍼스 탐색, 요약, 공개 원문 URL, 문서별 컨텍스트,
+  그리고 근거 문서가 동봉된 추출 관계를 제공합니다. 재배포 근거는
+  공공데이터포털의 개방 릴리스 "한국국제협력단_국별 개발협력동향"(이용허락범위
+  제한 없음)입니다. 문서 전문은 공식 원문 링크에 있으며, 위키 내부 경로와
+  플래그는 공개 응답에서 제거됩니다.
 - IATI 및 기타 국제 출처의 인증 정보는 서버에서 관리하며 플러그인에 포함하거나
   사용자에게 반환하지 않습니다.
 - 한국 ODA 통합누리집 지도 도구는 공개 지도에 이미 표시된 최종 유효 좌표를

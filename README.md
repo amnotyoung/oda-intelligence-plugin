@@ -17,7 +17,7 @@ context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
 The four data domains are not installed as four separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose 27 read-only tools
+Claude should show one `oda-intelligence` connector whose 29 read-only tools
 route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
 Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
 legacy/direct connections and are independent of this plugin.
@@ -37,7 +37,7 @@ created. In the plugin details, the expected installed components are:
 
 - three Skills;
 - one connector named `oda-intelligence`;
-- 27 read-only tools supplied by that connector.
+- 29 read-only tools supplied by that connector.
 
 If only the three Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
@@ -84,7 +84,7 @@ version must be reviewed and refreshed by a workspace administrator.
 
 ## Tools
 
-The connector supplies 27 read-only tools across five source domains. No tool
+The connector supplies 29 read-only tools across five source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
 The three bundled Skills route most questions to the right tools on their own,
@@ -223,24 +223,35 @@ conclusion against the current official source.
 
 ### Development documents — `development-documents`
 
-Discovery over country-office development-cooperation documents. Corpora are
-per office, so resolve the office before searching.
+Country-office development-cooperation documents and the relationships
+extracted from them — the content of the trend wiki, queryable without
+visiting the site. Corpora are per office, so resolve the office before
+searching. The working order is discovery → document context → relationship
+evidence.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
-| `search_development_trends` | Discovery metadata and bounded summaries. Full documents and entity-graph evidence are withheld | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, and the relationships extracted from that document | **`office`**, **`document_id`** |
+| `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
-> What do the Cambodia office documents say about the health sector this year?
+> Which organisations does KOICA work with in Cambodia, and on what evidence?
 
 ```text
-list_available_corpora    {}
-search_development_trends { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+list_available_corpora      {}
+search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+get_trend_document          { "office": "캄보디아", "document_id": "<article_id from the search>" }
+search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
 ```
 
 `office` takes a country name or slug (`캄보디아`, `cambodia`), `kinds` takes
 `trend` or `project`, and `office_role` distinguishes a host country from a
-concurrently accredited one.
+concurrently accredited one. Relationship extraction is a signal, not a
+verified fact: every relation ships with its evidence document, so check the
+document before repeating the claim. Document identifiers are join keys for
+chaining these tools — cite a document in prose by its title, date, outlet,
+and official link, not by its raw identifier.
 
 ### Partner-country procurement — `partner-country-procurement`
 
@@ -273,7 +284,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 25 for `oda_map_projects` |
+| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 25 for `oda_map_projects`, 50 for `search_entity_relationships` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -366,9 +377,12 @@ source, not an absence of travel risk.
   한국국제협력단_정관 및 내부규정 on the Korean public data portal (no usage
   restrictions). Bulk export is still not offered: listings truncate to the
   response budget and state the true total.
-- Development-document tools expose corpus discovery, bounded summaries, and
-  public original URLs. Complete indexed documents and extracted relationship
-  graphs are not exposed by the public profile.
+- Development-document tools expose corpus discovery, bounded summaries,
+  public original URLs, per-document context, and extracted relationships with
+  their evidence documents. The redistribution basis is the open-data release
+  한국국제협력단_국별 개발협력동향 on the Korean public data portal (no usage
+  restrictions). Complete document text lives at the official original link,
+  and wiki-internal paths and flags are stripped from public responses.
 - IATI and other international-source credentials are managed by the server
   and are never included in the plugin or returned to users.
 - Korean ODA Map tools can return the effective final coordinates already
