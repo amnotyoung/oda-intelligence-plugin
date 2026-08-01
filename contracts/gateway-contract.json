@@ -6,10 +6,7 @@
     "allow_additional_optional_inputs": true,
     "reject_new_required_inputs": true,
     "require_read_only": true,
-    "forbidden_tools": [
-      "get_trend_document",
-      "search_entity_relationships"
-    ]
+    "forbidden_tools": []
   },
   "gateway": {
     "id": "oda-intelligence",
@@ -219,6 +216,23 @@
       },
       "output_required": [
         "result"
+      ],
+      "read_only": true
+    },
+    "get_trend_document": {
+      "allowed_required_inputs": [
+        "document_id",
+        "office"
+      ],
+      "input_properties": {
+        "document_id": "string",
+        "office": "string"
+      },
+      "output_required": [
+        "corpus",
+        "document",
+        "relationship_count",
+        "relationships"
       ],
       "read_only": true
     },
@@ -463,6 +477,30 @@
         "corpus",
         "documents",
         "result_count"
+      ],
+      "read_only": true
+    },
+    "search_entity_relationships": {
+      "allowed_required_inputs": [
+        "entity",
+        "office"
+      ],
+      "input_properties": {
+        "entity": "string",
+        "kinds": "array",
+        "limit": "integer",
+        "month_from": "string",
+        "month_to": "string",
+        "office": "string",
+        "query": "string",
+        "relation_type": "string"
+      },
+      "output_required": [
+        "corpus",
+        "entity",
+        "relationships",
+        "result_count",
+        "total_matches"
       ],
       "read_only": true
     },
