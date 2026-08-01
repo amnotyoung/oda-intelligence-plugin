@@ -95,6 +95,53 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 - Skill 라우팅 또는 승인된 계약을 변경하려면 버전이 지정된 플러그인
   업데이트가 필요합니다.
 
+## 데이터 출처와 출처 제시
+
+각 게이트웨이 도구는 자신의 출처 도메인을 도구 설명에 `[Source: ...]` 형태로
+선언합니다. 답변은 근거로 삼은 출처의 이름과 공개 주소를 함께 제시합니다.
+독자가 원본을 직접 열어 확인할 수 있어야 하기 때문입니다.
+
+출처 상태 항목에는 `public_url` 필드가 실립니다. 아래 표보다 이 필드를 우선
+사용하세요. 게이트웨이가 그 출처에 대해 직접 선언하는 값이며, 이 문서가 뒤처져도
+정확합니다.
+
+| 출처 도메인 | 도구 | 공개 주소 |
+|---|---|---|
+| `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
+| `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
+| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | 공개 주소 미등록 |
+| `development-documents` | `list_available_corpora`, `search_development_trends` | 공개 주소 미등록 |
+| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | 응답의 `model_url` 필드에 모델별 주소 |
+
+`country_data_status`는 `international-data` 안에서 출처 키별로 최신성을
+보고합니다. 도메인이 아니라 그 키를 출처로 제시합니다.
+
+| 출처 키 | 공개 주소 |
+|---|---|
+| `iati` | https://d-portal.org |
+| `oecd` | https://data-explorer.oecd.org |
+| `world_bank` | https://data.worldbank.org |
+| `world_bank_documents` | https://documents.worldbank.org |
+| `unhcr` | https://www.unhcr.org/refugee-statistics/ |
+| `who_gho` | https://www.who.int/data/gho |
+| `reliefweb` | https://reliefweb.int |
+| `hdx_hapi` | https://hapi.humdata.org |
+| `usgs` | https://earthquake.usgs.gov |
+| `gdacs` | https://www.gdacs.org |
+| `eonet` | https://eonet.gsfc.nasa.gov |
+| `acled` | https://acleddata.com |
+| `mofa_travel_alert` | https://www.0404.go.kr |
+
+KOICA 규정 색인과 개발협력 문서 코퍼스에는 공개 주소가 없으며 게이트웨이가 곧
+접근 경로입니다. 색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 그렇게 답합니다.
+이름이 비슷한 공개 포털은 다른 자료를 담고 있어, 그쪽으로 안내하면 독자가 하려던
+확인을 오히려 막습니다. 조달은 다릅니다. 모델 응답마다 `model_url`이 실리므로
+도메인이 아니라 그 필드를 인용합니다.
+
+`country_travel_alert`는 계약에 승인되어 있지만, 공개 배포에 외교부 여행경보
+서비스키가 설정되어 있지 않아 `mofa_travel_alert`가 `disabled`로 보고되고 도구는
+경보 등급을 반환하지 않습니다. 이는 비활성 출처이지 여행 위험의 부재가 아닙니다.
+
 ## 공개 콘텐츠 범위
 
 - KOICA 규정 도구는 범위가 제한된 검색 결과 일부, 출처 메타데이터, 상호 참조
@@ -108,41 +155,6 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 - 한국 ODA 통합누리집 지도 도구는 공개 지도에 이미 표시된 최종 유효 좌표를
   반환할 수 있습니다. 좌표의 출처와 범위는 유지해야 하며, 보정 전 좌표,
   검토 이력 및 제출자 정보는 제외됩니다.
-
-## 데이터 출처 및 표기
-
-모든 도구는 공개된 상위 출처로 요청을 전달합니다. 이 저장소는 반환된 데이터에
-새로운 라이선스를 적용하지 않으며, 출처 표기·라이선스·재사용 조건은 아래에
-명시한 각 출처를 따릅니다.
-
-`country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`,
-`country_report_context`는 ★로 표시한 국제 출처를 종합합니다.
-
-| 공개 출처 | 주소 | 도구 |
-| --- | --- | --- |
-| IATI Standard | `https://iatistandard.org` | ★, `iati_query_country`, `iati_status`, `iati_test_connection` |
-| World Bank Open Data | `https://data.worldbank.org` | ★ |
-| World Bank Documents & Reports | `https://documents.worldbank.org` | ★ |
-| OECD Data Explorer (DAC) | `https://data-explorer.oecd.org` | ★ |
-| USGS Earthquake Hazards Program | `https://earthquake.usgs.gov` | ★ |
-| GDACS | `https://www.gdacs.org` | ★ |
-| NASA EONET | `https://eonet.gsfc.nasa.gov` | ★ |
-| UNHCR Refugee Data Finder | `https://www.unhcr.org/refugee-statistics` | ★ |
-| WHO Global Health Observatory | `https://www.who.int/data/gho` | ★ |
-| HDX HAPI | `https://data.humdata.org` | ★ |
-| ReliefWeb | `https://reliefweb.int` | ★ |
-| ACLED | `https://acleddata.com` | ★ |
-| 외교부 해외안전여행 — 대한민국 국민 대상 여행경보 단계 | `https://www.0404.go.kr` | `country_travel_alert` |
-| `datasets/geo-countries` 공개 국가 경계 GeoJSON | `https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson` | `country_map_outline` |
-| KOICA 규정·시행세칙·지침 | `https://www.koica.go.kr` | `find_references`, `list_sources`, `search_regulation`, `verify_citation` |
-| KOICA 해외사무소 등록부 및 개발협력 문서 코퍼스. 각 결과는 자체 공개 원문 URL을 포함합니다 | `https://www.koica.go.kr` | `country_list`, `list_available_corpora`, `search_development_trends` |
-| 대한민국 ODA 통합누리집 — 한국 ODA 사업·지도 자료 | `https://www.odakorea.go.kr` | `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects` |
-| 협력국 조달 모델. 공식 법령·기관 자료를 정규화한 2차 자료입니다 | 모델별 공개 주소를 응답의 `model_url` 필드로 반환 | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` |
-
-출처 가용성은 호출마다 함께 반환하며, 비활성·부실·오류 상태를 "경보 없음"이나
-"위험 없음"으로 바꾸지 않습니다. `country_travel_alert`는 공개 계약에 승인되어
-있으나, 배포된 게이트웨이에 외교부 여행경보 서비스키가 설정되어 있지 않아
-현재 모든 국가에서 `alert_signal: "unavailable"`을 반환합니다.
 
 ## 데이터 이용 안내
 

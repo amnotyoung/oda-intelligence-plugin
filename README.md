@@ -94,6 +94,57 @@ version must be reviewed and refreshed by a workspace administrator.
 - Skill routing and accepted contract changes require a versioned plugin
   update.
 
+## Data sources and attribution
+
+Each gateway tool declares its source domain in its description as
+`[Source: ...]`. An answer names the source it rests on and gives that source's
+public address, so a reader can open the evidence instead of taking the answer
+on trust.
+
+Source status entries carry a `public_url` field. Prefer it over the tables
+below: it is what the gateway declares for that source, and it stays correct
+when this document falls behind.
+
+| Source domain | Tools | Public address |
+|---|---|---|
+| `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
+| `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
+| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | No registered public address |
+| `development-documents` | `list_available_corpora`, `search_development_trends` | No registered public address |
+| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | Per-model address in the `model_url` response field |
+
+`country_data_status` reports freshness per source key within
+`international-data`. Attribute the key rather than the domain:
+
+| Source key | Public address |
+|---|---|
+| `iati` | https://d-portal.org |
+| `oecd` | https://data-explorer.oecd.org |
+| `world_bank` | https://data.worldbank.org |
+| `world_bank_documents` | https://documents.worldbank.org |
+| `unhcr` | https://www.unhcr.org/refugee-statistics/ |
+| `who_gho` | https://www.who.int/data/gho |
+| `reliefweb` | https://reliefweb.int |
+| `hdx_hapi` | https://hapi.humdata.org |
+| `usgs` | https://earthquake.usgs.gov |
+| `gdacs` | https://www.gdacs.org |
+| `eonet` | https://eonet.gsfc.nasa.gov |
+| `acled` | https://acleddata.com |
+| `mofa_travel_alert` | https://www.0404.go.kr |
+
+The KOICA regulation index and the development-document corpus have no
+registered public address, and the gateway is their access path. That is the
+answer to give when a reader asks where the indexed text can be seen. A public
+portal that resembles the source holds something else, and sending a reader
+there costs them the check they were trying to make. Procurement is different:
+each model response carries its own `model_url`, so quote that field rather than
+a domain.
+
+`country_travel_alert` is approved on the contract, but the MOFA travel-alert
+service key is not configured on the public deployment, so `mofa_travel_alert`
+reports `disabled` and the tool returns no alert level. That is a disabled
+source, not an absence of travel risk.
+
 ## Public content boundary
 
 - KOICA regulation tools expose bounded search snippets, source metadata,
@@ -107,42 +158,6 @@ version must be reviewed and refreshed by a workspace administrator.
 - Korean ODA Map tools can return the effective final coordinates already
   shown on the public map. Coordinate provenance and scope must be retained;
   pre-correction coordinates, review history, and submitter data are excluded.
-
-## Data sources and attribution
-
-Every tool routes to a public upstream source. This repository does not
-relicense returned data; attribution, licensing, and reuse conditions stay with
-the source named below.
-
-`country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`,
-and `country_report_context` aggregate the international sources marked ★.
-
-| Public source | Address | Tools |
-| --- | --- | --- |
-| IATI Standard | `https://iatistandard.org` | ★, `iati_query_country`, `iati_status`, `iati_test_connection` |
-| World Bank Open Data | `https://data.worldbank.org` | ★ |
-| World Bank Documents & Reports | `https://documents.worldbank.org` | ★ |
-| OECD Data Explorer (DAC) | `https://data-explorer.oecd.org` | ★ |
-| USGS Earthquake Hazards Program | `https://earthquake.usgs.gov` | ★ |
-| GDACS | `https://www.gdacs.org` | ★ |
-| NASA EONET | `https://eonet.gsfc.nasa.gov` | ★ |
-| UNHCR Refugee Data Finder | `https://www.unhcr.org/refugee-statistics` | ★ |
-| WHO Global Health Observatory | `https://www.who.int/data/gho` | ★ |
-| HDX HAPI | `https://data.humdata.org` | ★ |
-| ReliefWeb | `https://reliefweb.int` | ★ |
-| ACLED | `https://acleddata.com` | ★ |
-| MOFA overseas travel safety — travel alert levels for Korean nationals | `https://www.0404.go.kr` | `country_travel_alert` |
-| `datasets/geo-countries` public country GeoJSON | `https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson` | `country_map_outline` |
-| KOICA regulations, implementing rules, and guidelines | `https://www.koica.go.kr` | `find_references`, `list_sources`, `search_regulation`, `verify_citation` |
-| KOICA overseas office registry and the development-document corpus; each result carries its own public original URL | `https://www.koica.go.kr` | `country_list`, `list_available_corpora`, `search_development_trends` |
-| ODA Korea portal — Korean ODA project and map records | `https://www.odakorea.go.kr` | `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects` |
-| Partner-country procurement models, normalized from official law and institutional sources | per-model public address in the `model_url` response field | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` |
-
-Source availability is reported per call, and a disabled, stale, or failed
-source is never returned as "no alert" or "no risk". `country_travel_alert` is
-approved on the public contract but currently returns
-`alert_signal: "unavailable"` for every country, because the MOFA travel alert
-service key is not configured on the deployed gateway.
 
 ## Data-use notice
 

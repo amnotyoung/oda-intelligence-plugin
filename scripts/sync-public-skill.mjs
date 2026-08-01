@@ -78,9 +78,23 @@ async function fingerprint(directory) {
   return entries;
 }
 
+// 이미 공개된 사이트 주소는 은닉 대상이 아니다. 상류 스킬도 지도 근거를 제시할 때
+// 이 주소를 쓰게 되므로, 검사 전에 주소만 지운다. 맨 이름은 여전히 걸린다.
+// test/plugin-package.test.mjs가 같은 예외를 같은 이유로 적용한다.
+const PUBLIC_SOURCE_URLS = [/https:\/\/oda-map-lab\.pages\.dev/gu];
+
+function withoutPublicSourceUrls(text) {
+  return PUBLIC_SOURCE_URLS.reduce(
+    (value, pattern) => value.replaceAll(pattern, ""),
+    text,
+  );
+}
+
 async function assertNoPrivateNames(directory) {
   for (const file of await collect(directory)) {
-    const text = await readFile(join(directory, file), "utf8");
+    const text = withoutPublicSourceUrls(
+      await readFile(join(directory, file), "utf8"),
+    );
     const leaked = FORBIDDEN.filter((name) => text.includes(name));
     if (leaked.length > 0) {
       throw new Error(
