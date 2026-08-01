@@ -7,11 +7,7 @@
     "reject_new_required_inputs": true,
     "require_read_only": true,
     "forbidden_tools": [
-      "compliance_radar",
-      "get_article",
-      "get_attachment",
       "get_trend_document",
-      "list_attachments",
       "search_entity_relationships"
     ]
   },
@@ -22,6 +18,16 @@
     "authentication": "none"
   },
   "tools": {
+    "compliance_radar": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "source": "null|string"
+      },
+      "output_required": [
+        "result"
+      ],
+      "read_only": true
+    },
     "country_data_status": {
       "allowed_required_inputs": [
         "countryCode"
@@ -188,6 +194,34 @@
       ],
       "read_only": true
     },
+    "get_article": {
+      "allowed_required_inputs": [
+        "article",
+        "source"
+      ],
+      "input_properties": {
+        "article": "string",
+        "source": "string"
+      },
+      "output_required": [
+        "result"
+      ],
+      "read_only": true
+    },
+    "get_attachment": {
+      "allowed_required_inputs": [
+        "label",
+        "source"
+      ],
+      "input_properties": {
+        "label": "string",
+        "source": "string"
+      },
+      "output_required": [
+        "result"
+      ],
+      "read_only": true
+    },
     "iati_query_country": {
       "allowed_required_inputs": [
         "countryCode"
@@ -246,6 +280,20 @@
         "sampleIdentifier",
         "testedAt",
         "totalFound"
+      ],
+      "read_only": true
+    },
+    "list_attachments": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "category": "null|string",
+        "include_deleted": "boolean",
+        "kind": "null|string",
+        "source": "null|string"
+      },
+      "output_required": [
+        "result",
+        "total"
       ],
       "read_only": true
     },

@@ -17,7 +17,7 @@ context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
 The four data domains are not installed as four separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose 23 read-only tools
+Claude should show one `oda-intelligence` connector whose 27 read-only tools
 route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
 Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
 legacy/direct connections and are independent of this plugin.
@@ -37,7 +37,7 @@ created. In the plugin details, the expected installed components are:
 
 - three Skills;
 - one connector named `oda-intelligence`;
-- 23 read-only tools supplied by that connector.
+- 27 read-only tools supplied by that connector.
 
 If only the three Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
@@ -84,7 +84,7 @@ version must be reviewed and refreshed by a workspace administrator.
 
 ## Tools
 
-The connector supplies 23 read-only tools across five source domains. No tool
+The connector supplies 27 read-only tools across five source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
 The three bundled Skills route most questions to the right tools on their own,
@@ -186,27 +186,40 @@ iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 
 
 ### KOICA regulations — `koica-regulations`
 
-Search, cross-reference, and citation checking over the KOICA regulation
-index. The public profile returns bounded snippets, never full articles.
+Search, full text, cross-references, and citation checking over the KOICA
+regulation index — the same tool surface as the standalone `koica-reg-mcp`
+public deployment. The regulation text is openly released on the Korean
+public data portal (한국국제협력단_정관 및 내부규정, no usage restrictions),
+which is the redistribution basis for serving it here in full. The working
+order is discovery → full text → citation check.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
-| `search_regulation` | Regulation metadata and bounded article snippets with a relevance score. Full articles and attachments are withheld | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `search_regulation` | Regulation metadata and article snippets with a relevance score. `include_attachments: true` searches annex tables and forms (별표·별지) too | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `get_article` | The complete text of one article, selected by regulation name and article number. Main-body articles win over supplementary (부칙) duplicates | **`source`**, **`article`** |
 | `list_sources` | The indexed current regulations with category, revision date, and article count | `category` |
-| `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `list_attachments` | The annex/form index (별표·별지) with titles and excerpts, filterable by regulation, category, and kind. Truncates to the response budget; `total` always states the true count | `source`, `category`, `kind`, `include_deleted` |
+| `get_attachment` | The complete text of one annex table or form, selected by regulation name and label (`"별표 1"`, `"별지 제3호 서식"` — free form) | **`source`**, **`label`** |
+| `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. `include_mermaid: true` adds a flowchart of the graph. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `compliance_radar` | Revision-lag radar: flags implementation rules and guidelines whose parent regulation was revised more recently (`review_needed` / `ok` / `unknown` / `no_parent`) | `source` |
 | `verify_citation` | Cross-checks every `{regulation} 제N조` citation in a text against the index and marks each `ok`, `not_found`, or `unknown_source` | **`text`** |
 
-> How many days of annual leave can staff take, and which article says so?
+> How many days of annual leave can staff take, and which article says so —
+> quote the full article.
 
 ```text
 search_regulation { "query": "연차휴가", "limit": 3 }
+get_article       { "source": "복무규정", "article": "제24조" }
+get_attachment    { "source": "복무규정", "label": "별표 1" }
 find_references   { "source": "직제규정", "article": "제9조" }
 verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 ```
 
 `verify_citation` is the guard against invented articles: the citation above
 comes back `not_found`, because 인사규정 has no 제9999조. Run it over any
-drafted passage that cites regulations before the passage is circulated.
+drafted passage that cites regulations before the passage is circulated. The
+index follows official revisions on a sync cadence, so confirm a consequential
+conclusion against the current official source.
 
 ### Development documents — `development-documents`
 
@@ -260,14 +273,14 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation` and `find_references`, 20 for `search_development_trends`, 25 for `oda_map_projects` |
+| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 25 for `oda_map_projects` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
 | `fields` | Only the values listed in each tool's schema |
 | `refresh` | Ignored — the profile serves server-managed caches |
-| `include_attachments`, `include_mermaid` | Unavailable |
 | `includeEvents` | At most 200 events; `record_count` still states the true total |
+| `list_attachments` result | Truncated to the response budget; `total` always states the true count and a caveat names the narrower filters |
 
 ## Controlled updates
 
@@ -347,9 +360,12 @@ source, not an absence of travel risk.
 
 ## Public content boundary
 
-- KOICA regulation tools expose bounded search snippets, source metadata,
-  cross-references, and citation verification. Complete articles, attachments,
-  annex files, and bulk text are not exposed by the public profile.
+- KOICA regulation tools expose search, complete article text, complete
+  annex/form text (별표·별지), cross-references, a revision-lag radar, and
+  citation verification. The redistribution basis is the open-data release
+  한국국제협력단_정관 및 내부규정 on the Korean public data portal (no usage
+  restrictions). Bulk export is still not offered: listings truncate to the
+  response budget and state the true total.
 - Development-document tools expose corpus discovery, bounded summaries, and
   public original URLs. Complete indexed documents and extracted relationship
   graphs are not exposed by the public profile.

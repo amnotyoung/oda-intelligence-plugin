@@ -17,7 +17,7 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-23개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
+27개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
 `koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
 `koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
 작동합니다.
@@ -37,7 +37,7 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 
 - Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 23개
+- 해당 커넥터가 제공하는 읽기 전용 도구 27개
 
 Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
@@ -84,7 +84,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 도구
 
-커넥터는 다섯 개 출처 도메인에 걸쳐 23개의 읽기 전용 도구를 제공합니다. 출처에
+커넥터는 다섯 개 출처 도메인에 걸쳐 27개의 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
 번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
@@ -185,27 +185,37 @@ iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 
 
 ### KOICA 규정 — `koica-regulations`
 
-KOICA 규정 색인에 대한 검색·상호참조·인용 검증입니다. 공개 프로필은 범위가
-제한된 스니펫만 반환하며 조문 전문은 반환하지 않습니다.
+KOICA 규정 색인에 대한 검색·전문 조회·상호참조·인용 검증입니다. 단독 배포판
+`koica-reg-mcp` 공개 서버와 같은 도구 표면입니다. 규정 텍스트는 공공데이터포털의
+"한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)으로 개방되어 있으며,
+그것이 전문을 여기서 그대로 제공하는 재배포 근거입니다. 사용 순서는 탐색 →
+전문 조회 → 인용 검증입니다.
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
-| `search_regulation` | 규정 메타데이터와 범위가 제한된 조문 스니펫, 적합도 점수. 조문 전문과 첨부는 제공하지 않습니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `search_regulation` | 규정 메타데이터와 조문 스니펫, 적합도 점수. `include_attachments: true`면 별표·별지도 함께 검색합니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `get_article` | 규정명·조문 번호로 조문 본문 전체를 반환합니다. 본칙 조문이 같은 번호의 부칙 조문보다 우선합니다 | **`source`**, **`article`** |
 | `list_sources` | 색인된 현행 규정 목록. 규정 유형, 개정일, 조문 수 포함 | `category` |
-| `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `list_attachments` | 별표·별지 목록을 제목·발췌와 함께 반환하며 규정·유형·종류로 필터링합니다. 응답 예산에 맞춰 잘리지만 `total`이 언제나 실제 총계를 담습니다 | `source`, `category`, `kind`, `include_deleted` |
+| `get_attachment` | 규정명과 라벨로 별표·별지 본문 전체를 반환합니다. 라벨은 `"별표 1"`, `"별지 제3호 서식"` 등 자유 형식입니다 | **`source`**, **`label`** |
+| `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. `include_mermaid: true`면 인용망 flowchart 코드가 함께 실립니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `compliance_radar` | 정비 레이더 — 모규정이 더 최근에 개정된 시행세칙·지침을 `review_needed` / `ok` / `unknown` / `no_parent`로 플래그합니다 | `source` |
 | `verify_citation` | 텍스트 안의 모든 `{규정명} 제N조` 인용을 색인과 대조해 `ok`, `not_found`, `unknown_source`로 분류합니다 | **`text`** |
 
-> 연차휴가를 며칠 쓸 수 있는지 근거 조문과 함께 알려줘.
+> 연차휴가를 며칠 쓸 수 있는지 근거 조문 전문과 함께 알려줘.
 
 ```text
 search_regulation { "query": "연차휴가", "limit": 3 }
+get_article       { "source": "복무규정", "article": "제24조" }
+get_attachment    { "source": "복무규정", "label": "별표 1" }
 find_references   { "source": "직제규정", "article": "제9조" }
 verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 ```
 
 `verify_citation`은 지어낸 조문을 막는 장치입니다. 위 인용은 `not_found`로
 돌아옵니다. 인사규정에 제9999조가 없기 때문입니다. 규정을 인용한 문단은 회람하기
-전에 이 도구로 한 번 훑으세요.
+전에 이 도구로 한 번 훑으세요. 색인은 동기화 주기만큼 공식 개정을 뒤따르므로,
+중대한 결론은 현행 공식 원문으로 확인하세요.
 
 ### 개발협력 문서 — `development-documents`
 
@@ -257,14 +267,14 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation`·`find_references` 10, `search_development_trends` 20, `oda_map_projects` 25 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `oda_map_projects` 25 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
 | `fields` | 각 도구 스키마에 열거된 값만 |
 | `refresh` | 무시 — 서버가 관리하는 캐시를 제공합니다 |
-| `include_attachments`, `include_mermaid` | 제공하지 않음 |
 | `includeEvents` | 최대 200건 — 실제 총계는 `record_count`가 그대로 보고합니다 |
+| `list_attachments` 결과 | 응답 예산에 맞춰 잘림 — `total`이 언제나 실제 총계를 담고, caveat가 좁힐 필터를 안내합니다 |
 
 ## 통제된 업데이트
 
@@ -340,9 +350,11 @@ KOICA 규정 색인과 개발협력 문서 코퍼스에는 공개 주소가 없�
 
 ## 공개 콘텐츠 범위
 
-- KOICA 규정 도구는 범위가 제한된 검색 결과 일부, 출처 메타데이터, 상호 참조
-  및 인용 검증 기능을 제공합니다. 규정 전문, 첨부 자료, 별표·별지 파일 및
-  대량 텍스트는 공개 프로필에서 제공하지 않습니다.
+- KOICA 규정 도구는 검색, 조문 전문, 별표·별지 전문, 상호 참조, 정비 레이더 및
+  인용 검증을 제공합니다. 재배포 근거는 공공데이터포털의 개방 릴리스
+  "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)입니다. 대량 일괄
+  추출은 여전히 제공하지 않으며, 목록은 응답 예산에 맞춰 잘리되 실제 총계를
+  함께 보고합니다.
 - 개발협력 문서 도구는 문서 코퍼스 탐색, 범위가 제한된 요약 및 공개 원문
   URL을 제공합니다. 색인된 문서 전문과 추출된 관계 그래프는 공개 프로필에서
   제공하지 않습니다.
