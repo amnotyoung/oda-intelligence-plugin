@@ -87,10 +87,9 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 커넥터는 다섯 개 출처 도메인에 걸쳐 23개의 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
-번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결합니다. "미얀마
-KOICA 사업이 뭐가 있나", "연차휴가 며칠인가" 같은 평범한 질문에는 도구 이름을
-댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이 만든 호출을 읽을 때
-쓰는 자료입니다.
+번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
+질문에는 도구 이름을 댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이
+만든 호출을 읽을 때 쓰는 자료입니다.
 
 이 도구들로 만든 답변이 버티려면 두 가지 습관이 필요합니다.
 
@@ -101,6 +100,33 @@ KOICA 사업이 뭐가 있나", "연차휴가 며칠인가" 같은 평범한 질
 - **결측은 0이 아닙니다.** `stale`, `no_data`, `disabled`, `error`는 모두 근거를
   관측하지 못했다는 뜻입니다. 수치가 0이라거나 위험이 없다는 뜻이 아닙니다.
   응답에 실리는 `missing_is_zero: false`가 그것을 명시합니다.
+
+### 자연어로 묻기
+
+Skill은 도구 이름이 아니라 주제로 라우팅합니다. 세 Skill이 각각 다른 종류의
+질문을 맡습니다.
+
+| Skill | 맡는 질문 | 사용하는 도메인 |
+|---|---|---|
+| `korean-oda-portfolio-lookup` | 한국 기관이 그 나라에서 무엇을 하고 있는지 — 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
+| `generate-development-country-report` | 국가보고서·원조 지형 검토, 중점분야 선정, 참여 경로, 조달 진입, Go/No-Go 위험 | 다섯 개 전부 |
+| `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
+
+프롬프트를 쓸 때 다음 네 가지가 결과를 좌우합니다.
+
+- **국가명을 밝힙니다.** 한국어와 영문이 모두 해석됩니다(`미얀마`, `Myanmar`).
+  조달은 `nepal`, `NPL` 같은 slug·ISO3 코드도 받습니다.
+- **기준일을 지정합니다.** 건수를 재현해야 할 때 필요합니다. 사업 상태는 호출할
+  때마다 다시 계산되므로 "2026-03-31 기준으로"라고 못 박아야 고정됩니다.
+- **무엇에 쓸 답인지 말합니다.** 보고서인지, 슬라이드인지, 의사결정 메모인지에
+  따라 끌어올 근거의 양이 달라집니다.
+- **인용 검증을 직접 요청합니다.** 규정을 인용한 문단이라면 "인용한 조문을
+  검증해줘"라고 덧붙이면 `verify_citation`이 초안을 훑어 존재하지 않는 조문을
+  잡아냅니다.
+
+아래 각 도메인에는 프롬프트와, 그 프롬프트가 대체로 풀려 나가는 호출을 함께
+싣습니다. 호출을 고르는 것은 모델이므로 보장된 순서가 아니라 통상적인 해석으로
+읽으세요.
 
 ### 한국 ODA 사업 — `korean-oda-map`
 
@@ -113,6 +139,9 @@ KOICA 사업이 뭐가 있나", "연차휴가 며칠인가" 같은 평범한 질
 | `oda_map_country_context` | 국가별 사업·기관·위치 현황 요약. 지도 핀 수와 고유 사업 수를 구분하고 사업 상태를 `as_of` 기준으로 다시 계산합니다. 실시간 재난·치안·여행경보는 포함하지 않습니다 | **`country`**, `as_of`, `sections`, `sample_limit`, `include_coordinates` |
 | `oda_map_projects` | 국가의 사업을 검색·필터·페이지 처리합니다. 다중 위치 사업은 활동 식별자 기준으로 한 번만 집계하고 위치는 `locations`에 보존합니다 | **`country`**, `query`, `agency`, `sector`, `status`, `layers`, `as_of`, `limit`, `offset`, `fields`, `include_coordinates` |
 | `oda_map_project_detail` | 사업 식별자 또는 위치 접미사가 붙은 지도 entity ID로 사업 상세를 조회합니다. 다중 위치, 예산 중복, 원천 레이어 상태, 기준일 상태를 분리해 반환합니다 | **`project_id`**, `country`, `as_of`, `include_coordinates` |
+
+> 미얀마에서 한국 기관들이 하는 보건 사업을 정리하고, 어느 출처에서 나온
+> 목록인지 밝혀줘.
 
 ```text
 oda_map_data_status    { "country": "미얀마" }
@@ -142,6 +171,9 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | `iati_status` | 서버의 IATI 조회 기능이 준비됐는지만 확인합니다. 자격 증명 값이나 저장 위치는 반환하지 않습니다 | (없음) |
 | `iati_test_connection` | 서버가 관리하는 자격 증명으로 미얀마 활동 1건을 조회해 연결을 시험합니다. 자격 증명은 출력하지 않습니다 | (없음) |
 
+> 지금 미얀마에 대해 국제 근거가 얼마나 확보되는지, IATI에는 무엇이 있는지
+> 알려줘.
+
 ```text
 country_data_status    { "countryCode": "MM" }
 country_report_context { "countryCode": "MM", "sampleSize": 3 }
@@ -163,6 +195,8 @@ KOICA 규정 색인에 대한 검색·상호참조·인용 검증입니다. 공�
 | `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `verify_citation` | 텍스트 안의 모든 `{규정명} 제N조` 인용을 색인과 대조해 `ok`, `not_found`, `unknown_source`로 분류합니다 | **`text`** |
 
+> 연차휴가를 며칠 쓸 수 있는지 근거 조문과 함께 알려줘.
+
 ```text
 search_regulation { "query": "연차휴가", "limit": 3 }
 find_references   { "source": "직제규정", "article": "제9조" }
@@ -183,6 +217,8 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 | `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
 | `search_development_trends` | 문서 탐색 메타데이터와 범위가 제한된 요약. 문서 전문과 관계 그래프 근거는 제공하지 않습니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
 
+> 캄보디아 사무소 문서에서 올해 보건 분야 동향을 찾아줘.
+
 ```text
 list_available_corpora    {}
 search_development_trends { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
@@ -202,6 +238,8 @@ search_development_trends { "office": "캄보디아", "query": "보건 분야 �
 | `procurement_model_status` | 국가별로 어떤 축이 모델링되어 있는지와 그 검증 상태 | `country` |
 | `procurement_country_context` | 축별 요약: 권한기관, 절차 단계, 병목, 진입장벽. 전체 공정 그래프는 포함하지 않습니다 | **`country`** |
 | `procurement_model_detail` | 한 국가·한 축의 모델 전체. canvas, 공정 그래프(lanes·stages·nodes·edges), 검증 원출처 포함 | **`country`**, **`axis`** |
+
+> 네팔에서 ODA 사업이 어떤 절차로 형성되는지, 병목이 어디인지 설명해줘.
 
 ```text
 procurement_model_status { "country": "네팔" }
