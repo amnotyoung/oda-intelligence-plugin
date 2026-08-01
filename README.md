@@ -86,7 +86,7 @@ version must be reviewed and refreshed by a workspace administrator.
 
 - Data and compatible server behavior change at the remote services without a
   plugin update.
-- The versioned `v1` endpoint fixes the approved tool surface. Tool names,
+- The versioned `v2` endpoint fixes the approved tool surface. Tool names,
   required inputs, required outputs, read-only guarantees, and forbidden
   high-exposure tools are checked against `contracts/gateway-contract.json`.
 - A daily workflow records compatible metadata drift for review.
