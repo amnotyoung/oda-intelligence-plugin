@@ -88,9 +88,8 @@ The connector supplies 23 read-only tools across five source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
 The three bundled Skills route most questions to the right tools on their own,
-so a plain question — "what is KOICA doing in Myanmar", "how many days of
-annual leave" — usually needs no tool name. The tables below are for choosing
-a call deliberately, or for reading a call someone else made.
+so a plain question usually needs no tool name. The tables below are for
+choosing a call deliberately, or for reading a call someone else made.
 
 Two habits decide whether an answer built on these tools holds up:
 
@@ -103,6 +102,33 @@ Two habits decide whether an answer built on these tools holds up:
   quantity is zero or the risk is absent. Responses carry `missing_is_zero:
   false` to say so.
 
+### Asking in plain language
+
+The Skills route on subject, not on tool name. Each one claims a different
+kind of question:
+
+| Skill | The questions it takes | Domains it draws on |
+|---|---|---|
+| `korean-oda-portfolio-lookup` | What a Korean agency is doing in a country: project lists, agency and sector breakdowns, active or completed counts, one project in detail, projects comparable to a named one | `korean-oda-map` |
+| `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All five |
+| `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
+
+Four things make a prompt land:
+
+- **Name the country.** Korean and English both resolve — `미얀마`, `Myanmar`,
+  and for procurement also `nepal` or `NPL`.
+- **Give the as-of date** when a count has to be reproducible. Project status
+  is recomputed per call, so "as of 2026-03-31" pins it.
+- **Say what the answer is for** — a report, a slide, a decision memo. It
+  decides how much evidence is worth pulling.
+- **Ask for the citation check by name** when a passage cites regulations.
+  "인용한 조문을 검증해줘" runs `verify_citation` over the draft, which is what
+  catches an article that does not exist.
+
+Each domain below pairs a prompt with the calls it usually resolves to. The
+model chooses the calls, so read the sequences as the typical resolution
+rather than a guarantee.
+
 ### Korean ODA projects — `korean-oda-map`
 
 Korean development cooperation projects and their locations. Start with the
@@ -114,6 +140,9 @@ status tool; it reports the source and correction layers separately.
 | `oda_map_country_context` | Report-ready country summary: portfolio, agencies, sectors, map layers, locations. Separates map pins from unique projects and recalculates status against `as_of`. Carries no hazard, security, or travel data | **`country`**, `as_of`, `sections`, `sample_limit`, `include_coordinates` |
 | `oda_map_projects` | Search, filter, and page a country's projects. A multi-location project is counted once by activity identifier, with its sites kept in `locations` | **`country`**, `query`, `agency`, `sector`, `status`, `layers`, `as_of`, `limit`, `offset`, `fields`, `include_coordinates` |
 | `oda_map_project_detail` | One project by identifier, or by a location-suffixed map entity ID. Reports multi-location spread, budget duplication, source-layer state, and as-of status separately | **`project_id`**, `country`, `as_of`, `include_coordinates` |
+
+> Summarise the health projects Korean agencies run in Myanmar, and name the
+> source the list came from.
 
 ```text
 oda_map_data_status    { "country": "미얀마" }
@@ -143,6 +172,9 @@ reports freshness per source key, so read it before quoting any figure.
 | `iati_status` | Whether the server's IATI lookup is configured. Returns no credential value or storage location | (none) |
 | `iati_test_connection` | Fetches one Myanmar activity with the server-held credential to test the connection. Prints no credential | (none) |
 
+> How much international evidence is available for Myanmar right now, and what
+> does IATI hold for it?
+
 ```text
 country_data_status    { "countryCode": "MM" }
 country_report_context { "countryCode": "MM", "sampleSize": 3 }
@@ -164,6 +196,8 @@ index. The public profile returns bounded snippets, never full articles.
 | `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `verify_citation` | Cross-checks every `{regulation} 제N조` citation in a text against the index and marks each `ok`, `not_found`, or `unknown_source` | **`text`** |
 
+> How many days of annual leave can staff take, and which article says so?
+
 ```text
 search_regulation { "query": "연차휴가", "limit": 3 }
 find_references   { "source": "직제규정", "article": "제9조" }
@@ -183,6 +217,8 @@ per office, so resolve the office before searching.
 |---|---|---|
 | `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
 | `search_development_trends` | Discovery metadata and bounded summaries. Full documents and entity-graph evidence are withheld | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+
+> What do the Cambodia office documents say about the health sector this year?
 
 ```text
 list_available_corpora    {}
@@ -204,6 +240,9 @@ axes exist before citing procurement.
 | `procurement_model_status` | Which axes are modelled for a country and their verification state | `country` |
 | `procurement_country_context` | Report-ready summary of the axes: authorities, procedural stages, bottlenecks, entry barriers. No full process graph | **`country`** |
 | `procurement_model_detail` | One country and one axis in full: canvas, process graph (lanes, stages, nodes, edges), and verification sources | **`country`**, **`axis`** |
+
+> Walk me through how an ODA project is formed in Nepal and where it
+> bottlenecks.
 
 ```text
 procurement_model_status { "country": "네팔" }
