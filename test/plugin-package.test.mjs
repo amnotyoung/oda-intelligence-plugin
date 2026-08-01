@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -307,4 +308,32 @@ test("observed lock pins exactly the 23 approved tool definitions", async () => 
       /^[a-f0-9]{64}$/u.test(hash),
     ),
   );
+});
+
+// 생성 스킬은 상류 canonical에서 받아 public-skill.lock.json이 지문으로 고정한다.
+// 스킬 사본을 이 저장소에서 직접 고치면 lock이 조용히 뒤처지고, 다음 동기화가
+// 그 수정을 상류 빌드로 되돌리거나 금지어 검사에서 멈출 때까지 아무도 모른다.
+// 지문을 실제 디렉터리 내용과 대조해 그 드리프트를 이쪽 CI에서 잡는다.
+//
+// 계산 규칙은 scripts/sync-public-skill.mjs의 fingerprint와 같아야 한다. 그
+// 스크립트는 로드 시점에 main()을 실행하므로 가져오지 않고 같은 규칙을 재현한다:
+// agents/ 는 이 플러그인의 패키징이라 지문에서 빠진다.
+test("public skill lock fingerprint matches the synced skill directory", async () => {
+  const lock = await readJson("contracts", "public-skill.lock.json");
+  const skillRoot = resolve(
+    pluginRoot,
+    "skills",
+    "generate-development-country-report",
+  );
+  const digest = (value) => createHash("sha256").update(value).digest("hex");
+  const files = (await listFiles(skillRoot)).filter(
+    (file) => !file.startsWith("agents/"),
+  );
+  const entries = {};
+  for (const file of files.toSorted()) {
+    entries[file] = digest(await readFile(resolve(skillRoot, file), "utf8"));
+  }
+  assert.equal(lock.schema_version, 1);
+  assert.equal(lock.files, Object.keys(entries).length);
+  assert.equal(lock.fingerprint, digest(JSON.stringify(entries)));
 });
