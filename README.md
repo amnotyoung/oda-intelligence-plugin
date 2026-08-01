@@ -51,8 +51,7 @@ claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
 아래는 데스크톱 앱에서의 설치 데모입니다. 마켓플레이스를 추가하고, Skill 세 개와
-커넥터 한 개가 설치된 것을 확인한 뒤, 실제 질문에 답하기까지를 2배속으로
-담았습니다.
+커넥터 한 개가 설치된 것을 확인한 뒤, 실제 질문에 답하기까지를 담았습니다.
 
 ![ODA Intelligence 설치 데모](docs/assets/install-demo.gif)
 
