@@ -219,6 +219,24 @@
       ],
       "read_only": true
     },
+    "get_corpus_overview": {
+      "allowed_required_inputs": [
+        "office"
+      ],
+      "input_properties": {
+        "office": "string"
+      },
+      "output_required": [
+        "caveat",
+        "corpus",
+        "kinds",
+        "months",
+        "organizations",
+        "sectors",
+        "total_documents"
+      ],
+      "read_only": true
+    },
     "get_trend_document": {
       "allowed_required_inputs": [
         "document_id",

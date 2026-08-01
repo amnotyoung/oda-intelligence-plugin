@@ -1,8 +1,8 @@
 {
   "gateway": {
-    "instructions_sha256": "61a6c537ba5c7f4a68f26f5f60e0c26c0d2d9f8220d7250b91672d3a0381911f",
+    "instructions_sha256": "990c5a347f624ce396dcebca78e77739dedaf1498665648ec31976c41e4c7054",
     "server_name": "oda-intelligence",
-    "tool_count": 29,
+    "tool_count": 30,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
@@ -13,9 +13,10 @@
       "country_report_context": "97f2d6591a21f7ca4fa8e67c004c3e5996993a51696bfe81e86b50f9a3dc0100",
       "country_travel_alert": "a9503e88d9b57bbe6220181fc1e628091c0f4e06359d9ab4864ccc1f11d7bcad",
       "find_references": "abe7ec531aa1b9bd1e436964848b326c354495b92099cdce0c64b387ae0765bd",
-      "get_article": "4d3e154e20a574e826a3c1a3aec741018f74e3409c5945857a522b0c48bb1628",
-      "get_attachment": "db8b59a4d104ed2550f891b8df14ee4ff2aa62aafbaee581b0f44c1b78f6c0c3",
-      "get_trend_document": "327ba078b671e82a67c43d93de8a99c9a24afdf1c506887609f590b81bcaf787",
+      "get_article": "180be0e725246bc99456185c7f6b4d64eade085f5782054039ccdaaa4f50a9c9",
+      "get_attachment": "4948e143c9b8cbe27fc8f47b5140bd4a3955ad1e6caf808381ec5f2665a8e5ee",
+      "get_corpus_overview": "90e7fed6a42035ec94519b782cce19e36cc6e9369f70234548e11c02718eee40",
+      "get_trend_document": "a27abeab329d55587267653d9e51dfe97e25271a3419b5a4cd77915f8f91c0bd",
       "iati_query_country": "26c3c26952eee254f625771012cdf805ceb766ba5e78890e01530ecf3bce90d0",
       "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
       "iati_test_connection": "8aa708a1fd1f8e53fa9713d35c95f7096b6c86742ed50f07d0b16fd9e1164027",
