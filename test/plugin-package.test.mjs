@@ -180,6 +180,11 @@ test("public repository contains exactly the reviewed file allowlist", async () 
 // 조항이 배제하는 것은 URL이 아니라 비공개 저장소의 이름 자체다.
 // 공개 저장소만 링크할 수 있다. 사용자가 직접 설치해야 하는 것은 이름을 밝혀야
 // 하지만, 비공개 저장소는 그 존재조차 드러내지 않는다.
+//
+// `ODA Map Lab`은 저장소 이름이 아니라 지도의 제품명이며, 다른 이유로 같은 목록에
+// 있다. 지도는 어느 기관도 발행하지 않은 독립 취합물인데, 스킬 본문이 제품명을
+// 들고 있으면 답변이 그것을 기관명과 붙여 `KOICA ODA Map Lab`처럼 인용한다.
+// 소문자 `oda-map-lab`만 막아서는 이 표기가 통과한다.
 const allowedRepositoryPaths = new Set([
   "/amnotyoung",
   "/amnotyoung/oda-intelligence-plugin",
@@ -190,6 +195,7 @@ const forbiddenNames = [
   "overseas-procurement-100",
   "country-report-skill",
   "oda-map-lab",
+  "ODA Map Lab",
   "devcoop-kg",
   "amnotyoung/oda-mcp",
   "io-mcp",

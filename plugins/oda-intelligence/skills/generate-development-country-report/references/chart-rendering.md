@@ -33,7 +33,7 @@ validation. That is deliberate.
   "categories": ["KOICA", "EDCF", "교육부"],
   "values": [86, 23, 20],
   "highlight": 0,
-  "source": "ODA Map Lab",
+  "source": "한국 ODA 사업 위치 지도(비공식)",
   "unit": "사업 건수",
   "period": "기준일 2026-07-31",
   "coverage": "지도 등재 상위 10개 기관"

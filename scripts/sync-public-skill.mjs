@@ -26,10 +26,14 @@ const BUILD_OUTPUT = "dist/public-skill";
 
 // 생성물에 남아서는 안 되는 이름. 상류 빌드도 같은 검사를 하지만, 이 저장소가
 // 공개인 이상 받는 쪽에서도 확인한다. 한쪽 검사만 믿지 않는다.
+//
+// `ODA Map Lab`은 비공개 저장소 이름이 아니라 지도의 제품명이라서 다른 이유로
+// 걸린다. 스킬이 그 이름을 들고 있으면 답변은 그것을 KOICA 산출물처럼 인용한다.
 const FORBIDDEN = [
   "overseas-procurement-100",
   "country-report-skill",
   "oda-map-lab",
+  "ODA Map Lab",
   "devcoop-kg",
   "amnotyoung/oda-mcp",
   "io-mcp",
