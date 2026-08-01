@@ -82,6 +82,154 @@ ChatGPT keeps an approved snapshot of tool definitions. Compatible data and
 server behavior changes are available at the same URL, while a new tool-contract
 version must be reviewed and refreshed by a workspace administrator.
 
+## Tools
+
+The connector supplies 23 read-only tools across five source domains. No tool
+writes to a source, and no tool takes a credential from the user.
+
+The three bundled Skills route most questions to the right tools on their own,
+so a plain question — "what is KOICA doing in Myanmar", "how many days of
+annual leave" — usually needs no tool name. The tables below are for choosing
+a call deliberately, or for reading a call someone else made.
+
+Two habits decide whether an answer built on these tools holds up:
+
+- **Ask the status tool first.** `oda_map_data_status`,
+  `procurement_model_status`, `country_data_status`, and `iati_status` report
+  what each backend currently holds. An evidence tool called before them can
+  return a thin answer that looks complete.
+- **A missing source is not a zero.** `stale`, `no_data`, `disabled`, and
+  `error` each mean the evidence was not observed. None of them means the
+  quantity is zero or the risk is absent. Responses carry `missing_is_zero:
+  false` to say so.
+
+### Korean ODA projects — `korean-oda-map`
+
+Korean development cooperation projects and their locations. Start with the
+status tool; it reports the source and correction layers separately.
+
+| Tool | What it returns | Inputs |
+|---|---|---|
+| `oda_map_data_status` | Layer state (`fresh`, `stale`, `no_data`, `disabled`, `error`), cache time, record count, coverage | `country` |
+| `oda_map_country_context` | Report-ready country summary: portfolio, agencies, sectors, map layers, locations. Separates map pins from unique projects and recalculates status against `as_of`. Carries no hazard, security, or travel data | **`country`**, `as_of`, `sections`, `sample_limit`, `include_coordinates` |
+| `oda_map_projects` | Search, filter, and page a country's projects. A multi-location project is counted once by activity identifier, with its sites kept in `locations` | **`country`**, `query`, `agency`, `sector`, `status`, `layers`, `as_of`, `limit`, `offset`, `fields`, `include_coordinates` |
+| `oda_map_project_detail` | One project by identifier, or by a location-suffixed map entity ID. Reports multi-location spread, budget duplication, source-layer state, and as-of status separately | **`project_id`**, `country`, `as_of`, `include_coordinates` |
+
+```text
+oda_map_data_status    { "country": "미얀마" }
+oda_map_projects       { "country": "미얀마", "sector": "보건", "limit": 3 }
+oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
+```
+
+`status` accepts `active`, `ended`, `planned`, or `unknown`, and it is derived
+from `as_of` rather than stored, so a portfolio count is only meaningful next
+to the date it was computed for.
+
+### International context — `international-data`
+
+Country context assembled from international sources. `country_data_status`
+reports freshness per source key, so read it before quoting any figure.
+
+| Tool | What it returns | Inputs |
+|---|---|---|
+| `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness across IATI, World Bank, OECD, hazard, HAPI, UNHCR, WHO, and ReliefWeb | **`countryCode`**, `refresh` |
+| `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | Structured HDX HAPI, UNHCR, and WHO GHO observations, plus recent ReliefWeb and World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_hazard_snapshot` | USGS, GDACS, and NASA EONET events clipped to the country boundary, de-duplicated by same type within 100 km and 48 hours | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
+| `country_travel_alert` | MOFA travel-alert levels for Korean nationals — safety information, not a feasibility judgement. Disabled on the public deployment; see below | **`countryCode`**, `refresh` |
+| `country_list` | KOICA overseas-office host and concurrent countries with ISO codes, responsible office, and jurisdiction role | (none) |
+| `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** |
+| `iati_query_country` | IATI activities, transactions, or budgets. Counts and three samples by default; `summary: false` returns detailed records | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
+| `iati_status` | Whether the server's IATI lookup is configured. Returns no credential value or storage location | (none) |
+| `iati_test_connection` | Fetches one Myanmar activity with the server-held credential to test the connection. Prints no credential | (none) |
+
+```text
+country_data_status    { "countryCode": "MM" }
+country_report_context { "countryCode": "MM", "sampleSize": 3 }
+iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 3 }
+```
+
+`countryCode` is ISO alpha-2 (Myanmar is `MM`), and `collection` is
+`activity`, `transaction`, or `budget`.
+
+### KOICA regulations — `koica-regulations`
+
+Search, cross-reference, and citation checking over the KOICA regulation
+index. The public profile returns bounded snippets, never full articles.
+
+| Tool | What it returns | Inputs |
+|---|---|---|
+| `search_regulation` | Regulation metadata and bounded article snippets with a relevance score. Full articles and attachments are withheld | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `list_sources` | The indexed current regulations with category, revision date, and article count | `category` |
+| `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `verify_citation` | Cross-checks every `{regulation} 제N조` citation in a text against the index and marks each `ok`, `not_found`, or `unknown_source` | **`text`** |
+
+```text
+search_regulation { "query": "연차휴가", "limit": 3 }
+find_references   { "source": "직제규정", "article": "제9조" }
+verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
+```
+
+`verify_citation` is the guard against invented articles: the citation above
+comes back `not_found`, because 인사규정 has no 제9999조. Run it over any
+drafted passage that cites regulations before the passage is circulated.
+
+### Development documents — `development-documents`
+
+Discovery over country-office development-cooperation documents. Corpora are
+per office, so resolve the office before searching.
+
+| Tool | What it returns | Inputs |
+|---|---|---|
+| `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
+| `search_development_trends` | Discovery metadata and bounded summaries. Full documents and entity-graph evidence are withheld | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+
+```text
+list_available_corpora    {}
+search_development_trends { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+```
+
+`office` takes a country name or slug (`캄보디아`, `cambodia`), `kinds` takes
+`trend` or `project`, and `office_role` distinguishes a host country from a
+concurrently accredited one.
+
+### Partner-country procurement — `partner-country-procurement`
+
+Three modelled axes per country: `bidding` (bidding rules), `governance`
+(procurement governance), and `pipeline` (ODA project formation). Check which
+axes exist before citing procurement.
+
+| Tool | What it returns | Inputs |
+|---|---|---|
+| `procurement_model_status` | Which axes are modelled for a country and their verification state | `country` |
+| `procurement_country_context` | Report-ready summary of the axes: authorities, procedural stages, bottlenecks, entry barriers. No full process graph | **`country`** |
+| `procurement_model_detail` | One country and one axis in full: canvas, process graph (lanes, stages, nodes, edges), and verification sources | **`country`**, **`axis`** |
+
+```text
+procurement_model_status { "country": "네팔" }
+procurement_model_detail { "country": "네팔", "axis": "pipeline" }
+```
+
+`country` accepts a slug, ISO3 code, Korean name, or English name (`nepal`,
+`NPL`, `네팔`, `Nepal`). An absent model means the axis has not been modelled,
+not that the partner country lacks a formal procedure.
+
+### Public profile limits
+
+The public profile caps result size and withholds some fields. These are
+enforced by the gateway, not by the client:
+
+| Parameter | Limit |
+|---|---|
+| `limit` | 10 for `search_regulation` and `find_references`, 20 for `search_development_trends`, 25 for `oda_map_projects` |
+| `rows` | 20 for `iati_query_country` |
+| `sampleSize`, `sample_limit` | 10 |
+| `offset`, `start` | 10000 |
+| `fields` | Only the values listed in each tool's schema |
+| `refresh` | Ignored — the profile serves server-managed caches |
+| `include_attachments`, `include_mermaid` | Unavailable |
+| `includeEvents` | At most 200 events; `record_count` still states the true total |
+
 ## Controlled updates
 
 - Data and compatible server behavior change at the remote services without a
