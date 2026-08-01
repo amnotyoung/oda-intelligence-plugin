@@ -197,6 +197,19 @@ const forbiddenNames = [
   "dependency-locks",
 ];
 
+// 이미 공개된 사이트 주소는 은닉 대상이 아니다. 배제 조항이 겨냥하는 것은 비공개
+// 저장소의 이름이지, 로그인 없이 열리는 웹사이트의 도메인이 아니다. 스킬은 지도
+// 근거를 제시할 때 그 주소를 독자에게 보여야 하고, 독자가 원본을 열지 못하면 근거를
+// 확인할 방법이 없다. 검사 전에 이 주소만 지우므로, 맨 이름은 여전히 실패한다.
+const publicSourceUrls = [/https:\/\/oda-map-lab\.pages\.dev/gu];
+
+function withoutPublicSourceUrls(text) {
+  return publicSourceUrls.reduce(
+    (value, pattern) => value.replaceAll(pattern, ""),
+    text,
+  );
+}
+
 // 상류에서 동기화되는 스킬 본문과 계약 파일이 대상이다. README는 네 백엔드
 // 식별자를 의도적으로 설명하고 있어 이 검사와 별개로 다룬다.
 test("synced skill text contains no non-public repository or internal path name", async () => {
@@ -204,7 +217,9 @@ test("synced skill text contains no non-public repository or internal path name"
     (file) => file.startsWith("plugins/") || file.startsWith("contracts/"),
   );
   for (const file of files) {
-    const text = await readFile(resolve(root, file), "utf8");
+    const text = withoutPublicSourceUrls(
+      await readFile(resolve(root, file), "utf8"),
+    );
     for (const name of forbiddenNames) {
       assert.ok(
         !text.includes(name),
@@ -212,6 +227,21 @@ test("synced skill text contains no non-public repository or internal path name"
       );
     }
   }
+});
+
+// 공개 도메인 예외가 맨 이름까지 열어주면 안 된다. 이 검사가 없으면 위 예외는
+// 조용히 넓어진다.
+test("the public source exception does not admit the bare private repository name", async () => {
+  assert.equal(
+    withoutPublicSourceUrls("see https://oda-map-lab.pages.dev for the map"),
+    "see  for the map",
+  );
+  assert.ok(withoutPublicSourceUrls("oda-map-lab").includes("oda-map-lab"));
+  assert.ok(
+    withoutPublicSourceUrls("github.com/owner/oda-map-lab").includes(
+      "oda-map-lab",
+    ),
+  );
 });
 
 test("public text contains no local path or unrelated owner repository URL", async () => {

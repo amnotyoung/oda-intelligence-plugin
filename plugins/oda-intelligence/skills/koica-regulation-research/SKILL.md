@@ -32,3 +32,5 @@ Read [references/research-protocol.md](references/research-protocol.md) before a
 ## Output
 
 Lead with the direct answer. Then give the governing provisions, procedure or criteria, exceptions, unresolved facts, and whether the complete official text was confirmed. Cite each material proposition as `규정명 제N조` and identify relevant annexes separately.
+
+Close with the sources the answer used: the regulation titles and revision labels `list_sources` returns, and whether the complete official text was confirmed outside the gateway. The regulation index has no registered public address — the gateway is its access path — so say that rather than offering a public portal URL that resembles it.
