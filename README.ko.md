@@ -17,7 +17,7 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-22개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
+23개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
 `koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
 `koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
 작동합니다.
@@ -37,7 +37,7 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 
 - Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 22개
+- 해당 커넥터가 제공하는 읽기 전용 도구 23개
 
 Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
@@ -108,6 +108,41 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 - 한국 ODA 통합누리집 지도 도구는 공개 지도에 이미 표시된 최종 유효 좌표를
   반환할 수 있습니다. 좌표의 출처와 범위는 유지해야 하며, 보정 전 좌표,
   검토 이력 및 제출자 정보는 제외됩니다.
+
+## 데이터 출처 및 표기
+
+모든 도구는 공개된 상위 출처로 요청을 전달합니다. 이 저장소는 반환된 데이터에
+새로운 라이선스를 적용하지 않으며, 출처 표기·라이선스·재사용 조건은 아래에
+명시한 각 출처를 따릅니다.
+
+`country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`,
+`country_report_context`는 ★로 표시한 국제 출처를 종합합니다.
+
+| 공개 출처 | 주소 | 도구 |
+| --- | --- | --- |
+| IATI Standard | `https://iatistandard.org` | ★, `iati_query_country`, `iati_status`, `iati_test_connection` |
+| World Bank Open Data | `https://data.worldbank.org` | ★ |
+| World Bank Documents & Reports | `https://documents.worldbank.org` | ★ |
+| OECD Data Explorer (DAC) | `https://data-explorer.oecd.org` | ★ |
+| USGS Earthquake Hazards Program | `https://earthquake.usgs.gov` | ★ |
+| GDACS | `https://www.gdacs.org` | ★ |
+| NASA EONET | `https://eonet.gsfc.nasa.gov` | ★ |
+| UNHCR Refugee Data Finder | `https://www.unhcr.org/refugee-statistics` | ★ |
+| WHO Global Health Observatory | `https://www.who.int/data/gho` | ★ |
+| HDX HAPI | `https://data.humdata.org` | ★ |
+| ReliefWeb | `https://reliefweb.int` | ★ |
+| ACLED | `https://acleddata.com` | ★ |
+| 외교부 해외안전여행 — 대한민국 국민 대상 여행경보 단계 | `https://www.0404.go.kr` | `country_travel_alert` |
+| `datasets/geo-countries` 공개 국가 경계 GeoJSON | `https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson` | `country_map_outline` |
+| KOICA 규정·시행세칙·지침 | `https://www.koica.go.kr` | `find_references`, `list_sources`, `search_regulation`, `verify_citation` |
+| KOICA 해외사무소 등록부 및 개발협력 문서 코퍼스. 각 결과는 자체 공개 원문 URL을 포함합니다 | `https://www.koica.go.kr` | `country_list`, `list_available_corpora`, `search_development_trends` |
+| 대한민국 ODA 통합누리집 — 한국 ODA 사업·지도 자료 | `https://www.odakorea.go.kr` | `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects` |
+| 협력국 조달 모델. 공식 법령·기관 자료를 정규화한 2차 자료입니다 | 모델별 공개 주소를 응답의 `model_url` 필드로 반환 | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` |
+
+출처 가용성은 호출마다 함께 반환하며, 비활성·부실·오류 상태를 "경보 없음"이나
+"위험 없음"으로 바꾸지 않습니다. `country_travel_alert`는 공개 계약에 승인되어
+있으나, 배포된 게이트웨이에 외교부 여행경보 서비스키가 설정되어 있지 않아
+현재 모든 국가에서 `alert_signal: "unavailable"`을 반환합니다.
 
 ## 데이터 이용 안내
 
