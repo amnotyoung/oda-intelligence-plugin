@@ -29,7 +29,7 @@ addresses for those domains:
 
 | Tool domain | What it holds | Public address |
 |---|---|---|
-| `korean-oda-map` | The Korean development cooperation location map and its reviewed-correction layer | https://oda-map-lab.pages.dev |
+| `korean-oda-map` | An independent, unofficial map of Korean development cooperation locations and its reviewed-correction layer. No agency published it | https://oda-map-lab.pages.dev |
 | `international-data` | IATI, World Bank, OECD, hazard, and humanitarian feeds, keyed per source below | Per source below |
 | `development-documents` | Indexed development cooperation documents | No registered public address |
 | `koica-regulations` | Indexed KOICA regulation text | No registered public address |
@@ -70,6 +70,10 @@ Rules:
   procurement answer quotes the `model_url` the model itself carries.
 - When the user asks where a source can be seen, answer with the address rather than searching the
   web for a government portal that resembles it.
+- Never construct a publisher name either. Call the map `한국 ODA 사업 위치 지도(비공식)` and leave its
+  compiler unnamed. It rests on Korean ODA project data, but it is an independent compilation that
+  no agency published, and writing an agency name in front of it — `KOICA ...` — turns a private
+  project into an official record the reader may go on to cite as one.
 
 ## The absence trap
 

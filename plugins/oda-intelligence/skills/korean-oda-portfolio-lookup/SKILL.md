@@ -139,8 +139,12 @@ Lead with the direct answer — the count, the agencies, or the named projects t
 Then give the breakdown, the reference date, the source status with its observation time, and the
 limitations that change interpretation.
 
-- Name the ODA Map source and the reference date beside the first count, with its public address
-  https://oda-map-lab.pages.dev, so the reader can open the map the count was computed from.
+- Beside the first count, name the map `한국 ODA 사업 위치 지도(비공식)` with the reference date and the
+  public address https://oda-map-lab.pages.dev, so the reader can open the map the count was
+  computed from. The map is an independent compilation, not a KOICA publication: never put KOICA or
+  any other agency name in front of it, and never give it a product name of your own. It draws on
+  Korean ODA project data, but naming an agency as its publisher presents a private compilation as
+  an official record.
 - Close with the sources the answer used — the tool domain or the `sources[].source` key, its
   status, and its observation time. `references/portfolio-lookup-protocol.md` holds the public
   address for each one. Three domains have no registered public address; say that rather than
