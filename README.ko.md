@@ -82,6 +82,152 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 변경은 같은 URL에서 사용할 수 있지만, 도구 계약의 새 버전은 워크스페이스
 관리자가 검토하고 갱신해야 합니다.
 
+## 도구
+
+커넥터는 다섯 개 출처 도메인에 걸쳐 23개의 읽기 전용 도구를 제공합니다. 출처에
+쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
+
+번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결합니다. "미얀마
+KOICA 사업이 뭐가 있나", "연차휴가 며칠인가" 같은 평범한 질문에는 도구 이름을
+댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이 만든 호출을 읽을 때
+쓰는 자료입니다.
+
+이 도구들로 만든 답변이 버티려면 두 가지 습관이 필요합니다.
+
+- **상태 도구를 먼저 호출합니다.** `oda_map_data_status`,
+  `procurement_model_status`, `country_data_status`, `iati_status`는 각 백엔드가
+  지금 무엇을 보유하고 있는지 보고합니다. 이를 건너뛰고 근거 도구를 부르면
+  빈약한 응답을 완결된 답으로 오해하기 쉽습니다.
+- **결측은 0이 아닙니다.** `stale`, `no_data`, `disabled`, `error`는 모두 근거를
+  관측하지 못했다는 뜻입니다. 수치가 0이라거나 위험이 없다는 뜻이 아닙니다.
+  응답에 실리는 `missing_is_zero: false`가 그것을 명시합니다.
+
+### 한국 ODA 사업 — `korean-oda-map`
+
+한국 개발협력 사업과 그 위치를 다룹니다. 상태 도구부터 호출하세요. 원천 레이어와
+승인 보정 레이어의 상태를 분리해 보고합니다.
+
+| 도구 | 무엇을 반환하는가 | 입력 |
+|---|---|---|
+| `oda_map_data_status` | 레이어 상태(`fresh`, `stale`, `no_data`, `disabled`, `error`), 캐시 시각, 레코드 수, 커버리지 | `country` |
+| `oda_map_country_context` | 국가별 사업·기관·위치 현황 요약. 지도 핀 수와 고유 사업 수를 구분하고 사업 상태를 `as_of` 기준으로 다시 계산합니다. 실시간 재난·치안·여행경보는 포함하지 않습니다 | **`country`**, `as_of`, `sections`, `sample_limit`, `include_coordinates` |
+| `oda_map_projects` | 국가의 사업을 검색·필터·페이지 처리합니다. 다중 위치 사업은 활동 식별자 기준으로 한 번만 집계하고 위치는 `locations`에 보존합니다 | **`country`**, `query`, `agency`, `sector`, `status`, `layers`, `as_of`, `limit`, `offset`, `fields`, `include_coordinates` |
+| `oda_map_project_detail` | 사업 식별자 또는 위치 접미사가 붙은 지도 entity ID로 사업 상세를 조회합니다. 다중 위치, 예산 중복, 원천 레이어 상태, 기준일 상태를 분리해 반환합니다 | **`project_id`**, `country`, `as_of`, `include_coordinates` |
+
+```text
+oda_map_data_status    { "country": "미얀마" }
+oda_map_projects       { "country": "미얀마", "sector": "보건", "limit": 3 }
+oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
+```
+
+`status`는 `active`, `ended`, `planned`, `unknown` 중 하나이며 저장된 값이 아니라
+`as_of`로 다시 계산한 값입니다. 따라서 사업 건수는 어느 기준일로 계산했는지와
+함께 제시해야 의미가 있습니다.
+
+### 국제 현황 — `international-data`
+
+국제 출처에서 모은 국가 현황입니다. `country_data_status`가 출처 키별로 최신성을
+보고하므로, 어떤 수치든 인용하기 전에 먼저 확인하세요.
+
+| 도구 | 무엇을 반환하는가 | 입력 |
+|---|---|---|
+| `country_data_status` | IATI·World Bank·OECD·재난·HAPI·UNHCR·WHO·ReliefWeb 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
+| `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | HDX HAPI·UNHCR·WHO GHO의 정형 관측치와 ReliefWeb·World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_hazard_snapshot` | USGS·GDACS·NASA EONET 사건을 국가 경계로 거른 뒤 같은 유형·100㎞·48시간 기준으로 중복 제거한 결과 | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
+| `country_travel_alert` | 외교부 여행경보 단계. 대한민국 국민 대상 안전 정보이며 사업 타당성 평가가 아닙니다. 공개 배포에서는 비활성 상태입니다(아래 참조) | **`countryCode`**, `refresh` |
+| `country_list` | KOICA 해외사무소 소재국·겸임국을 ISO 코드, 담당 사무소, 관할 역할과 함께 반환 | (없음) |
+| `country_map_outline` | 보고서 배경용 단순화 국가 윤곽선. 사업 위치를 얹을 지리 맥락일 뿐 경계 확정이 아닙니다 | **`countryCode`** |
+| `iati_query_country` | IATI 활동·거래·예산 조회. 기본은 건수와 표본 3건이며 `summary: false`일 때 상세 레코드를 반환합니다 | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
+| `iati_status` | 서버의 IATI 조회 기능이 준비됐는지만 확인합니다. 자격 증명 값이나 저장 위치는 반환하지 않습니다 | (없음) |
+| `iati_test_connection` | 서버가 관리하는 자격 증명으로 미얀마 활동 1건을 조회해 연결을 시험합니다. 자격 증명은 출력하지 않습니다 | (없음) |
+
+```text
+country_data_status    { "countryCode": "MM" }
+country_report_context { "countryCode": "MM", "sampleSize": 3 }
+iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 3 }
+```
+
+`countryCode`는 ISO alpha-2 코드이며(미얀마는 `MM`), `collection`은 `activity`,
+`transaction`, `budget` 중 하나입니다.
+
+### KOICA 규정 — `koica-regulations`
+
+KOICA 규정 색인에 대한 검색·상호참조·인용 검증입니다. 공개 프로필은 범위가
+제한된 스니펫만 반환하며 조문 전문은 반환하지 않습니다.
+
+| 도구 | 무엇을 반환하는가 | 입력 |
+|---|---|---|
+| `search_regulation` | 규정 메타데이터와 범위가 제한된 조문 스니펫, 적합도 점수. 조문 전문과 첨부는 제공하지 않습니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `list_sources` | 색인된 현행 규정 목록. 규정 유형, 개정일, 조문 수 포함 | `category` |
+| `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
+| `verify_citation` | 텍스트 안의 모든 `{규정명} 제N조` 인용을 색인과 대조해 `ok`, `not_found`, `unknown_source`로 분류합니다 | **`text`** |
+
+```text
+search_regulation { "query": "연차휴가", "limit": 3 }
+find_references   { "source": "직제규정", "article": "제9조" }
+verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
+```
+
+`verify_citation`은 지어낸 조문을 막는 장치입니다. 위 인용은 `not_found`로
+돌아옵니다. 인사규정에 제9999조가 없기 때문입니다. 규정을 인용한 문단은 회람하기
+전에 이 도구로 한 번 훑으세요.
+
+### 개발협력 문서 — `development-documents`
+
+국가사무소 개발협력 문서 탐색입니다. 코퍼스가 사무소 단위이므로 검색 전에
+사무소부터 확인합니다.
+
+| 도구 | 무엇을 반환하는가 | 입력 |
+|---|---|---|
+| `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
+| `search_development_trends` | 문서 탐색 메타데이터와 범위가 제한된 요약. 문서 전문과 관계 그래프 근거는 제공하지 않습니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+
+```text
+list_available_corpora    {}
+search_development_trends { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
+```
+
+`office`는 국가명 또는 slug(`캄보디아`, `cambodia`)를 받고, `kinds`는 `trend`와
+`project` 중에서 고르며, `office_role`은 주재국과 겸임국을 구분합니다.
+
+### 협력국 조달 — `partner-country-procurement`
+
+국가별로 세 개 축을 모델링합니다. `bidding`(입찰제도), `governance`(조달
+거버넌스), `pipeline`(ODA 사업형성 절차)입니다. 조달 근거를 쓰기 전에 어떤 축이
+있는지 먼저 확인하세요.
+
+| 도구 | 무엇을 반환하는가 | 입력 |
+|---|---|---|
+| `procurement_model_status` | 국가별로 어떤 축이 모델링되어 있는지와 그 검증 상태 | `country` |
+| `procurement_country_context` | 축별 요약: 권한기관, 절차 단계, 병목, 진입장벽. 전체 공정 그래프는 포함하지 않습니다 | **`country`** |
+| `procurement_model_detail` | 한 국가·한 축의 모델 전체. canvas, 공정 그래프(lanes·stages·nodes·edges), 검증 원출처 포함 | **`country`**, **`axis`** |
+
+```text
+procurement_model_status { "country": "네팔" }
+procurement_model_detail { "country": "네팔", "axis": "pipeline" }
+```
+
+`country`는 slug, ISO3 코드, 한국어명, 영문명을 모두 받습니다(`nepal`, `NPL`,
+`네팔`, `Nepal`). 모델이 없다는 것은 그 축이 아직 모델링되지 않았다는 뜻이지,
+협력국에 공식 절차가 없다는 뜻이 아닙니다.
+
+### 공개 프로필 제한
+
+공개 프로필은 결과 크기를 제한하고 일부 필드를 제공하지 않습니다. 클라이언트가
+아니라 게이트웨이가 강제합니다.
+
+| 파라미터 | 제한 |
+|---|---|
+| `limit` | `search_regulation`·`find_references` 10, `search_development_trends` 20, `oda_map_projects` 25 |
+| `rows` | `iati_query_country` 20 |
+| `sampleSize`, `sample_limit` | 10 |
+| `offset`, `start` | 10000 |
+| `fields` | 각 도구 스키마에 열거된 값만 |
+| `refresh` | 무시 — 서버가 관리하는 캐시를 제공합니다 |
+| `include_attachments`, `include_mermaid` | 제공하지 않음 |
+| `includeEvents` | 최대 200건 — 실제 총계는 `record_count`가 그대로 보고합니다 |
+
 ## 통제된 업데이트
 
 - 데이터 및 호환되는 서버 동작은 플러그인을 업데이트하지 않아도 원격
