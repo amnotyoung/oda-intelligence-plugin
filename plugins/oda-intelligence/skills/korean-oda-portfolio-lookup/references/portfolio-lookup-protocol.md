@@ -35,6 +35,13 @@ Before writing that Korean or KOICA project evidence is unavailable, confirm all
 - The statement names the ODA Map source and its status, rather than claiming the country has no
   Korean projects.
 
+The comparison question carries its own version of the trap. A user asks which projects resemble a
+named one; the question sounds like open research, so the assistant searches the web and builds the
+answer from whatever press coverage exists. The gateway holds the project records, and press
+coverage is a biased sample of them — it favours recent launches and large budgets, and it says
+nothing about the projects no one wrote about. Search the countries first, then use the web only for
+what the record does not carry.
+
 ## Status semantics
 
 | Status | Meaning | Answer treatment |
@@ -54,8 +61,37 @@ that, and tell the reader it is a gateway limitation rather than a data gap.
 `observed_at` on the ODA Map source is the map asset build time, not the observation time of each
 underlying project record. Say so when the age of an individual project matters.
 
+## Selecting fields
+
+`fields` on `oda_map_projects` works in both directions, and its default is much narrower than the
+schema. Omitting it returns seven fields:
+
+```
+id  name  agency  sector  dates  status  location_summary
+```
+
+Seven of the fourteen the schema allows are therefore absent by default — `description`, `amounts`,
+`locations`, `stage`, `aid_type`, `markers`, and `source`.
+
+- `description` carries the project's outputs and expected results — what gets built, what equipment
+  is installed, who gets trained. That is what a question about project content is asking for, and
+  what makes two projects comparable or not. The field is populated; the default call drops it
+  without saying so. Request it by name whenever the answer describes what a project does.
+- `amounts` carries `budget` and `spent`. A default call returns neither, so an answer that quotes a
+  figure without having requested `amounts` is quoting something else — usually the amount embedded
+  in the project name, which is name text rather than a validated field.
+- A response echoes the `fields` it applied. Read that echo back before concluding a field is empty:
+  an absent key in the items means the field was not requested, not that the source lacks a value.
+- Request `locations` with `include_coordinates` only when the answer needs geography, and carry the
+  `coordinate_provenance` and `coordinate_scope` caveats with any location claim.
+
 ## Filtering and paging
 
+- `country` is required on `oda_map_data_status`, `oda_map_country_context`, and
+  `oda_map_projects`. Nothing on this gateway searches the portfolio across countries, so a
+  comparison, precedent, or benchmark question is answered by repeated per-country calls over a
+  country set you chose — and the answer has to name that set. A bounded search reported without its
+  boundary reads as an exhaustive one.
 - `agency` matches the agency label the source returns, such as `한국국제협력단(KOICA)`. Confirm the
   label from the `agencies` section of `oda_map_country_context` before filtering, and prefer the
   `koica_project_count` field over a hand-rolled count. The labels are not normalised: one country
@@ -69,13 +105,12 @@ underlying project record. Say so when the age of an individual project matters.
   `oda_map_country_context` at different values; read each tool's schema rather than assuming one
   cap. When `has_more` is true, either page through with `offset` or say explicitly that the list is
   a sample of a stated total.
-- `fields` controls the returned shape. Request `locations` with `include_coordinates` only when the
-  answer needs geography, and carry the `coordinate_provenance` and `coordinate_scope` caveats with
-  any location claim.
 
 ## What not to infer
 
 - Do not infer a budget figure, a currency, or a total spend from the map dataset.
+- Do not read the amount embedded in a project name as its budget. `('25-'29/880만불)` is part of
+  the name string and can disagree with `amounts` on the same record.
 - Do not infer that an `active` project has an approved current-year budget, a solicitation, or a
   contract.
 - Do not infer sector priority from a sector count alone; the counts include activities of very
