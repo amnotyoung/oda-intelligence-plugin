@@ -320,9 +320,9 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 |---|---|---|
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
-| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | 공개 주소 미등록 |
-| `development-documents` | `list_available_corpora`, `search_development_trends` | 공개 주소 미등록 |
-| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | 응답의 `model_url` 필드에 모델별 주소 |
+| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | https://github.com/amnotyoung/koica-reg-mcp |
+| `development-documents` | `list_available_corpora`, `search_development_trends` | https://devcoop-trends-wiki.pages.dev |
+| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 
 `korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
 한국 ODA 사업 데이터에 기반하지만 어느 기관도 발행하지 않았고 어느 기관의 보증도
@@ -349,17 +349,18 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 `international-data`에 속하지만 출처 키가 없는 도구가 둘 있습니다.
 `country_list`는 개발협력 문서 인덱스에서 가져온 사무소 관할 정보를 반환하므로,
-공개 주소가 등록되지 않은 그 인덱스를 출처로 제시합니다. `country_map_outline`은
-자신의 출처를 응답에 직접 싣습니다. 매 응답의 `source` 필드가 공개
+그 인덱스(https://devcoop-trends-wiki.pages.dev)를 출처로 제시합니다.
+`country_map_outline`은 자신의 출처를 응답에 직접 싣습니다. 매 응답의 `source` 필드가 공개
 `datasets/geo-countries` GeoJSON 주소 —
 https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
 — 를 담으므로, 조달의 `model_url`처럼 그 필드를 인용합니다.
 
-KOICA 규정 색인과 개발협력 문서 코퍼스에는 공개 주소가 없으며 게이트웨이가 곧
-접근 경로입니다. 색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 그렇게 답합니다.
-이름이 비슷한 공개 포털은 다른 자료를 담고 있어, 그쪽으로 안내하면 독자가 하려던
-확인을 오히려 막습니다. 조달은 다릅니다. 모델 응답마다 `model_url`이 실리므로
-도메인이 아니라 그 필드를 인용합니다.
+색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 위 표의 주소로 답합니다. KOICA
+규정 색인은 단독 배포판 저장소가, 개발협력 문서 코퍼스는 공개 위키가 그 자리입니다.
+다만 이름이 비슷한 다른 공개 포털은 다른 자료를 담고 있으므로, 표에 적힌 주소가
+아닌 곳으로 안내하면 독자가 하려던 확인을 오히려 막습니다. 조달은 도메인 하나로
+답하기 어렵습니다. 모델 응답마다 `model_url`이 실리므로, 사이트 주소보다 그 필드를
+우선 인용합니다.
 
 `country_travel_alert`는 계약에 승인되어 있지만, 공개 배포에 외교부 여행경보
 서비스키가 설정되어 있지 않아 `mofa_travel_alert`가 `disabled`로 보고되고 도구는

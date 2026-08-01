@@ -329,9 +329,9 @@ when this document falls behind.
 |---|---|---|
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
-| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | No registered public address |
-| `development-documents` | `list_available_corpora`, `search_development_trends` | No registered public address |
-| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | Per-model address in the `model_url` response field |
+| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | https://github.com/amnotyoung/koica-reg-mcp |
+| `development-documents` | `list_available_corpora`, `search_development_trends` | https://devcoop-trends-wiki.pages.dev |
+| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `korean-oda-map` is an independent, unofficial compilation of Korean
 development cooperation locations. It rests on Korean ODA project data, but no
@@ -359,17 +359,18 @@ unofficial map and name no agency as its publisher.
 
 Two tools sit in `international-data` without a source key. `country_list`
 returns office jurisdiction drawn from the development-document index, so
-attribute it to that index, which has no registered public address.
+attribute it to that index at https://devcoop-trends-wiki.pages.dev.
 `country_map_outline` names its own source: each response carries the public
 `datasets/geo-countries` GeoJSON address in its `source` field — currently
 https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
 — so cite that field, the way a procurement answer cites `model_url`.
 
-The KOICA regulation index and the development-document corpus have no
-registered public address, and the gateway is their access path. That is the
-answer to give when a reader asks where the indexed text can be seen. A public
-portal that resembles the source holds something else, and sending a reader
-there costs them the check they were trying to make. Procurement is different:
+When a reader asks where the indexed text can be seen, answer with the address
+in the table above: the standalone distribution repository for the KOICA
+regulation index, the public wiki for the development-document corpus. A
+different public portal that resembles the source holds something else, so
+sending a reader anywhere other than the listed address costs them the check
+they were trying to make. Procurement is different:
 each model response carries its own `model_url`, so quote that field rather than
 a domain.
 

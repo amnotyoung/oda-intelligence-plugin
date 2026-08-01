@@ -194,6 +194,10 @@ const allowedRepositoryPaths = new Set([
   // README "Related tooling"이 가리키는 동반 프레임워크. 이 게이트웨이를
   // 선택적 증거원으로 쓰는 소비자이며, 역방향 의존은 없다.
   "/amnotyoung/dev-eval-agents",
+  // koica-regulations 백엔드의 단독 배포판. 공개 저장소이므로(공개 확인:
+  // 인증 없는 GET 200, GitHub API visibility=public) 출처 표의 공개 주소로
+  // 밝힌다. 배제 조항이 겨냥하는 것은 비공개 저장소의 이름이다.
+  "/amnotyoung/koica-reg-mcp",
 ]);
 
 const forbiddenNames = [
