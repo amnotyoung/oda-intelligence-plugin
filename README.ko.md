@@ -132,6 +132,14 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 | `acled` | https://acleddata.com |
 | `mofa_travel_alert` | https://www.0404.go.kr |
 
+`international-data`에 속하지만 출처 키가 없는 도구가 둘 있습니다.
+`country_list`는 개발협력 문서 인덱스에서 가져온 사무소 관할 정보를 반환하므로,
+공개 주소가 등록되지 않은 그 인덱스를 출처로 제시합니다. `country_map_outline`은
+자신의 출처를 응답에 직접 싣습니다. 매 응답의 `source` 필드가 공개
+`datasets/geo-countries` GeoJSON 주소 —
+https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
+— 를 담으므로, 조달의 `model_url`처럼 그 필드를 인용합니다.
+
 KOICA 규정 색인과 개발협력 문서 코퍼스에는 공개 주소가 없으며 게이트웨이가 곧
 접근 경로입니다. 색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 그렇게 답합니다.
 이름이 비슷한 공개 포털은 다른 자료를 담고 있어, 그쪽으로 안내하면 독자가 하려던
