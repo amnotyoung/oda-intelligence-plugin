@@ -276,7 +276,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `oda_map_projects` 25, `search_entity_relationships` 50 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -284,6 +284,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | `refresh` | 무시 — 서버가 관리하는 캐시를 제공합니다 |
 | `includeEvents` | 최대 200건 — 실제 총계는 `record_count`가 그대로 보고합니다 |
 | `list_attachments` 결과 | 응답 예산에 맞춰 잘림 — `total`이 언제나 실제 총계를 담고, caveat가 좁힐 필터를 안내합니다 |
+| `oda_map_projects` 항목 | 무거운 필드 조합(전체 필드+좌표)은 응답 예산에 맞춰 잘립니다 — `returned`·`has_more`가 페이징에 맞게 보정되고 caveat가 잘린 건수를 알립니다. 기본 압축 필드는 100건이 그대로 반환됩니다 |
 
 ## 통제된 업데이트
 
