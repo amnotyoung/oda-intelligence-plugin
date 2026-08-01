@@ -50,6 +50,12 @@ claude plugin marketplace add amnotyoung/oda-intelligence-plugin
 claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
+An install demo in the desktop app, at 2× speed: adding the marketplace,
+confirming that three Skills and one connector are installed, and answering a
+real question.
+
+![ODA Intelligence install demo](docs/assets/install-demo.gif)
+
 ## Codex
 
 Install from the public marketplace:

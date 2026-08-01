@@ -22,6 +22,7 @@ const expectedPublicFiles = [
   "TERMS.md",
   "contracts/gateway-contract.json",
   "contracts/observed.lock.json",
+  "docs/assets/install-demo.gif",
   "package-lock.json",
   "package.json",
   "plugins/oda-intelligence/.claude-plugin/plugin.json",
