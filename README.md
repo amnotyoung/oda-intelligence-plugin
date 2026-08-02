@@ -57,17 +57,32 @@ claude plugin install oda-intelligence@oda-intelligence-plugin
 
 ## Codex
 
-공개 마켓플레이스에서 설치합니다.
+공개 GitHub 저장소를 Codex 마켓플레이스 소스로 추가한 뒤 플러그인을
+설치합니다.
 
 ```bash
 codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
 
-로컬 개발 시에는 저장소 인자를 `.`으로 바꾸세요.
+로컬 개발 시에는 저장소 루트에서 저장소 인자를 `.`으로 바꿉니다.
 
-설치 또는 업데이트 후 새 작업을 시작해야 Codex가 새 Skill과 MCP 구성을
-불러옵니다.
+```bash
+codex plugin marketplace add .
+codex plugin add oda-intelligence@oda-intelligence-plugin
+```
+
+GitHub 설치본을 업데이트할 때는 마켓플레이스를 갱신한 뒤 플러그인을 다시
+설치합니다.
+
+```bash
+codex plugin marketplace upgrade oda-intelligence-plugin
+codex plugin add oda-intelligence@oda-intelligence-plugin
+```
+
+로컬 소스를 수정한 경우에는 플러그인 버전 또는 Codex 캐시버스터를 갱신한 뒤
+`codex plugin add`를 다시 실행하세요. 설치 또는 재설치 후 새 작업을 시작해야
+Codex가 갱신된 Skill과 MCP 구성을 불러옵니다.
 
 ## ChatGPT
 

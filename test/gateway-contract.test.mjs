@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   buildObservedLock,
+  evaluateSmokeResults,
   validateGatewayCompatibility,
   validatePluginConfiguration,
+  validateSmokeCoverage,
 } from "../scripts/check-gateway-contract.mjs";
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const contract = {
   gateway: {
@@ -196,4 +203,49 @@ test("forbidden, additional, and write-capable public tools fail", () => {
   assert.match(failures, /unapproved additional tool raw_document/);
   assert.match(failures, /unapproved additional tool write_record/);
   assert.match(failures, /write_record: readOnlyHint is not true/);
+});
+
+test("every contracted tool declares smoke arguments or an exemption", () => {
+  const smokeContract = {
+    tools: {
+      callable: { smoke_arguments: { query: "x" } },
+      volatile: { smoke_exempt_reason: "id changes per build" },
+      forgotten: {},
+      both: { smoke_arguments: {}, smoke_exempt_reason: "why" },
+    },
+  };
+  const failures = validateSmokeCoverage(smokeContract).join("\n");
+  assert.match(failures, /forgotten: needs smoke_arguments/);
+  assert.match(failures, /both: smoke_arguments and smoke_exempt_reason/);
+  assert.doesNotMatch(failures, /callable/);
+  assert.doesNotMatch(failures, /volatile/);
+});
+
+test("a tool that is listed but always errors fails the smoke check", () => {
+  const failures = evaluateSmokeResults([
+    { tool: "healthy", result: { content: [{ type: "text", text: "{}" }] } },
+    {
+      tool: "blocked",
+      result: {
+        isError: true,
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ ok: false, code: "PUBLIC_RESPONSE_BLOCKED" }),
+          },
+        ],
+      },
+    },
+    { tool: "unreachable", error: "socket hang up" },
+  ]).join("\n");
+  assert.match(failures, /blocked: returned isError — PUBLIC_RESPONSE_BLOCKED/);
+  assert.match(failures, /unreachable: call failed — socket hang up/);
+  assert.doesNotMatch(failures, /healthy/);
+});
+
+test("the shipped contract covers every tool with smoke arguments", async () => {
+  const contractFile = JSON.parse(
+    await readFile(resolve(ROOT, "contracts", "gateway-contract.json"), "utf8"),
+  );
+  assert.deepEqual(validateSmokeCoverage(contractFile), []);
 });

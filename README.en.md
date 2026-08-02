@@ -58,17 +58,33 @@ real question.
 
 ## Codex
 
-Install from the public marketplace:
+Add the public GitHub repository as a Codex marketplace source, then install
+the plugin:
 
 ```bash
 codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
 
-For local development, replace the repository argument with `.`.
+For local development, run the commands from the repository root and replace
+the repository argument with `.`:
 
-Start a new task after installation or update so Codex loads the new Skills and
-MCP configuration.
+```bash
+codex plugin marketplace add .
+codex plugin add oda-intelligence@oda-intelligence-plugin
+```
+
+To update an installation from GitHub, refresh the marketplace and reinstall
+the plugin:
+
+```bash
+codex plugin marketplace upgrade oda-intelligence-plugin
+codex plugin add oda-intelligence@oda-intelligence-plugin
+```
+
+After changing the local source, update the plugin version or Codex cachebuster
+and run `codex plugin add` again. Start a new task after installation or
+reinstallation so Codex loads the updated Skills and MCP configuration.
 
 ## ChatGPT
 

@@ -23,7 +23,8 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "country_data_status": {
       "allowed_required_inputs": [
@@ -46,7 +47,10 @@
         "stale_sources",
         "total_sources"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "country_hazard_snapshot": {
       "allowed_required_inputs": [
@@ -71,7 +75,10 @@
         "sample",
         "sources"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "country_humanitarian_context": {
       "allowed_required_inputs": [
@@ -93,7 +100,10 @@
         "source_status",
         "summary"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "country_list": {
       "allowed_required_inputs": [],
@@ -104,7 +114,8 @@
         "office_count",
         "registry_as_of"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "country_map_outline": {
       "allowed_required_inputs": [
@@ -119,7 +130,10 @@
         "rings",
         "status"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "country_report_context": {
       "allowed_required_inputs": [
@@ -144,7 +158,10 @@
         "source_status",
         "summary"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "country_travel_alert": {
       "allowed_required_inputs": [
@@ -170,7 +187,10 @@
         "risk_score",
         "source_status"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "find_references": {
       "allowed_required_inputs": [
@@ -189,7 +209,11 @@
         "outgoing",
         "target"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "대외무상협력사업에 관한 조달 및 계약규정",
+        "article": "제30조"
+      }
     },
     "get_article": {
       "allowed_required_inputs": [
@@ -203,7 +227,11 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "대외무상협력사업에 관한 조달 및 계약규정",
+        "article": "제30조"
+      }
     },
     "get_attachment": {
       "allowed_required_inputs": [
@@ -217,7 +245,11 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "인사규정",
+        "label": "[별지 제1호 서식]"
+      }
     },
     "get_corpus_overview": {
       "allowed_required_inputs": [
@@ -235,7 +267,10 @@
         "sectors",
         "total_documents"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "office": "vietnam"
+      }
     },
     "get_trend_document": {
       "allowed_required_inputs": [
@@ -252,7 +287,8 @@
         "relationship_count",
         "relationships"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_exempt_reason": "document_id는 코퍼스마다 달라 고정할 수 없다"
     },
     "iati_query_country": {
       "allowed_required_inputs": [
@@ -288,7 +324,10 @@
         "summary",
         "total_found"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "VN"
+      }
     },
     "iati_status": {
       "allowed_required_inputs": [],
@@ -299,7 +338,8 @@
         "nextStep",
         "ok"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "iati_test_connection": {
       "allowed_required_inputs": [],
@@ -313,7 +353,8 @@
         "testedAt",
         "totalFound"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "list_attachments": {
       "allowed_required_inputs": [],
@@ -327,7 +368,10 @@
         "result",
         "total"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "인사규정"
+      }
     },
     "list_available_corpora": {
       "allowed_required_inputs": [],
@@ -336,7 +380,8 @@
         "corpora",
         "office_registry"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "list_sources": {
       "allowed_required_inputs": [],
@@ -346,7 +391,8 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "oda_map_country_context": {
       "allowed_required_inputs": [
@@ -367,7 +413,10 @@
         "summary"
       ],
       "requires_coordinate_output": true,
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "베트남"
+      }
     },
     "oda_map_data_status": {
       "allowed_required_inputs": [],
@@ -378,7 +427,10 @@
         "data",
         "summary"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "베트남"
+      }
     },
     "oda_map_project_detail": {
       "allowed_required_inputs": [
@@ -398,7 +450,8 @@
         "summary"
       ],
       "requires_coordinate_output": true,
-      "read_only": true
+      "read_only": true,
+      "smoke_exempt_reason": "project_id는 지도 빌드마다 달라 고정할 수 없다"
     },
     "oda_map_projects": {
       "allowed_required_inputs": [
@@ -425,7 +478,10 @@
         "summary"
       ],
       "requires_coordinate_output": true,
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "베트남"
+      }
     },
     "procurement_country_context": {
       "allowed_required_inputs": [
@@ -441,7 +497,10 @@
         "models",
         "status"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "베트남"
+      }
     },
     "procurement_model_detail": {
       "allowed_required_inputs": [
@@ -459,7 +518,11 @@
         "dataset",
         "status"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "베트남",
+        "axis": "bidding"
+      }
     },
     "procurement_model_status": {
       "allowed_required_inputs": [],
@@ -472,7 +535,8 @@
         "dataset",
         "status"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {}
     },
     "search_development_trends": {
       "allowed_required_inputs": [
@@ -496,7 +560,11 @@
         "documents",
         "result_count"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "office": "vietnam",
+        "query": "보건"
+      }
     },
     "search_entity_relationships": {
       "allowed_required_inputs": [
@@ -520,7 +588,11 @@
         "result_count",
         "total_matches"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "office": "vietnam",
+        "entity": "KOICA"
+      }
     },
     "search_regulation": {
       "allowed_required_inputs": [
@@ -537,7 +609,10 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "query": "지체상금"
+      }
     },
     "verify_citation": {
       "allowed_required_inputs": [
@@ -549,7 +624,10 @@
       "output_required": [
         "result"
       ],
-      "read_only": true
+      "read_only": true,
+      "smoke_arguments": {
+        "text": "인사규정 제1조"
+      }
     }
   }
 }
