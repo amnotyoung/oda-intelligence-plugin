@@ -217,7 +217,7 @@ order is discovery → full text → citation check.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
-| `search_regulation` | Regulation metadata and article snippets with a relevance score. `include_attachments: true` searches annex tables and forms (별표·별지) too | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `search_regulation` | Regulation metadata and article snippets with a relevance score. `include_attachments: true` searches annex tables and forms (별표·별지) too, and `mode` picks hybrid (default), keyword, or semantic retrieval | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
 | `get_article` | The complete text of one article, selected by regulation name and article number. Main-body articles win over supplementary (부칙) duplicates | **`source`**, **`article`** |
 | `list_sources` | The indexed current regulations with category, revision date, and article count | `category` |
 | `list_attachments` | The annex/form index (별표·별지) with titles and excerpts, filterable by regulation, category, and kind. Truncates to the response budget; `total` always states the true count | `source`, `category`, `kind`, `include_deleted` |
@@ -247,14 +247,16 @@ conclusion against the current official source.
 
 Country-office development-cooperation documents and the relationships
 extracted from them — the content of the trend wiki, queryable without
-visiting the site. Corpora are per office, so resolve the office before
-searching. The working order is discovery → document context → relationship
-evidence.
+visiting the site. Corpora are per office. When you do not know which office
+to look at, `search_offices_by_topic` finds the offices that carry the topic
+across all 48 corpora. The working order is office discovery → search →
+document context → relationship evidence.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
-| `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_offices_by_topic` | An office ranking across all 48 corpora — hit count and up to two evidence documents per office. `total_matches` states the corpus-wide count and `truncated_office_count` how many offices the cap dropped | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document. `total_matches` states the full count and `offset` pages past the first results | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, the relationships extracted from that document, and ten related trends and ten related projects — the lists its wiki page shows | **`office`**, **`document_id`** |
 | `get_corpus_overview` | Sector, month, kind, and organization document counts for an office corpus — the same aggregates the wiki catalog page shows. Organization counts are once per document | **`office`** |
 | `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
@@ -308,7 +310,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
+| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 20 offices for `search_offices_by_topic`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -345,8 +347,8 @@ when this document falls behind.
 |---|---|---|
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
-| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_development_trends` | https://devcoop-trends-wiki.pages.dev |
+| `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
+| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `korean-oda-map` is an independent, unofficial compilation of Korean

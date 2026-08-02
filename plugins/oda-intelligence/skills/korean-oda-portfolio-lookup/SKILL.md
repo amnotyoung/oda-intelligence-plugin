@@ -85,16 +85,19 @@ source recomputes status at the call date, and the answer should say which date 
 
 ## Cross-country comparison
 
-`country` is required on every ODA Map tool. No call searches the whole portfolio at once, so a
-comparison question is assembled country by country rather than answered by one query.
+Every ODA Map call that reads the portfolio — `oda_map_country_context`, `oda_map_projects` —
+takes exactly one `country`, and nothing searches the whole portfolio at once. A comparison
+question is therefore assembled country by country rather than answered by one query.
 
 1. Read the reference project first — `oda_map_projects` for its country with `description` in
    `fields`, or `oda_map_project_detail` for the single activity. Its sector label and description
    are what make the following queries mean anything. A comparison built from the project title
    alone matches on wording, not on what the projects do.
-2. Choose the countries to search, and say why you chose them: the region, the partner countries
-   from `country_list`, the countries the user named. The choice bounds the answer, so it belongs in
-   the answer.
+2. Choose the countries to search, and say why you chose them: the countries the user named, the
+   region, the partner countries from `country_list` — or, for a sector-shaped comparison, the
+   office ranking from `search_offices_by_topic`. That tool reads the development-documents
+   corpus, not the ODA Map inventory, so its hits justify which countries to query and never
+   enter the project count. The choice bounds the answer, so it belongs in the answer.
 3. Query each country with `query` or `sector`, always with `description` in `fields`. Sector labels
    are not normalised, so a `sector` filter misses projects a `query` term catches, and the reverse.
    Run both when the comparison carries weight.
