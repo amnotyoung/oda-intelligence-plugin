@@ -31,12 +31,12 @@ addresses for those domains:
 |---|---|---|
 | `korean-oda-map` | An independent, unofficial map of Korean development cooperation locations and its reviewed-correction layer. No agency published it | https://oda-map-lab.pages.dev |
 | `international-data` | IATI, World Bank, OECD, hazard, and humanitarian feeds, keyed per source below | Per source below |
-| `development-documents` | Indexed development cooperation documents | No registered public address |
-| `koica-regulations` | Indexed KOICA regulation text | No registered public address |
-| `partner-country-procurement` | Partner-country procurement models | Per-model address in the `model_url` response field |
+| `development-documents` | Indexed development cooperation documents | https://devcoop-trends-wiki.pages.dev |
+| `koica-regulations` | Indexed KOICA regulation text | https://github.com/amnotyoung/koica-reg-mcp |
+| `partner-country-procurement` | Partner-country procurement models | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `country_list` is tagged `international-data` but returns office jurisdiction drawn from the
-development-document index. Attribute it to that index, which has no registered public address.
+development-document index. Attribute it to that index at https://devcoop-trends-wiki.pages.dev.
 
 `country_data_status` and `country_report_context` return `sources[].source` keys inside the
 `international-data` domain. Attribute the key, not the domain:
@@ -64,10 +64,10 @@ Rules:
   gap.
 - Carry the observation time with the address. `https://oda-map-lab.pages.dev` shows the map as it
   stands now, and the answer was computed from a build observed at `observed_at`.
-- Never construct an address that is not in these tables. `No registered public address` is the
-  correct answer for the regulation index and the document corpus — the gateway is the access path,
-  and inventing a portal URL sends the reader somewhere that does not hold the evidence. A
-  procurement answer quotes the `model_url` the model itself carries.
+- Never construct an address that is not in these tables. Inventing a portal URL sends the reader
+  somewhere that does not hold the evidence, and a government portal whose name resembles a source
+  holds something else. A procurement answer quotes the `model_url` the model itself carries, which
+  is more precise than the site address.
 - When the user asks where a source can be seen, answer with the address rather than searching the
   web for a government portal that resembles it.
 - Never construct a publisher name either. Call the map `한국 ODA 사업 위치 지도(비공식)` and leave its
