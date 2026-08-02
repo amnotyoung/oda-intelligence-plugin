@@ -216,7 +216,13 @@ const forbiddenNames = [
 // 저장소의 이름이지, 로그인 없이 열리는 웹사이트의 도메인이 아니다. 스킬은 지도
 // 근거를 제시할 때 그 주소를 독자에게 보여야 하고, 독자가 원본을 열지 못하면 근거를
 // 확인할 방법이 없다. 검사 전에 이 주소만 지우므로, 맨 이름은 여전히 실패한다.
-const publicSourceUrls = [/https:\/\/oda-map-lab\.pages\.dev/gu];
+const publicSourceUrls = [
+  /https:\/\/oda-map-lab\.pages\.dev/gu,
+  // 조달 모델의 공개 사이트. 로그인 없이 열리므로 은닉 대상이 아니지만, 경로에
+  // 데이터셋 이름이 들어 있어 URL을 지우지 않으면 금칙어 검사에 걸린다. 접두사를
+  // 요구하므로 맨 이름 `overseas-procurement-100`은 그대로 남아 계속 실패한다.
+  /https:\/\/amnotyoung\.github\.io\/overseas-procurement-100(?:\/[\w./-]*)?/gu,
+];
 
 function withoutPublicSourceUrls(text) {
   return publicSourceUrls.reduce(
@@ -250,6 +256,23 @@ test("the public source exception does not admit the bare private repository nam
   assert.equal(
     withoutPublicSourceUrls("see https://oda-map-lab.pages.dev for the map"),
     "see  for the map",
+  );
+  assert.equal(
+    withoutPublicSourceUrls(
+      "see https://amnotyoung.github.io/overseas-procurement-100/ for models",
+    ),
+    "see  for models",
+  );
+  assert.equal(
+    withoutPublicSourceUrls(
+      "model https://amnotyoung.github.io/overseas-procurement-100/model/nepal-bidding-system/ here",
+    ),
+    "model  here",
+  );
+  assert.ok(
+    withoutPublicSourceUrls("overseas-procurement-100").includes(
+      "overseas-procurement-100",
+    ),
   );
   assert.ok(withoutPublicSourceUrls("oda-map-lab").includes("oda-map-lab"));
   assert.ok(

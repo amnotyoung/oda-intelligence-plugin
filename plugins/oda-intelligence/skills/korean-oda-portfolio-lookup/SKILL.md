@@ -147,8 +147,8 @@ limitations that change interpretation.
   an official record.
 - Close with the sources the answer used — the tool domain or the `sources[].source` key, its
   status, and its observation time. `references/portfolio-lookup-protocol.md` holds the public
-  address for each one. Three domains have no registered public address; say that rather than
-  offering a government portal that merely resembles the source.
+  address for each one. Give the listed address rather than a government portal that merely
+  resembles the source.
 - Give project names as the source gives them, Korean and English where both exist.
 - For a comparison answer, state the countries searched beside the matches, and describe each match
   from its `description` rather than from its title. What makes two projects comparable is what they
