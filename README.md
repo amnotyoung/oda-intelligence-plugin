@@ -252,6 +252,7 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 | `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크. `total_matches`가 전체 일치 수를 보고하고 `offset`으로 다음 페이지를 조회합니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들, 그리고 관련 동향·사업 각 10건(위키 문서 페이지의 그 목록) | **`office`**, **`document_id`** |
 | `get_corpus_overview` | 사무소 코퍼스의 분야·월·문서종류·기관별 문서 수 — 위키 목차 페이지와 같은 레코드에서 센 집계입니다. 기관 카운트는 문서당 1회 기준 | **`office`** |
+| `search_offices_by_entity` | 48개 사무소를 가로지른 기관 랭킹 — 사무소별 관계 수, 주요 관계 유형, 대표 관계 최대 2건(근거 문장 없음). 근거 본문 검색(`query`)은 사무소별 도구만 지원합니다 | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
 | `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
 > 캄보디아에서 KOICA가 어떤 기관들과 협력하는지, 무슨 근거로 그런지 보여줘.
@@ -301,7 +302,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_offices_by_topic` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_offices_by_topic`·`search_offices_by_entity` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -339,7 +340,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
+| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 
 `korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.

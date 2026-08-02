@@ -595,6 +595,30 @@
         "entity": "KOICA"
       }
     },
+    "search_offices_by_entity": {
+      "allowed_required_inputs": [
+        "entity"
+      ],
+      "input_properties": {
+        "entity": "string",
+        "kinds": "array",
+        "limit": "integer",
+        "month_from": "string",
+        "month_to": "string",
+        "relation_type": "string"
+      },
+      "output_required": [
+        "caveat",
+        "entity",
+        "office_count",
+        "offices",
+        "total_matches"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "entity": "KOICA"
+      }
+    },
     "search_offices_by_topic": {
       "allowed_required_inputs": [
         "query"
