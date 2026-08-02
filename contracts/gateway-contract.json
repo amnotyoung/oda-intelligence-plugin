@@ -551,6 +551,7 @@
         "month_to": "string",
         "office": "string",
         "office_role": "string",
+        "offset": "integer",
         "query": "string",
         "sector": "string"
       },
@@ -603,6 +604,7 @@
         "fuzzy": "boolean",
         "include_attachments": "boolean",
         "limit": "integer",
+        "mode": "string",
         "query": "string",
         "source": "null|string"
       },
