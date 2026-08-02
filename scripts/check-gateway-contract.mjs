@@ -245,7 +245,84 @@ export function validatePluginConfiguration(contract, config) {
   return failures;
 }
 
-export async function inspectGateway(contract) {
+// A tool can satisfy every schema check in tools/list and still fail on every
+// call — the gateway sanitizes responses after the upstream answers, so an
+// upstream field the response policy does not allow blocks the tool while its
+// advertised contract stays intact. Only a real call sees that.
+export function validateSmokeCoverage(contract) {
+  const failures = [];
+  for (const [toolName, spec] of Object.entries(contract.tools ?? {})) {
+    const hasArguments =
+      spec.smoke_arguments !== null &&
+      typeof spec.smoke_arguments === "object" &&
+      !Array.isArray(spec.smoke_arguments);
+    const hasExemption =
+      typeof spec.smoke_exempt_reason === "string" &&
+      spec.smoke_exempt_reason.length > 0;
+    if (hasArguments && hasExemption) {
+      failures.push(
+        `${toolName}: smoke_arguments and smoke_exempt_reason are both set`,
+      );
+    } else if (!hasArguments && !hasExemption) {
+      failures.push(
+        `${toolName}: needs smoke_arguments or a smoke_exempt_reason`,
+      );
+    }
+  }
+  return failures;
+}
+
+function describeToolError(result) {
+  const text = result?.content?.find((part) => part?.type === "text")?.text;
+  if (typeof text !== "string") return "no error text";
+  try {
+    const parsed = JSON.parse(text);
+    return parsed.code ?? parsed.message ?? text.slice(0, 200);
+  } catch {
+    return text.slice(0, 200);
+  }
+}
+
+export function evaluateSmokeResults(results) {
+  const failures = [];
+  for (const { tool, result, error } of results) {
+    if (error) {
+      failures.push(`${tool}: call failed — ${error}`);
+    } else if (result?.isError === true) {
+      failures.push(`${tool}: returned isError — ${describeToolError(result)}`);
+    }
+  }
+  return failures;
+}
+
+const SMOKE_CALL_TIMEOUT_MS = 240_000;
+
+async function smokeTools(client, contract) {
+  const results = [];
+  // Sequential: the public gateway rate-limits per minute, and a burst of
+  // parallel calls would report a limit breach as a broken tool.
+  for (const [toolName, spec] of Object.entries(contract.tools ?? {})) {
+    if (spec.smoke_exempt_reason) continue;
+    try {
+      const result = await client.callTool(
+        { name: toolName, arguments: spec.smoke_arguments },
+        undefined,
+        // The country tools fan out to external APIs and answer in minutes on a
+        // cold cache. The default 60s would report that as a broken tool.
+        { timeout: SMOKE_CALL_TIMEOUT_MS },
+      );
+      results.push({ tool: toolName, result });
+    } catch (error) {
+      results.push({
+        tool: toolName,
+        error: error instanceof Error ? error.message : "unknown error",
+      });
+    }
+  }
+  return results;
+}
+
+export async function inspectGateway(contract, { smoke = false } = {}) {
   const packageMetadata = await readJson(PACKAGE_PATH);
   const transport = new StreamableHTTPClientTransport(
     new URL(contract.gateway.url),
@@ -261,6 +338,7 @@ export async function inspectGateway(contract) {
       serverInfo: client.getServerVersion() ?? {},
       instructions: client.getInstructions() ?? null,
       tools: listed.tools ?? [],
+      smokeResults: smoke ? await smokeTools(client, contract) : [],
     };
   } finally {
     await Promise.allSettled([client.close(), transport.close()]);
@@ -273,12 +351,16 @@ async function readJson(path) {
 
 async function main() {
   const updateLock = process.argv.includes("--update-lock");
+  const skipSmoke = process.argv.includes("--skip-smoke");
   const contract = await readJson(CONTRACT_PATH);
   const config = await readJson(MCP_CONFIG_PATH);
-  const staticFailures = validatePluginConfiguration(contract, config);
+  const staticFailures = [
+    ...validatePluginConfiguration(contract, config),
+    ...validateSmokeCoverage(contract),
+  ];
   if (staticFailures.length) throw new Error(staticFailures.join("\n"));
 
-  const observed = await inspectGateway(contract);
+  const observed = await inspectGateway(contract, { smoke: !skipSmoke });
   const compatibilityFailures = validateGatewayCompatibility(
     contract,
     observed,
@@ -286,6 +368,21 @@ async function main() {
   if (compatibilityFailures.length) {
     throw new Error(
       `Breaking gateway contract:\n${compatibilityFailures.join("\n")}`,
+    );
+  }
+
+  const smokeFailures = evaluateSmokeResults(observed.smokeResults);
+  if (smokeFailures.length) {
+    throw new Error(
+      `Gateway tools advertised but not callable:\n${smokeFailures.join("\n")}`,
+    );
+  }
+  if (!skipSmoke) {
+    const exempt = Object.entries(contract.tools).filter(
+      ([, spec]) => spec.smoke_exempt_reason,
+    );
+    console.log(
+      `Smoke-called ${observed.smokeResults.length} tools; ${exempt.length} exempt (${exempt.map(([name]) => name).join(", ")}).`,
     );
   }
 
