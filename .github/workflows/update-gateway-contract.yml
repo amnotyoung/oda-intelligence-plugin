@@ -5,8 +5,11 @@ on:
   schedule:
     - cron: "23 1 * * *"
 
+# contracts:update smoke-calls the rate-limited public gateway, so this run
+# shares the repository-wide gateway-smoke group with CI instead of keeping
+# its own: two groups would still let the nightly sync collide with a CI run.
 concurrency:
-  group: oda-intelligence-contract-sync
+  group: oda-intelligence-gateway-smoke
   cancel-in-progress: false
 
 permissions:
