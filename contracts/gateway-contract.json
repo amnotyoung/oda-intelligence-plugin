@@ -595,6 +595,32 @@
         "entity": "KOICA"
       }
     },
+    "search_offices_by_topic": {
+      "allowed_required_inputs": [
+        "query"
+      ],
+      "input_properties": {
+        "country": "string",
+        "kinds": "array",
+        "limit": "integer",
+        "month_from": "string",
+        "month_to": "string",
+        "office_role": "string",
+        "query": "string",
+        "sector": "string"
+      },
+      "output_required": [
+        "caveat",
+        "office_count",
+        "offices",
+        "query",
+        "total_matches"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "query": "보건 인력"
+      }
+    },
     "search_regulation": {
       "allowed_required_inputs": [
         "query"
