@@ -259,6 +259,7 @@ document context → relationship evidence.
 | `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document. `total_matches` states the full count and `offset` pages past the first results | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, the relationships extracted from that document, and ten related trends and ten related projects — the lists its wiki page shows | **`office`**, **`document_id`** |
 | `get_corpus_overview` | Sector, month, kind, and organization document counts for an office corpus — the same aggregates the wiki catalog page shows. Organization counts are once per document | **`office`** |
+| `search_offices_by_entity` | An office ranking across all 48 corpora for one organisation — per-office relationship counts, leading relation types, and up to two sample relationships (no evidence sentences). Evidence-text search (`query`) stays office-level | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
 | `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
 
 > Which organisations does KOICA work with in Cambodia, and on what evidence?
@@ -310,7 +311,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 20 offices for `search_offices_by_topic`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
+| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 20 offices for `search_offices_by_topic` and `search_offices_by_entity`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -348,7 +349,7 @@ when this document falls behind.
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
+| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `korean-oda-map` is an independent, unofficial compilation of Korean
