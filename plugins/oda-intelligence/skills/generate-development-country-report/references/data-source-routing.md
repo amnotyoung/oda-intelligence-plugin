@@ -8,7 +8,7 @@
 4. Collect current political, economic, humanitarian, and health documents.
 5. Collect OECD and IATI aid evidence.
 6. Collect the Korean portfolio and project details.
-7. Search development-cooperation documents and relationships.
+7. Search development-cooperation documents and relationships in the responsible office corpus.
 8. Collect country-specific ODA project-formation and procurement-governance evidence.
 9. Collect hazard signals when they affect operating conditions.
 10. Write technical snapshots.
@@ -35,7 +35,8 @@
 | Donor, sector, channel, or activity detail | OECD CRS | Use for disaggregated analysis; do not relabel DAC2A as CRS or reconstruct a country total when DAC2A is available |
 | Activity discovery | IATI | Counts are records, not unique projects |
 | Korean portfolio | Unofficial Korean ODA location map | Deduplicate by activity ID; inspect project details; cite it as unofficial and name no agency as its publisher |
-| Korean project documents | Development-cooperation document corpus | Cite the exact title and direct original URL when present; keep internal IDs in the technical snapshot |
+| Korean project documents | `search_development_trends` on the responsible office | Cite the exact title and direct original URL when present; keep internal IDs in the technical snapshot. A withheld URL means the source published it over plain http, not that the document is unsourced — cite the outlet and title |
+| Organisation relationships | `search_entity_relationships` on the responsible office | Extracted signals, not verified relationships; each relation ships with its evidence document, so read that document before repeating the claim |
 | ODA project-formation route | `procurement_model_detail` with `axis: "pipeline"` | In Korean prose call it `사업 발굴·형성 절차`; inspect `verification` and `unresolved`; verify material claims from the linked primary sources |
 | Procurement governance and oversight | `procurement_model_detail` with `axis: "governance"` | Distinguish domestic and external funding routes, responsible authorities, contracting bodies, and oversight; retain provisional or unresolved legal details |
 | Bidding system | `procurement_model_detail` with `axis: "bidding"` | Covers advertisement, submission, evaluation, and award; belongs in section 6.3 after governance and is normally prose or a table rather than a diagram |
@@ -55,8 +56,22 @@ Use the first four tools from the pinned country-data MCP contract and the remai
 6. `oda_map_country_context`
 7. `oda_map_projects`
 8. `oda_map_project_detail`
-9. development-cooperation document and relationship search
+9. `get_corpus_overview` for the office corpus shape, then `search_development_trends`, then
+   `get_trend_document` and `search_entity_relationships` for the documents the report turns on
 10. `procurement_model_status`, then `procurement_country_context` or `procurement_model_detail`
+
+Those four take `office`, not a country code. Resolve the responsible office with `country_list`: a
+concurrently accredited country is served by another country's office, and passing the country name
+where the office is expected returns the wrong corpus or none.
+
+Do not call `search_offices_by_topic` or `search_offices_by_entity` here. They answer which office
+carries a topic or an organisation when you do not know, and a country report already knows. Use
+them only when the report needs regional comparison, and label what they return as other countries'
+evidence.
+
+`search_development_trends` returns at most 20 documents per call and reports `total_matches`. When
+the total exceeds what you retrieved, either page with `offset` or narrow by `sector`, `kinds`, or
+the month range, and say which — 20 of 271 documents is a sample, not the corpus.
 
 If a named tool is unavailable, use an equivalent authoritative source. Do not silently replace an unavailable value with zero.
 
