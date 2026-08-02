@@ -213,7 +213,7 @@ KOICA 규정 색인에 대한 검색·전문 조회·상호참조·인용 검증
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
-| `search_regulation` | 규정 메타데이터와 조문 스니펫, 적합도 점수. `include_attachments: true`면 별표·별지도 함께 검색합니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments` |
+| `search_regulation` | 규정 메타데이터와 조문 스니펫, 적합도 점수. `include_attachments: true`면 별표·별지도 함께 검색하고, `mode`로 hybrid(기본)·keyword·semantic 검색을 고릅니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
 | `get_article` | 규정명·조문 번호로 조문 본문 전체를 반환합니다. 본칙 조문이 같은 번호의 부칙 조문보다 우선합니다 | **`source`**, **`article`** |
 | `list_sources` | 색인된 현행 규정 목록. 규정 유형, 개정일, 조문 수 포함 | `category` |
 | `list_attachments` | 별표·별지 목록을 제목·발췌와 함께 반환하며 규정·유형·종류로 필터링합니다. 응답 예산에 맞춰 잘리지만 `total`이 언제나 실제 총계를 담습니다 | `source`, `category`, `kind`, `include_deleted` |
@@ -240,13 +240,16 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 ### 개발협력 문서 — `development-documents`
 
 국가사무소 개발협력 문서와 거기서 추출한 관계를 다룹니다 — 동향 위키에 직접
-가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스가 사무소 단위이므로 검색 전에
-사무소부터 확인합니다. 사용 순서는 탐색 → 문서 컨텍스트 → 관계 근거입니다.
+가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스는 사무소 단위입니다. 어느
+사무소를 볼지 모르면 `search_offices_by_topic`이 48개 사무소를 가로질러 주제를
+가진 사무소부터 찾아줍니다. 사용 순서는 사무소 탐색 → 검색 → 문서 컨텍스트 →
+관계 근거입니다.
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
-| `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_offices_by_topic` | 48개 사무소를 가로지른 사무소 랭킹 — 사무소별 히트 수와 대표 문서 최대 2건. `total_matches`가 전체 일치 수, `truncated_office_count`가 상한에서 잘린 사무소 수를 보고합니다 | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
+| `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크. `total_matches`가 전체 일치 수를 보고하고 `offset`으로 다음 페이지를 조회합니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들, 그리고 관련 동향·사업 각 10건(위키 문서 페이지의 그 목록) | **`office`**, **`document_id`** |
 | `get_corpus_overview` | 사무소 코퍼스의 분야·월·문서종류·기관별 문서 수 — 위키 목차 페이지와 같은 레코드에서 센 집계입니다. 기관 카운트는 문서당 1회 기준 | **`office`** |
 | `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
@@ -298,7 +301,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_offices_by_topic` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -335,8 +338,8 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 |---|---|---|
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
-| `koica-regulations` | `search_regulation`, `find_references`, `list_sources`, `verify_citation` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_development_trends` | https://devcoop-trends-wiki.pages.dev |
+| `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
+| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 
 `korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
