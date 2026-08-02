@@ -19,8 +19,10 @@ regulation research. Users do not provide an OAuth token or IATI credential.
 The four data domains are not installed as four separate Claude connectors.
 Claude should show one `oda-intelligence` connector whose 30 read-only tools
 route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
-Any separately configured `devcoop-trends` or `koica-reg-mcp` connectors are
-legacy/direct connections and are independent of this plugin.
+Configuring an individual connector such as `devcoop-trends` or
+`koica-reg-mcp` directly remains equally valid. Those are smaller install
+units for anyone who needs a single domain, and they work independently of
+this plugin.
 
 This repository contains no source-server implementation, deployment secret,
 private Git history, or local credential store. Its only runtime dependency is

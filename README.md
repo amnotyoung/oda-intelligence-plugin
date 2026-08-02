@@ -18,9 +18,9 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
 30개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
-`koica-reg` 백엔드로 요청을 전달합니다. 별도로 구성한 `devcoop-trends` 또는
-`koica-reg-mcp` 커넥터는 레거시/직접 연결이며 이 플러그인과 독립적으로
-작동합니다.
+`koica-reg` 백엔드로 요청을 전달합니다. `devcoop-trends`나 `koica-reg-mcp`
+같은 개별 커넥터를 직접 구성하는 방법도 그대로 유효합니다. 한 도메인만
+필요할 때 고르는 더 작은 설치 단위이며, 이 플러그인과 독립적으로 작동합니다.
 
 이 저장소에는 서버 구현 소스, 배포 비밀 정보, 비공개 Git 기록 또는 로컬 인증
 정보 저장소가 포함되어 있지 않습니다. 유일한 런타임 의존성은 공개 MCP
