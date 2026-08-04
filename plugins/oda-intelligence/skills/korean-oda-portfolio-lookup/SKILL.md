@@ -1,6 +1,6 @@
 ---
 name: korean-oda-portfolio-lookup
-description: Answer direct questions about what Korean development cooperation agencies are doing in a country — KOICA, EDCF, KOFIH, and Korean ministries — using the ODA Map portfolio tools. Use for "what projects does KOICA run in X", Korean project lists, agency or sector breakdowns, active or completed project counts, single-project detail, what a project actually does, and finding projects comparable to a named one — similar projects, precedents, benchmarks. Korean bilateral project inventory lives only in the ODA Map source; never conclude from IATI, OECD, or World Bank evidence that Korean projects are absent, and never assemble a comparison from web search when the gateway holds the records. For a full written country report, use generate-development-country-report instead.
+description: Answer direct questions about what Korean development cooperation agencies are doing in a country — KOICA, EDCF, KOFIH, and Korean ministries — using the ODA Map portfolio tools. Use for "what projects does KOICA run in X", Korean project lists, agency or sector breakdowns, active or completed project counts, single-project detail, what a project actually does, and finding projects comparable to a named one — similar projects, precedents, benchmarks. Korean bilateral project inventory lives only in the ODA Map source; never conclude from IATI, OECD, or World Bank evidence that Korean projects are absent, and never assemble a comparison from web search when the gateway holds the records. For DAC/CRS code meanings or international aid statistics, use international-oda-data-lookup. For a full written country report, use generate-development-country-report.
 ---
 
 # Look Up the Korean ODA Portfolio
@@ -25,6 +25,9 @@ the gateway, following `Cross-country comparison` below.
 
 Hand off to `generate-development-country-report` when the user wants a written country report,
 priority-sector selection, procurement entry analysis, or a DOCX deliverable.
+Hand off to `international-oda-data-lookup` when the user asks for DAC/CRS purpose-code meanings,
+international donor or sector statistics, or IATI activity discovery rather than a Korean project
+inventory.
 
 ## The routing rule this Skill exists to enforce
 

@@ -192,6 +192,42 @@
         "countryCode": "VN"
       }
     },
+    "dac_purpose_code_lookup": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "code": "string",
+        "includeChildren": "boolean",
+        "limit": "integer",
+        "query": "string",
+        "refresh": "boolean"
+      },
+      "output_required": [
+        "api_url",
+        "cache_hit",
+        "cached_at",
+        "caveats",
+        "codelist",
+        "codes",
+        "coverage",
+        "fetched_at",
+        "methodology_version",
+        "observed_at",
+        "ok",
+        "public_url",
+        "query",
+        "record_count",
+        "returned",
+        "source",
+        "stale",
+        "status",
+        "total_matches",
+        "truncated"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "code": "311"
+      }
+    },
     "find_references": {
       "allowed_required_inputs": [
         "article",

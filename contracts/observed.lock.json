@@ -1,8 +1,8 @@
 {
   "gateway": {
-    "instructions_sha256": "990c5a347f624ce396dcebca78e77739dedaf1498665648ec31976c41e4c7054",
+    "instructions_sha256": "eb0c87ac2cf96ff1efaa6148adf543d493de64e513e82161523c50a72b71acb0",
     "server_name": "oda-intelligence",
-    "tool_count": 32,
+    "tool_count": 33,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
@@ -12,6 +12,7 @@
       "country_map_outline": "d2524188225b838c8c4b489c5a9d0534fe09de80da00f17d4099968d641fd170",
       "country_report_context": "97f2d6591a21f7ca4fa8e67c004c3e5996993a51696bfe81e86b50f9a3dc0100",
       "country_travel_alert": "a9503e88d9b57bbe6220181fc1e628091c0f4e06359d9ab4864ccc1f11d7bcad",
+      "dac_purpose_code_lookup": "d8cc6aa4c526ef1545a261240331155753ec656edbe541f6bfe004d28647aab1",
       "find_references": "abe7ec531aa1b9bd1e436964848b326c354495b92099cdce0c64b387ae0765bd",
       "get_article": "180be0e725246bc99456185c7f6b4d64eade085f5782054039ccdaaa4f50a9c9",
       "get_attachment": "4948e143c9b8cbe27fc8f47b5140bd4a3955ad1e6caf808381ec5f2665a8e5ee",

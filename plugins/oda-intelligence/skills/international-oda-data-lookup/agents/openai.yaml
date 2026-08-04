@@ -1,0 +1,13 @@
+interface:
+  display_name: "International ODA Data Lookup"
+  short_description: "Look up OECD, DAC, CRS, and IATI evidence"
+  default_prompt: "Use $international-oda-data-lookup to find and verify OECD DAC, CRS, or IATI evidence."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "oda-intelligence"
+      description: "Read-only gateway for official OECD DAC/CRS codes, country-level international aid context, and IATI discovery"
+      transport: "streamable_http"
+      url: "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
+policy:
+  allow_implicit_invocation: true

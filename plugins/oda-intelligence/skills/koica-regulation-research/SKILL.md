@@ -1,6 +1,6 @@
 ---
 name: koica-regulation-research
-description: Search, read in full, and verify citations to KOICA internal regulations, implementation rules, guidelines, standards, annexes, and cross-references through the ODA Intelligence public gateway. Use for questions about KOICA personnel, leave, pay, promotion, discipline, organization, accounting, contracts, procurement, audits, welfare, country programs, partnerships, or training rules. Confirm consequential conclusions against the current official source, and do not use this Skill as the sole source for external Korean law.
+description: Search, read in full, and verify citations to KOICA internal regulations, implementation rules, guidelines, standards, annexes, and cross-references through the ODA Intelligence public gateway. Use for questions about KOICA personnel, leave, pay, promotion, discipline, organization, accounting, contracts, procurement, audits, welfare, country programs, partnerships, or training rules. Confirm consequential conclusions against the current official source. Do not use for OECD DAC/CRS purpose codes, external classifications, aid statistics, or external Korean law.
 ---
 
 # Research KOICA Regulations
@@ -23,6 +23,10 @@ Read [references/research-protocol.md](references/research-protocol.md) before a
 ## Rules
 
 - Distinguish KOICA internal rules from statutes, presidential decrees, ministry rules, and other external law.
+- Treat OECD DAC/CRS purpose codes, sector classifications, and statistical code lists as external
+  classifications. Never call `search_regulation` merely because the question mentions KOICA or
+  asks how an ODA activity is classified. Use `international-oda-data-lookup` unless the user asks
+  for the internal KOICA rule governing how staff apply that classification.
 - Do not infer that a rule applies to a person or case when the facts needed for applicability are missing.
 - Quote only the minimum text necessary and otherwise summarize faithfully.
 - Preserve exceptions, provisos, effective dates, transitional provisions, and referenced annexes.

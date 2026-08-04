@@ -16,13 +16,14 @@ The gateway provides controlled tools for international aid and country
 context, Korean ODA projects, development-cooperation documents, and KOICA
 regulation research. Users do not provide an OAuth token or IATI credential.
 
-The four data domains are not installed as four separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose 30 read-only tools
-route to the `io-mcp`, `oda-map-lab`, `devcoop-kg`, and `koica-reg` backends.
-Configuring an individual connector such as `devcoop-trends` or
-`koica-reg-mcp` directly remains equally valid. Those are smaller install
-units for anyone who needs a single domain, and they work independently of
-this plugin.
+The five source domains are not installed as five separate Claude connectors.
+Claude should show one `oda-intelligence` connector whose read-only tools
+route to international data (`io-mcp`), Korean ODA projects,
+development-cooperation documents, KOICA regulations, and partner-country
+procurement sources. Configuring an individual connector such as
+`devcoop-trends` or `koica-reg-mcp` directly remains equally valid. Those are
+smaller install units for anyone who needs a single domain, and they work
+independently of this plugin.
 
 This repository contains no source-server implementation, deployment secret,
 private Git history, or local credential store. Its only runtime dependency is
@@ -37,11 +38,11 @@ After a marketplace sync or plugin update, start a new Claude conversation.
 Existing conversations can retain the tool snapshot they had when they were
 created. In the plugin details, the expected installed components are:
 
-- three Skills;
+- four Skills;
 - one connector named `oda-intelligence`;
-- 30 read-only tools supplied by that connector.
+- the read-only tools supplied by that connector.
 
-If only the three Skills appear, sync the marketplace, update or reinstall the
+If only the four Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
 backend on their own; they require the bundled connector.
 
@@ -108,10 +109,10 @@ version must be reviewed and refreshed by a workspace administrator.
 
 ## Tools
 
-The connector supplies 30 read-only tools across five source domains. No tool
+The connector supplies reviewed read-only tools across five source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
-The three bundled Skills route most questions to the right tools on their own,
+The four bundled Skills route most questions to the right tools on their own,
 so a plain question usually needs no tool name. The tables below are for
 choosing a call deliberately, or for reading a call someone else made.
 
@@ -133,6 +134,7 @@ kind of question:
 
 | Skill | The questions it takes | Domains it draws on |
 |---|---|---|
+| `international-oda-data-lookup` | OECD DAC/DAC2A/CRS codes and statistics, IATI discovery, and correct separation of international-aid evidence | `international-data` plus the official OECD source when needed |
 | `korean-oda-portfolio-lookup` | What a Korean agency is doing in a country: project lists, agency and sector breakdowns, active or completed counts, one project in detail, projects comparable to a named one | `korean-oda-map` |
 | `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All five |
 | `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
@@ -185,6 +187,7 @@ reports freshness per source key, so read it before quoting any figure.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
+| `dac_purpose_code_lookup` | Official OECD SDMX `CL_DAC_SECTOR` entries: 3-digit DAC sectors, 5-digit CRS purpose codes, parent relationships, and codelist version | `code`, `query`, `includeChildren`, `limit`, `refresh` |
 | `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness across IATI, World Bank, OECD, hazard, HAPI, UNHCR, WHO, and ReliefWeb | **`countryCode`**, `refresh` |
 | `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_humanitarian_context` | Structured HDX HAPI, UNHCR, and WHO GHO observations, plus recent ReliefWeb and World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
@@ -195,6 +198,14 @@ reports freshness per source key, so read it before quoting any figure.
 | `iati_query_country` | IATI activities, transactions, or budgets. Counts and three samples by default; `summary: false` returns detailed records | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
 | `iati_status` | Whether the server's IATI lookup is configured. Returns no credential value or storage location | (none) |
 | `iati_test_connection` | Fetches one Myanmar activity with the server-held credential to test the connection. Prints no credential | (none) |
+
+`dac_purpose_code_lookup` reads the official OECD API codelist. If an older
+conversation's tool snapshot does not show it yet, start a new conversation;
+the Skill checks the official OECD API directly in the meantime.
+`iati_query_country.sectorCode` only applies an already verified three- to
+five-digit code to country-level IATI records. The OECD observations in
+`country_report_context` are country-level DAC2A totals; donor, sector,
+channel, and activity-level CRS detail remains a separate query surface.
 
 > How much international evidence is available for Myanmar right now, and what
 > does IATI hold for it?

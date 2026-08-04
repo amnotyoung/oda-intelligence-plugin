@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -40,6 +41,8 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/generate-development-country-report/references/procurement-model-integration.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/references/report-standard.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate-report.mjs",
+  "plugins/oda-intelligence/skills/international-oda-data-lookup/SKILL.md",
+  "plugins/oda-intelligence/skills/international-oda-data-lookup/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
   "plugins/oda-intelligence/skills/koica-regulation-research/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/references/research-protocol.md",
@@ -72,6 +75,19 @@ async function listFiles(directory, prefix = "") {
     }
   }
   return files;
+}
+
+function listRepositoryFiles() {
+  return execFileSync(
+    "git",
+    ["ls-files", "--cached", "--others", "--exclude-standard"],
+    {
+      cwd: root,
+      encoding: "utf8",
+    },
+  )
+    .split(/\r?\n/u)
+    .filter(Boolean);
 }
 
 test("Claude and Codex manifests point only to the public plugin repository", async () => {
@@ -141,6 +157,7 @@ test("plugin and every Skill depend on one credential-free gateway", async () =>
 
   for (const relative of [
     "skills/generate-development-country-report/agents/openai.yaml",
+    "skills/international-oda-data-lookup/agents/openai.yaml",
     "skills/koica-regulation-research/agents/openai.yaml",
     "skills/korean-oda-portfolio-lookup/agents/openai.yaml",
   ]) {
@@ -149,6 +166,44 @@ test("plugin and every Skill depend on one credential-free gateway", async () =>
     assert.match(text, /value: "oda-intelligence"/);
     assert.ok(text.includes(`url: "${gatewayUrl}"`));
   }
+});
+
+test("standalone DAC and CRS questions route away from KOICA regulations", async () => {
+  const internationalSkill = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "SKILL.md",
+    ),
+    "utf8",
+  );
+  const regulationSkill = await readFile(
+    resolve(pluginRoot, "skills", "koica-regulation-research", "SKILL.md"),
+    "utf8",
+  );
+  const portfolioSkill = await readFile(
+    resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),
+    "utf8",
+  );
+  const gatewayContract = await readJson("contracts", "gateway-contract.json");
+
+  assert.doesNotMatch(internationalSkill, /\[TODO:/u);
+  assert.match(internationalSkill, /DAC\/CRS code meaning or code list/u);
+  assert.match(internationalSkill, /Never call `search_regulation`/u);
+  assert.match(internationalSkill, /call `dac_purpose_code_lookup`/u);
+  assert.match(internationalSkill, /official OECD\s+SDMX `CL_DAC_SECTOR`/u);
+  assert.match(regulationSkill, /Never call `search_regulation` merely/u);
+  assert.match(portfolioSkill, /international-oda-data-lookup/u);
+  assert.ok(Object.hasOwn(gatewayContract.tools, "dac_purpose_code_lookup"));
+  assert.deepEqual(
+    gatewayContract.tools.dac_purpose_code_lookup.smoke_arguments,
+    { code: "311" },
+  );
+  assert.deepEqual(
+    gatewayContract.tools.iati_query_country.allowed_required_inputs,
+    ["countryCode"],
+  );
 });
 
 test("ChatGPT compatibility maps the registered gateway app without a secret", async () => {
@@ -173,7 +228,7 @@ test("ChatGPT compatibility maps the registered gateway app without a secret", a
 });
 
 test("public repository contains exactly the reviewed file allowlist", async () => {
-  const files = await listFiles(root);
+  const files = listRepositoryFiles();
   assert.deepEqual(files.toSorted(), expectedPublicFiles.toSorted());
 });
 
@@ -234,7 +289,7 @@ function withoutPublicSourceUrls(text) {
 // 상류에서 동기화되는 스킬 본문과 계약 파일이 대상이다. README는 네 백엔드
 // 식별자를 의도적으로 설명하고 있어 이 검사와 별개로 다룬다.
 test("synced skill text contains no non-public repository or internal path name", async () => {
-  const files = (await listFiles(root)).filter(
+  const files = listRepositoryFiles().filter(
     (file) => file.startsWith("plugins/") || file.startsWith("contracts/"),
   );
   for (const file of files) {
@@ -283,7 +338,7 @@ test("the public source exception does not admit the bare private repository nam
 });
 
 test("public text contains no local path or unrelated owner repository URL", async () => {
-  const files = await listFiles(root);
+  const files = listRepositoryFiles();
   const textFiles = files.filter((file) => !file.endsWith("package-lock.json"));
   for (const file of textFiles) {
     const text = await readFile(resolve(root, file), "utf8");
@@ -304,9 +359,9 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 32 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 33 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 32);
+  assert.equal(Object.keys(contract.tools).length, 33);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
@@ -323,19 +378,20 @@ test("minimal accepted gateway contract contains 32 approved read-only tools", a
     "get_corpus_overview",
     "search_offices_by_topic",
     "search_offices_by_entity",
+    "dac_purpose_code_lookup",
   ]) {
     assert.ok(opened in contract.tools, `${opened} must be an approved tool`);
   }
   assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
 });
 
-test("observed lock pins exactly the 32 approved tool definitions", async () => {
+test("observed lock pins exactly the 33 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 32);
+  assert.equal(lock.gateway.tool_count, 33);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

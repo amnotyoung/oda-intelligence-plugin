@@ -15,12 +15,13 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 조사를 위한 통제된 도구를 제공합니다. 사용자는 OAuth 토큰이나 IATI 인증 정보를
 제공할 필요가 없습니다.
 
-네 가지 데이터 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
+다섯 개 출처 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
 Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-30개의 읽기 전용 도구는 `io-mcp`, `oda-map-lab`, `devcoop-kg`,
-`koica-reg` 백엔드로 요청을 전달합니다. `devcoop-trends`나 `koica-reg-mcp`
-같은 개별 커넥터를 직접 구성하는 방법도 그대로 유효합니다. 한 도메인만
-필요할 때 고르는 더 작은 설치 단위이며, 이 플러그인과 독립적으로 작동합니다.
+읽기 전용 도구가 국제데이터(`io-mcp`), 한국 ODA 사업, 개발협력 문서,
+KOICA 규정, 협력국 조달 출처로 요청을 전달합니다. `devcoop-trends`나
+`koica-reg-mcp` 같은 개별 커넥터를 직접 구성하는 방법도 그대로 유효합니다.
+한 도메인만 필요할 때 고르는 더 작은 설치 단위이며, 이 플러그인과 독립적으로
+작동합니다.
 
 이 저장소에는 서버 구현 소스, 배포 비밀 정보, 비공개 Git 기록 또는 로컬 인증
 정보 저장소가 포함되어 있지 않습니다. 유일한 런타임 의존성은 공개 MCP
@@ -35,11 +36,11 @@ Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터
 시작하세요. 기존 대화에는 대화 생성 시점의 도구 스냅샷이 남아 있을 수 있습니다.
 플러그인 상세 화면에는 다음 구성 요소가 설치된 것으로 표시되어야 합니다.
 
-- Skill 세 개
+- Skill 네 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
-- 해당 커넥터가 제공하는 읽기 전용 도구 30개
+- 해당 커넥터가 제공하는 읽기 전용 도구
 
-Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
+Skill 네 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
 번들로 제공되는 커넥터가 필요합니다.
 
@@ -50,7 +51,7 @@ claude plugin marketplace add amnotyoung/oda-intelligence-plugin
 claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
-아래는 데스크톱 앱에서의 설치 데모입니다. 마켓플레이스를 추가하고, Skill 세 개와
+아래는 데스크톱 앱에서의 설치 데모입니다. 마켓플레이스를 추가하고, Skill 네 개와
 커넥터 한 개가 설치된 것을 확인한 뒤, 실제 질문에 답하기까지를 담았습니다.
 
 ![ODA Intelligence 설치 데모](docs/assets/install-demo.gif)
@@ -104,10 +105,10 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 도구
 
-커넥터는 다섯 개 출처 도메인에 걸쳐 30개의 읽기 전용 도구를 제공합니다. 출처에
+커넥터는 다섯 개 출처 도메인에 걸쳐 검토된 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
-번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
+번들로 제공되는 Skill 네 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
 질문에는 도구 이름을 댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이
 만든 호출을 읽을 때 쓰는 자료입니다.
 
@@ -123,11 +124,12 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ### 자연어로 묻기
 
-Skill은 도구 이름이 아니라 주제로 라우팅합니다. 세 Skill이 각각 다른 종류의
+Skill은 도구 이름이 아니라 주제로 라우팅합니다. 네 Skill이 각각 다른 종류의
 질문을 맡습니다.
 
 | Skill | 맡는 질문 | 사용하는 도메인 |
 |---|---|---|
+| `international-oda-data-lookup` | OECD DAC/DAC2A/CRS 코드·통계, IATI 활동 탐색, 국제 원조 근거의 구분과 검증 | `international-data` + 필요한 경우 OECD 공식 원문 |
 | `korean-oda-portfolio-lookup` | 한국 기관이 그 나라에서 무엇을 하고 있는지 — 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
 | `generate-development-country-report` | 국가보고서·원조 지형 검토, 중점분야 선정, 참여 경로, 조달 진입, Go/No-Go 위험 | 다섯 개 전부 |
 | `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
@@ -180,6 +182,7 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
+| `dac_purpose_code_lookup` | OECD 공식 SDMX `CL_DAC_SECTOR`에서 3자리 DAC 분야와 5자리 CRS 목적코드, 부모관계, 코드목록 버전을 조회 | `code`, `query`, `includeChildren`, `limit`, `refresh` |
 | `country_data_status` | IATI·World Bank·OECD·재난·HAPI·UNHCR·WHO·ReliefWeb 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
 | `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_humanitarian_context` | HDX HAPI·UNHCR·WHO GHO의 정형 관측치와 ReliefWeb·World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
@@ -190,6 +193,13 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | `iati_query_country` | IATI 활동·거래·예산 조회. 기본은 건수와 표본 3건이며 `summary: false`일 때 상세 레코드를 반환합니다 | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
 | `iati_status` | 서버의 IATI 조회 기능이 준비됐는지만 확인합니다. 자격 증명 값이나 저장 위치는 반환하지 않습니다 | (없음) |
 | `iati_test_connection` | 서버가 관리하는 자격 증명으로 미얀마 활동 1건을 조회해 연결을 시험합니다. 자격 증명은 출력하지 않습니다 | (없음) |
+
+`dac_purpose_code_lookup`은 OECD 공식 API의 코드표를 조회합니다. 이전 대화의
+도구 스냅샷에 이 도구가 아직 없다면 새 대화를 시작해야 하며, Skill은 그동안
+OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 이렇게 확인한
+3~5자리 코드를 국가별 IATI 기록에 적용하는 필터일 뿐 코드 뜻을 검증하지 않습니다.
+`country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
+채널·활동 세부자료 전용 조회는 별도 범위입니다.
 
 > 지금 미얀마에 대해 국제 근거가 얼마나 확보되는지, IATI에는 무엇이 있는지
 > 알려줘.
