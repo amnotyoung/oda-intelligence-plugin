@@ -271,13 +271,23 @@ test("named-geography project questions gather local evidence before DAC and CRS
   assert.match(section, /material\s+mapped project[\s\S]+`oda_map_project_detail`/u);
   assert.match(section, /neither a country nor an identifier[\s\S]+ask for the recipient country/u);
   assert.match(section, /same original `country`[\s\S]+wrong\s+recipient/u);
-  assert.match(section, /actually reported under[\s\S]+matched activity-level OECD CRS or IATI record/u);
+  assert.match(section, /actually reported under in IATI[\s\S]+`activity_sectors`/u);
+  assert.match(section, /literal leading `iati:`[\s\S]+never synthesize/u);
+  assert.match(section, /`total_found: 1`[\s\S]+canonical `iati_identifier`/u);
+  assert.match(section, /named non-Korean activity[\s\S]+publisher's public IATI record/u);
+  assert.match(section, /`activity_sectors`/u);
+  assert.match(
+    section,
+    /publisher's public IATI XML or d-portal activity\s+HTML\/XML/u,
+  );
   assert.match(section, /geography alone/u);
   assert.match(section, /does not itself assign an official CRS code/u);
   assert.match(section, /empty place or document search[\s\S]+does not prove/u);
   assert.match(internationalAgent, /Classify projects with OECD, DAC, CRS, and IATI evidence/u);
   assert.match(portfolioSkill, /do not hand off before reading the project/u);
   assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
+  assert.match(portfolioProtocol, /empty `transaction_sector_code`[\s\S]+no sector absence/u);
+  assert.match(portfolioProtocol, /miss for `311`[\s\S]+`31120`/u);
 
   const countryTopicTool = gatewayContract.tools.search_offices_by_topic;
   assert.ok(countryTopicTool, "country-topic document discovery must be approved");
@@ -287,6 +297,56 @@ test("named-geography project questions gather local evidence before DAC and CRS
   assert.ok(gatewayContract.tools.search_development_by_place);
   assert.ok(gatewayContract.tools.oda_map_project_detail);
   assert.ok(gatewayContract.tools.dac_purpose_code_lookup);
+});
+
+test("reported sectors distinguish current IATI evidence from OECD CRS submissions", async () => {
+  const internationalSkill = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "SKILL.md",
+    ),
+    "utf8",
+  );
+  const internationalAgent = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "agents",
+      "openai.yaml",
+    ),
+    "utf8",
+  );
+
+  assert.match(internationalSkill, /publisher's current IATI-reported sector/u);
+  assert.match(internationalSkill, /`311` does not match `31120`/u);
+  assert.match(
+    internationalSkill,
+    /present empty\s+array[\s\S]+structured current activity record was read/u,
+  );
+  assert.match(
+    internationalSkill,
+    /empty\s+`activity_sectors`[\s\S]+transaction-level check/u,
+  );
+  assert.match(
+    internationalSkill,
+    /current IATI-reported activity or transaction sector[\s\S]+official OECD/u,
+  );
+  assert.match(
+    internationalSkill,
+    /every vocabulary `1` sector and its percentage[\s\S]+`vocabulary_inferred`/u,
+  );
+  assert.match(
+    internationalSkill,
+    /`activity_sectors_truncated` is true[\s\S]+partial/u,
+  );
+  assert.match(
+    internationalSkill,
+    /`transaction_sector_code` alone[\s\S]+must never be labelled CRS/u,
+  );
+  assert.match(internationalAgent, /current IATI-reported sector[\s\S]+official OECD CRS/u);
 });
 
 test("place-led questions resolve place evidence before country portfolio detail", async () => {

@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
@@ -268,6 +269,40 @@ export function validateSmokeCoverage(contract) {
         `${toolName}: needs smoke_arguments or a smoke_exempt_reason`,
       );
     }
+    if (spec.smoke_output_assertions !== undefined) {
+      if (!hasArguments) {
+        failures.push(
+          `${toolName}: smoke_output_assertions require smoke_arguments`,
+        );
+      }
+      if (
+        !Array.isArray(spec.smoke_output_assertions) ||
+        spec.smoke_output_assertions.length === 0
+      ) {
+        failures.push(
+          `${toolName}: smoke_output_assertions must be a non-empty array`,
+        );
+        continue;
+      }
+      for (const [index, assertion] of spec.smoke_output_assertions.entries()) {
+        const pathIsValid =
+          Array.isArray(assertion?.path) &&
+          assertion.path.length > 0 &&
+          assertion.path.every(
+            (part) =>
+              (typeof part === "string" && part.length > 0) ||
+              (Number.isInteger(part) && part >= 0),
+          );
+        const modes = ["equals", "array_contains"].filter((mode) =>
+          Object.hasOwn(assertion ?? {}, mode),
+        );
+        if (!pathIsValid || modes.length !== 1) {
+          failures.push(
+            `${toolName}: smoke_output_assertions[${index}] needs a path and exactly one assertion mode`,
+          );
+        }
+      }
+    }
   }
   return failures;
 }
@@ -283,13 +318,79 @@ function describeToolError(result) {
   }
 }
 
+function smokePayload(result) {
+  if (
+    result?.structuredContent &&
+    typeof result.structuredContent === "object"
+  ) {
+    return result.structuredContent;
+  }
+  const text = result?.content?.find((part) => part?.type === "text")?.text;
+  if (typeof text !== "string") return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function valueAtPath(value, path) {
+  return path.reduce(
+    (current, part) =>
+      current !== null && current !== undefined ? current[part] : undefined,
+    value,
+  );
+}
+
+function containsExpectedShape(actual, expected) {
+  if (expected && typeof expected === "object" && !Array.isArray(expected)) {
+    return (
+      actual !== null &&
+      typeof actual === "object" &&
+      !Array.isArray(actual) &&
+      Object.entries(expected).every(([key, value]) =>
+        containsExpectedShape(actual[key], value),
+      )
+    );
+  }
+  return Object.is(actual, expected);
+}
+
 export function evaluateSmokeResults(results) {
   const failures = [];
-  for (const { tool, result, error } of results) {
+  for (const { tool, result, error, assertions = [] } of results) {
     if (error) {
       failures.push(`${tool}: call failed — ${error}`);
     } else if (result?.isError === true) {
       failures.push(`${tool}: returned isError — ${describeToolError(result)}`);
+    } else if (assertions.length > 0) {
+      const payload = smokePayload(result);
+      if (!payload) {
+        failures.push(`${tool}: smoke output is not structured JSON`);
+        continue;
+      }
+      for (const [index, assertion] of assertions.entries()) {
+        const actual = valueAtPath(payload, assertion.path);
+        if (
+          Object.hasOwn(assertion, "equals") &&
+          !isDeepStrictEqual(actual, assertion.equals)
+        ) {
+          failures.push(
+            `${tool}: smoke_output_assertions[${index}] expected ${JSON.stringify(assertion.equals)} at ${assertion.path.join(".")}`,
+          );
+        }
+        if (
+          Object.hasOwn(assertion, "array_contains") &&
+          (!Array.isArray(actual) ||
+            !actual.some((item) =>
+              containsExpectedShape(item, assertion.array_contains),
+            ))
+        ) {
+          failures.push(
+            `${tool}: smoke_output_assertions[${index}] did not find ${JSON.stringify(assertion.array_contains)} at ${assertion.path.join(".")}`,
+          );
+        }
+      }
     }
   }
   return failures;
@@ -311,11 +412,16 @@ async function smokeTools(client, contract) {
         // cold cache. The default 60s would report that as a broken tool.
         { timeout: SMOKE_CALL_TIMEOUT_MS },
       );
-      results.push({ tool: toolName, result });
+      results.push({
+        tool: toolName,
+        result,
+        assertions: spec.smoke_output_assertions ?? [],
+      });
     } catch (error) {
       results.push({
         tool: toolName,
         error: error instanceof Error ? error.message : "unknown error",
+        assertions: spec.smoke_output_assertions ?? [],
       });
     }
   }

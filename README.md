@@ -191,7 +191,7 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | `country_travel_alert` | 외교부 여행경보 단계. 대한민국 국민 대상 안전 정보이며 사업 타당성 평가가 아닙니다. 공개 배포에서는 비활성 상태입니다(아래 참조) | **`countryCode`**, `refresh` |
 | `country_list` | KOICA 해외사무소 소재국·겸임국을 ISO 코드, 담당 사무소, 관할 역할과 함께 반환 | (없음) |
 | `country_map_outline` | 보고서 배경용 단순화 국가 윤곽선. 사업 위치를 얹을 지리 맥락일 뿐 경계 확정이 아닙니다 | **`countryCode`** |
-| `iati_query_country` | IATI 활동·거래·예산 조회. 기본은 건수와 표본 3건이며 `summary: false`일 때 상세 레코드를 반환합니다 | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
+| `iati_query_country` | IATI 활동·거래·예산 조회. 식별자로 좁혀 단일 활동을 확인하면 코드·어휘·비율·명칭의 대응관계를 보존한 `activity_sectors`와 `activity_sectors_truncated`를 반환하며, `summary: false`일 때 상세 레코드를 반환합니다 | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
 | `iati_status` | 서버의 IATI 조회 기능이 준비됐는지만 확인합니다. 자격 증명 값이나 저장 위치는 반환하지 않습니다 | (없음) |
 | `iati_test_connection` | 서버가 관리하는 자격 증명으로 미얀마 활동 1건을 조회해 연결을 시험합니다. 자격 증명은 출력하지 않습니다 | (없음) |
 
@@ -199,6 +199,12 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 도구 스냅샷에 이 도구가 아직 없다면 새 대화를 시작해야 하며, Skill은 그동안
 OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 이렇게 확인한
 3~5자리 코드를 국가별 IATI 기록에 적용하는 필터일 뿐 코드 뜻을 검증하지 않습니다.
+`sectorCode`는 정확 일치 필터이므로 `311`은 `31120`을 찾지 않습니다. 기존 사업의
+현재 IATI 보고값은 검증된 사업 식별자를 `iatiIdentifier`에 넣고 단일 매칭된 canonical
+`iati_identifier`의 `activity_sectors`와 `activity_sectors_truncated`에서 확인합니다. ODA Map의 `iati:` 접두사만 제거할
+수 있으며 다른 접두사를 만들면 안 됩니다. 잘림 표지가 참이면 목록은 부분 결과입니다. 빈 `activity_sectors`는 거래 수준 보고를
+확인해야 한다는 뜻이지 sector 부재가 아닙니다. 이 값은 OECD CRS 제출자료나 최초 제출
+이력을 자동으로 증명하지 않습니다.
 `country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
 채널·활동 세부자료 전용 조회는 별도 범위입니다.
 

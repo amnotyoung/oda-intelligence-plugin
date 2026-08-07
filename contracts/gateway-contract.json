@@ -362,8 +362,66 @@
       ],
       "read_only": true,
       "smoke_arguments": {
-        "countryCode": "VN"
-      }
+        "countryCode": "FJ",
+        "collection": "activity",
+        "iatiIdentifier": "KR-GOV-051-2021010100097",
+        "summary": false,
+        "rows": 1,
+        "fields": [
+          "iati_identifier",
+          "title_narrative",
+          "recipient_country_code",
+          "activity_sectors",
+          "activity_sectors_truncated",
+          "last_updated_datetime"
+        ]
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "data",
+            0,
+            "title_narrative"
+          ],
+          "equals": "Fiji Agrophotovoltaic Program (GCF)"
+        },
+        {
+          "path": [
+            "data",
+            0,
+            "recipient_country_code"
+          ],
+          "equals": "FJ"
+        },
+        {
+          "path": [
+            "data",
+            0,
+            "iati_identifier"
+          ],
+          "equals": "KR-GOV-010-KR-GOV-051-2021010100097"
+        },
+        {
+          "path": [
+            "data",
+            0,
+            "activity_sectors"
+          ],
+          "array_contains": {
+            "code": "31120",
+            "vocabulary": "1",
+            "vocabulary_inferred": false
+          }
+        },
+        {
+          "path": [
+            "data",
+            0,
+            "activity_sectors_truncated"
+          ],
+          "equals": false
+        }
+      ]
     },
     "iati_status": {
       "allowed_required_inputs": [],

@@ -196,7 +196,7 @@ reports freshness per source key, so read it before quoting any figure.
 | `country_travel_alert` | MOFA travel-alert levels for Korean nationals — safety information, not a feasibility judgement. Disabled on the public deployment; see below | **`countryCode`**, `refresh` |
 | `country_list` | KOICA overseas-office host and concurrent countries with ISO codes, responsible office, and jurisdiction role | (none) |
 | `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** |
-| `iati_query_country` | IATI activities, transactions, or budgets. Counts and three samples by default; `summary: false` returns detailed records | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
+| `iati_query_country` | IATI activities, transactions, or budgets. An identifier-scoped single-activity match returns `activity_sectors` with code, vocabulary, percentage, and label associations preserved plus `activity_sectors_truncated`; `summary: false` returns detailed records | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
 | `iati_status` | Whether the server's IATI lookup is configured. Returns no credential value or storage location | (none) |
 | `iati_test_connection` | Fetches one Myanmar activity with the server-held credential to test the connection. Prints no credential | (none) |
 
@@ -204,7 +204,14 @@ reports freshness per source key, so read it before quoting any figure.
 conversation's tool snapshot does not show it yet, start a new conversation;
 the Skill checks the official OECD API directly in the meantime.
 `iati_query_country.sectorCode` only applies an already verified three- to
-five-digit code to country-level IATI records. The OECD observations in
+five-digit code to country-level IATI records. It is an exact filter, so `311`
+does not match `31120`. To verify a publisher's current IATI value, pass a
+verified project identifier, require one match, verify the returned canonical
+`iati_identifier`, and read `activity_sectors` plus `activity_sectors_truncated`. Remove only a literal ODA Map
+`iati:` namespace; never synthesize another prefix. A true truncation flag means the list is partial. An empty `activity_sectors`
+array requires a transaction-level check because IATI permits sector reporting
+at either level. This current IATI value does not by itself prove an OECD CRS
+submission or the first historical submission. The OECD observations in
 `country_report_context` are country-level DAC2A totals; donor, sector,
 channel, and activity-level CRS detail remains a separate query surface.
 

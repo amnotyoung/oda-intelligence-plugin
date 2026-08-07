@@ -208,15 +208,27 @@ test("forbidden, additional, and write-capable public tools fail", () => {
 test("every contracted tool declares smoke arguments or an exemption", () => {
   const smokeContract = {
     tools: {
-      callable: { smoke_arguments: { query: "x" } },
+      callable: {
+        smoke_arguments: { query: "x" },
+        smoke_output_assertions: [
+          { path: ["data", 0, "code"], equals: "31120" },
+        ],
+      },
       volatile: { smoke_exempt_reason: "id changes per build" },
       forgotten: {},
       both: { smoke_arguments: {}, smoke_exempt_reason: "why" },
+      malformed: {
+        smoke_arguments: {},
+        smoke_output_assertions: [
+          { path: [], equals: "x", array_contains: { code: "x" } },
+        ],
+      },
     },
   };
   const failures = validateSmokeCoverage(smokeContract).join("\n");
   assert.match(failures, /forgotten: needs smoke_arguments/);
   assert.match(failures, /both: smoke_arguments and smoke_exempt_reason/);
+  assert.match(failures, /malformed: smoke_output_assertions\[0\]/);
   assert.doesNotMatch(failures, /callable/);
   assert.doesNotMatch(failures, /volatile/);
 });
@@ -241,6 +253,52 @@ test("a tool that is listed but always errors fails the smoke check", () => {
   assert.match(failures, /blocked: returned isError — PUBLIC_RESPONSE_BLOCKED/);
   assert.match(failures, /unreachable: call failed — socket hang up/);
   assert.doesNotMatch(failures, /healthy/);
+});
+
+test("smoke output assertions catch successful responses with missing semantics", () => {
+  const assertions = [
+    {
+      path: ["data", 0, "activity_sectors"],
+      array_contains: {
+        code: "31120",
+        vocabulary: "1",
+        vocabulary_inferred: false,
+      },
+    },
+  ];
+  const passing = evaluateSmokeResults([
+    {
+      tool: "iati_query_country",
+      assertions,
+      result: {
+        structuredContent: {
+          data: [
+            {
+              activity_sectors: [
+                {
+                  code: "31120",
+                  vocabulary: "1",
+                  vocabulary_inferred: false,
+                  percentage: null,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+  ]);
+  assert.deepEqual(passing, []);
+
+  const failures = evaluateSmokeResults([
+    {
+      tool: "iati_query_country",
+      assertions,
+      result: { structuredContent: { data: [{ transaction_sector_code: [] }] } },
+    },
+  ]).join("\n");
+  assert.match(failures, /did not find/);
+  assert.match(failures, /activity_sectors/);
 });
 
 test("the shipped contract covers every tool with smoke arguments", async () => {
