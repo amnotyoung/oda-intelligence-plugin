@@ -1,12 +1,12 @@
 ---
 name: korean-oda-portfolio-lookup
-description: Answer direct questions about what Korean development cooperation agencies are doing in a country — KOICA, EDCF, KOFIH, and Korean ministries — using the ODA Map portfolio tools. Use for "what projects does KOICA run in X", Korean project lists, agency or sector breakdowns, active or completed project counts, single-project detail, what a project actually does, and finding projects comparable to a named one — similar projects, precedents, benchmarks. Korean bilateral project inventory lives only in the ODA Map source; never conclude from IATI, OECD, or World Bank evidence that Korean projects are absent, and never assemble a comparison from web search when the gateway holds the records. For DAC/CRS code meanings or international aid statistics, use international-oda-data-lookup. For a full written country report, use generate-development-country-report.
+description: Answer direct questions about Korean development cooperation in a country or around a named city, province, or district. Use search_development_by_place first for place-led questions about development-document mentions, projects mapped there, or both; use the ODA Map portfolio tools for country inventories, counts, and project detail. Covers KOICA, EDCF, KOFIH, Korean ministries, project lists, agency or sector breakdowns, status counts, single-project detail, what projects do, and comparable projects. Korean bilateral inventory lives only in the ODA Map; never infer absence from IATI, OECD, or World Bank or assemble comparisons from web search when gateway records exist. For DAC/CRS codes or international statistics, use international-oda-data-lookup. For a written country report, use generate-development-country-report.
 ---
 
 # Look Up the Korean ODA Portfolio
 
-Answer a direct question about Korean development cooperation projects in a country from the ODA Map
-portfolio, with the counting rules the source requires.
+Answer a direct question about Korean development cooperation projects in a country or around a
+named place, with the source separation and counting rules the evidence requires.
 
 Read [references/portfolio-lookup-protocol.md](references/portfolio-lookup-protocol.md) before
 reporting counts, budgets, or status.
@@ -17,6 +17,11 @@ Use this Skill when the user asks what Korea, KOICA, EDCF, KOFIH, or a Korean mi
 country — a project list, an agency or sector breakdown, an active or completed count, a portfolio
 overview, or the detail of one project. Use it for a targeted answer; it does not produce a report
 document.
+
+Use it as well when the question starts from a city, province, state, county, or district and asks
+for development-cooperation documents, mapped Korean projects, or both. A place-led question has a
+different first call from a country inventory: resolve the place before choosing an office corpus
+or treating a map result as a portfolio.
 
 It also covers the comparison question — projects comparable to a named one, a precedent, a
 benchmark, prior cases in the same sector. That question sounds like a research task and reads as
@@ -33,6 +38,11 @@ inventory.
 
 Korean bilateral project inventory is carried by the **ODA Map** source and nothing else on this
 gateway.
+
+`search_development_by_place` is a place-discovery surface, not a second country inventory. It
+combines two explicitly separate branches: development documents connected to the resolved place
+and projects placed at that location in a dated map snapshot. Use it to start a place-led question,
+then use the portfolio tools below for current country-level status, exhaustive counts, and detail.
 
 - `country_report_context`, `iati_query_country`, and the OECD and World Bank evidence behind them
   are international-data sources. They carry country-level aid aggregates and multi-donor activity
@@ -62,7 +72,33 @@ no Korean projects, and the source status for the same country is often `fresh`.
 When the source status is `fresh` and a response stays blocked, say that the gateway withheld it.
 A reader told the evidence does not exist stops looking.
 
-## Workflow
+## Place-first workflow
+
+When the user's question begins with a city, province, state, county, or district, call
+`search_development_by_place` first. Pass the user's place wording in `place` and carry any stated
+topic, sector, document kind, month range, or result limit into the same call.
+
+1. Inspect `resolved_places` before interpreting either result branch. The resolver accepts only
+   verified exact aliases; no match is not permission to guess from a partial spelling.
+2. When `requires_disambiguation` is true, do not choose a same-named place silently. Use the
+   country already supplied by the user or ask which candidate they mean, then retry
+   `search_development_by_place` with the same `place` and that candidate's `country`.
+3. Keep the branches distinct. `knowledge_graph` contains documents that mention the place or are
+   connected to a mapped project name. `map` contains projects placed at the resolved map location.
+   A document mention is not proof that an activity occurred there, and a map placement is not a
+   statement that the project document mentions the place.
+4. For a document the answer turns on, call `get_trend_document` with the returned document's
+   `office` and its `article_id` as `document_id`. Cite the title, date, outlet, and public original
+   URL rather than the identifier.
+5. For a mapped project the answer turns on, call `oda_map_project_detail` with its `project_id`.
+   If the question asks for a current status, country total, budget, or exhaustive project list,
+   continue with `oda_map_data_status` and the country-level workflow below; the place result is a
+   bounded snapshot, not the whole portfolio.
+6. Never add `knowledge_graph.total_matches` to `map.total_matches`, and never report either as a
+   unique country-project count. State the place, resolved country, filters, and the separate totals
+   when the bounded search size matters.
+
+## Country-level workflow
 
 1. Resolve the country name. The ODA Map tools accept the Korean or English official name and
    return the canonical name with its aliases; pass the user's wording and read `country.canonical`
@@ -159,6 +195,9 @@ limitations that change interpretation.
 - For a comparison answer, state the countries searched beside the matches, and describe each match
   from its `description` rather than from its title. What makes two projects comparable is what they
   build and train, and the title rarely says.
+- For a place answer, name the resolved place and country, distinguish document mentions from mapped
+  project locations, and say which documents or projects received a follow-up detail call. Do not
+  turn the two branch totals into one count.
 - Keep activity identifiers, layer names, and other internal fields out of reader-facing prose
   unless the user asked for a machine-readable list.
 - Do not read an existing Korean project as an open opportunity, a partnership, or an endorsement.

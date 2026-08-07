@@ -1,8 +1,8 @@
 {
   "gateway": {
-    "instructions_sha256": "eb0c87ac2cf96ff1efaa6148adf543d493de64e513e82161523c50a72b71acb0",
+    "instructions_sha256": "ccd82beeda60b633c540f3e600a6bdb216fb5d618d2bf4bd8d0c355d217f4279",
     "server_name": "oda-intelligence",
-    "tool_count": 33,
+    "tool_count": 34,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
@@ -31,6 +31,7 @@
       "procurement_country_context": "75dbd248075263016de72629a0e1088fd8e6ba5ce8bfe330b8387863b65ea93e",
       "procurement_model_detail": "7c63760e34ce2e0844fba1cfb55b347052e9bc483b50ff010fb14a2849ed1e9a",
       "procurement_model_status": "05c19b7d709afc9bfa0ac85b0dbef0f9162c97366e122548e7b93b582c7cdf56",
+      "search_development_by_place": "b8b66e496b26216994982e8e3aee695a92a4a9295c96df3d08eb6e73c8c5be43",
       "search_development_trends": "8dca2540b1d580ec9dfaea6dc47ecf3134f617063e22b7f675e472bf0e3a8c45",
       "search_entity_relationships": "a802b7a3ed1c84bfbd7913de684a9e86dddb0c33eb4871ae988878117549c70c",
       "search_offices_by_entity": "4a0e9818a8c46d016d1b5d2e81c07c2af85e9a73bf070982fff6bf60eb19caeb",

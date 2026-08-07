@@ -206,6 +206,74 @@ test("standalone DAC and CRS questions route away from KOICA regulations", async
   );
 });
 
+test("place-led questions resolve place evidence before country portfolio detail", async () => {
+  const portfolioSkill = await readFile(
+    resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),
+    "utf8",
+  );
+  const portfolioProtocol = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "korean-oda-portfolio-lookup",
+      "references",
+      "portfolio-lookup-protocol.md",
+    ),
+    "utf8",
+  );
+  const portfolioAgent = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "korean-oda-portfolio-lookup",
+      "agents",
+      "openai.yaml",
+    ),
+    "utf8",
+  );
+  const gatewayContract = await readJson("contracts", "gateway-contract.json");
+  const placeTool = gatewayContract.tools.search_development_by_place;
+
+  assert.ok(placeTool, "place search must be an approved gateway tool");
+  assert.deepEqual(placeTool.allowed_required_inputs, ["place"]);
+  assert.deepEqual(placeTool.input_properties, {
+    country: "string",
+    kinds: "array",
+    limit: "integer",
+    month_from: "string",
+    month_to: "string",
+    place: "string",
+    query: "string",
+    sector: "string",
+  });
+  assert.deepEqual(placeTool.output_required, [
+    "caveat",
+    "country",
+    "knowledge_graph",
+    "map",
+    "place",
+    "requires_disambiguation",
+    "resolved_places",
+    "result_count",
+  ]);
+  assert.deepEqual(placeTool.smoke_arguments, {
+    country: "라오스",
+    limit: 1,
+    place: "비엔티안",
+    query: "보건",
+  });
+  assert.equal(placeTool.read_only, true);
+
+  assert.match(portfolioSkill, /mentions, projects mapped there, or both/u);
+  assert.match(portfolioSkill, /call\s+`search_development_by_place` first/u);
+  assert.match(portfolioSkill, /requires_disambiguation[\s\S]+retry[\s\S]+`country`/u);
+  assert.match(portfolioSkill, /Keep the branches distinct[\s\S]+`knowledge_graph`[\s\S]+`map`/u);
+  assert.match(portfolioSkill, /`get_trend_document`[\s\S]+`oda_map_project_detail`/u);
+  assert.match(portfolioProtocol, /documentary linkage, not proof/u);
+  assert.match(portfolioProtocol, /map\s+branch is a dated, place-linked snapshot/u);
+  assert.match(portfolioAgent, /country or around a named place/u);
+});
+
 test("ChatGPT compatibility maps the registered gateway app without a secret", async () => {
   const codex = await readJson(
     "plugins",
@@ -359,9 +427,9 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 33 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 34 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 33);
+  assert.equal(Object.keys(contract.tools).length, 34);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
@@ -374,6 +442,7 @@ test("minimal accepted gateway contract contains 33 approved read-only tools", a
     "get_attachment",
     "list_attachments",
     "get_trend_document",
+    "search_development_by_place",
     "search_entity_relationships",
     "get_corpus_overview",
     "search_offices_by_topic",
@@ -385,13 +454,13 @@ test("minimal accepted gateway contract contains 33 approved read-only tools", a
   assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
 });
 
-test("observed lock pins exactly the 33 approved tool definitions", async () => {
+test("observed lock pins exactly the 34 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 33);
+  assert.equal(lock.gateway.tool_count, 34);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

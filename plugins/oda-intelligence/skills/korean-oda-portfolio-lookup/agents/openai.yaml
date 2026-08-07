@@ -1,12 +1,12 @@
 interface:
   display_name: "Korean ODA Portfolio Lookup"
-  short_description: "Look up Korean and KOICA projects in a country"
-  default_prompt: "Use $korean-oda-portfolio-lookup to look up what Korean agencies are doing in a country."
+  short_description: "Look up Korean projects by country or named place"
+  default_prompt: "Use $korean-oda-portfolio-lookup to look up what Korean agencies are doing in a country or around a named place."
 dependencies:
   tools:
     - type: "mcp"
       value: "oda-intelligence"
-      description: "Read-only gateway for Korean ODA portfolio status, country context, project search, and project detail"
+      description: "Read-only gateway for place-linked development evidence plus Korean ODA portfolio status, search, and project detail"
       transport: "streamable_http"
       url: "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
 policy:

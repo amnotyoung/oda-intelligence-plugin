@@ -574,6 +574,38 @@
       "read_only": true,
       "smoke_arguments": {}
     },
+    "search_development_by_place": {
+      "allowed_required_inputs": [
+        "place"
+      ],
+      "input_properties": {
+        "country": "string",
+        "kinds": "array",
+        "limit": "integer",
+        "month_from": "string",
+        "month_to": "string",
+        "place": "string",
+        "query": "string",
+        "sector": "string"
+      },
+      "output_required": [
+        "caveat",
+        "country",
+        "knowledge_graph",
+        "map",
+        "place",
+        "requires_disambiguation",
+        "resolved_places",
+        "result_count"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "country": "라오스",
+        "limit": 1,
+        "place": "비엔티안",
+        "query": "보건"
+      }
+    },
     "search_development_trends": {
       "allowed_required_inputs": [
         "office",

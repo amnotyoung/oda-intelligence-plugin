@@ -135,14 +135,15 @@ kind of question:
 | Skill | The questions it takes | Domains it draws on |
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS codes and statistics, IATI discovery, and correct separation of international-aid evidence | `international-data` plus the official OECD source when needed |
-| `korean-oda-portfolio-lookup` | What a Korean agency is doing in a country: project lists, agency and sector breakdowns, active or completed counts, one project in detail, projects comparable to a named one | `korean-oda-map` |
+| `korean-oda-portfolio-lookup` | What Korean agencies are doing in a country or around a named city, province, or district: place-linked documents and mapped projects, country project lists, agency and sector breakdowns, active or completed counts, project detail, and comparable projects | `development-documents` + `korean-oda-map` |
 | `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All five |
 | `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
 
 Four things make a prompt land:
 
-- **Name the country.** Korean and English both resolve — `미얀마`, `Myanmar`,
-  and for procurement also `nepal` or `NPL`.
+- **Name the country or place.** Korean and English both resolve — `미얀마`,
+  `Myanmar`, `비엔티안`, or `Vientiane`. Add the country for an ambiguous place;
+  procurement also accepts `nepal` or `NPL`.
 - **Give the as-of date** when a count has to be reproducible. Project status
   is recomputed per call, so "as of 2026-03-31" pins it.
 - **Say what the answer is for** — a report, a slide, a decision memo. It
@@ -260,20 +261,42 @@ conclusion against the current official source.
 
 Country-office development-cooperation documents and the relationships
 extracted from them — the content of the trend wiki, queryable without
-visiting the site. Corpora are per office. When you do not know which office
-to look at, `search_offices_by_topic` finds the offices that carry the topic
-across all 48 corpora. The working order is office discovery → search →
-document context → relationship evidence.
+visiting the site. Corpora are per office. For a city, province, or district,
+`search_development_by_place` resolves the place first and returns related
+documents separately from projects placed there on the map. When you do not
+know which office carries a topic, `search_offices_by_topic` searches all 48
+corpora. The working order is place resolution or office discovery → search →
+document or project detail → relationship evidence.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
+| `search_development_by_place` | Resolves an exact verified alias for a city, province, or district, then returns related documents (`knowledge_graph`) separately from projects placed there on the map (`map`). Same-named places return candidates and `requires_disambiguation` | **`place`**, `country`, `query`, `month_from`, `month_to`, `sector`, `kinds`, `limit` |
 | `search_offices_by_topic` | An office ranking across all 48 corpora — hit count and up to two evidence documents per office. `total_matches` states the corpus-wide count and `truncated_office_count` how many offices the cap dropped | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
 | `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document. `total_matches` states the full count and `offset` pages past the first results | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, the relationships extracted from that document, and ten related trends and ten related projects — the lists its wiki page shows | **`office`**, **`document_id`** |
 | `get_corpus_overview` | Sector, month, kind, and organization document counts for an office corpus — the same aggregates the wiki catalog page shows. Organization counts are once per document | **`office`** |
 | `search_offices_by_entity` | An office ranking across all 48 corpora for one organisation — per-office relationship counts, leading relation types, and up to two sample relationships (no evidence sentences). Evidence-text search (`query`) stays office-level | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
 | `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
+
+> Show recent health documents connected to Vientiane and Korean ODA projects
+> placed at that location.
+
+```text
+search_development_by_place { "place": "Vientiane", "country": "Laos", "query": "health", "limit": 5 }
+get_trend_document          { "office": "<office from the document>", "document_id": "<article_id from the document>" }
+oda_map_project_detail      { "project_id": "<project_id from the mapped project>" }
+```
+
+When `requires_disambiguation` is `true`, do not merge the candidates or choose
+one silently. Retry the same place with the intended `country`.
+`knowledge_graph` is a document mention or a link through a mapped project
+name; `map` is project placement at the map location. Neither relation proves
+the other. Follow a material document with `get_trend_document`, using its
+returned `office` and `article_id`, and a material mapped project with
+`oda_map_project_detail`, using its `project_id`. For a current country total,
+status, budget, or exhaustive list, ignore the place-result count and use
+`oda_map_data_status` plus the country portfolio tools.
 
 > Which organisations does KOICA work with in Cambodia, and on what evidence?
 
@@ -324,7 +347,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`, 20 for `find_references` and `search_development_trends`, 20 offices for `search_offices_by_topic` and `search_offices_by_entity`, 50 for `search_entity_relationships`, 100 for `oda_map_projects` |
+| `limit` | 10 for `search_regulation`; 20 for `find_references` and `search_development_trends`; 20 in each `knowledge_graph` and `map` branch of `search_development_by_place`; 20 offices for `search_offices_by_topic` and `search_offices_by_entity`; 50 for `search_entity_relationships`; 100 for `oda_map_projects` |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -362,7 +385,7 @@ when this document falls behind.
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
+| `development-documents` | `list_available_corpora`, `search_development_by_place`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `korean-oda-map` is an independent, unofficial compilation of Korean

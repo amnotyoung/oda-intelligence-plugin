@@ -130,13 +130,14 @@ Skill은 도구 이름이 아니라 주제로 라우팅합니다. 네 Skill이 �
 | Skill | 맡는 질문 | 사용하는 도메인 |
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS 코드·통계, IATI 활동 탐색, 국제 원조 근거의 구분과 검증 | `international-data` + 필요한 경우 OECD 공식 원문 |
-| `korean-oda-portfolio-lookup` | 한국 기관이 그 나라에서 무엇을 하고 있는지 — 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
+| `korean-oda-portfolio-lookup` | 한국 기관이 한 국가 또는 특정 도시·주·군에서 무엇을 하고 있는지 — 지명별 문서·지도 사업, 국가 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `development-documents` + `korean-oda-map` |
 | `generate-development-country-report` | 국가보고서·원조 지형 검토, 중점분야 선정, 참여 경로, 조달 진입, Go/No-Go 위험 | 다섯 개 전부 |
 | `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
 
 프롬프트를 쓸 때 다음 네 가지가 결과를 좌우합니다.
 
-- **국가명을 밝힙니다.** 한국어와 영문이 모두 해석됩니다(`미얀마`, `Myanmar`).
+- **국가명이나 지명을 밝힙니다.** 한국어와 영문이 모두 해석됩니다(`미얀마`,
+  `Myanmar`, `비엔티안`, `Vientiane`). 동명이의 지명은 국가를 함께 적어야 하며,
   조달은 `nepal`, `NPL` 같은 slug·ISO3 코드도 받습니다.
 - **기준일을 지정합니다.** 건수를 재현해야 할 때 필요합니다. 사업 상태는 호출할
   때마다 다시 계산되므로 "2026-03-31 기준으로"라고 못 박아야 고정됩니다.
@@ -250,20 +251,39 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 ### 개발협력 문서 — `development-documents`
 
 국가사무소 개발협력 문서와 거기서 추출한 관계를 다룹니다 — 동향 위키에 직접
-가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스는 사무소 단위입니다. 어느
-사무소를 볼지 모르면 `search_offices_by_topic`이 48개 사무소를 가로질러 주제를
-가진 사무소부터 찾아줍니다. 사용 순서는 사무소 탐색 → 검색 → 문서 컨텍스트 →
-관계 근거입니다.
+가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스는 사무소 단위입니다. 도시·주·군
+같은 지명에서 시작하면 `search_development_by_place`가 장소를 먼저 해석해 관련 문서와
+그 위치에 배치된 지도 사업을 분리해 반환합니다. 어느 사무소를 볼지 모르는 주제
+질문은 `search_offices_by_topic`이 48개 사무소를 가로질러 관련 사무소부터 찾습니다.
+사용 순서는 지명 해석 또는 사무소 탐색 → 검색 → 문서·사업 상세 → 관계 근거입니다.
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
+| `search_development_by_place` | 도시·주·군 등 지명을 정확한 별칭으로 해석하고, 관련 문서(`knowledge_graph`)와 그 장소에 배치된 지도 사업(`map`)을 별도 분기로 반환합니다. 동명이의 장소는 후보와 `requires_disambiguation`을 반환합니다 | **`place`**, `country`, `query`, `month_from`, `month_to`, `sector`, `kinds`, `limit` |
 | `search_offices_by_topic` | 48개 사무소를 가로지른 사무소 랭킹 — 사무소별 히트 수와 대표 문서 최대 2건. `total_matches`가 전체 일치 수, `truncated_office_count`가 상한에서 잘린 사무소 수를 보고합니다 | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
 | `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크. `total_matches`가 전체 일치 수를 보고하고 `offset`으로 다음 페이지를 조회합니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
 | `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들, 그리고 관련 동향·사업 각 10건(위키 문서 페이지의 그 목록) | **`office`**, **`document_id`** |
 | `get_corpus_overview` | 사무소 코퍼스의 분야·월·문서종류·기관별 문서 수 — 위키 목차 페이지와 같은 레코드에서 센 집계입니다. 기관 카운트는 문서당 1회 기준 | **`office`** |
 | `search_offices_by_entity` | 48개 사무소를 가로지른 기관 랭킹 — 사무소별 관계 수, 주요 관계 유형, 대표 관계 최대 2건(근거 문장 없음). 근거 본문 검색(`query`)은 사무소별 도구만 지원합니다 | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
 | `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
+
+> 비엔티안과 관련된 최근 보건 문서와 그 장소에 배치된 한국 ODA 사업을 함께 보여줘.
+
+```text
+search_development_by_place { "place": "비엔티안", "country": "라오스", "query": "보건", "limit": 5 }
+get_trend_document          { "office": "<문서가 준 office>", "document_id": "<문서가 준 article_id>" }
+oda_map_project_detail      { "project_id": "<지도 사업이 준 project_id>" }
+```
+
+`requires_disambiguation`이 `true`면 후보를 임의로 합치거나 하나를 고르지 말고, 사용자가
+뜻한 국가를 `country`에 넣어 같은 지명을 다시 검색합니다. `knowledge_graph`는 지명
+언급 또는 지도 사업명과의 문서 연결이고, `map`은 사업의 지도상 위치입니다. 문서 언급을
+사업 위치로, 지도 위치를 문서 언급으로 바꾸어 읽지 마세요. 중요한 문서는 반환된
+`office`와 `article_id`로 `get_trend_document`를, 중요한 지도 사업은 `project_id`로
+`oda_map_project_detail`을 이어서 호출합니다. 국가 전체의 최신 사업 수·상태·예산이
+필요하면 지명 검색 건수를 쓰지 말고 `oda_map_data_status`와 국가별 사업 도구로
+확인합니다.
 
 > 캄보디아에서 KOICA가 어떤 기관들과 협력하는지, 무슨 근거로 그런지 보여줘.
 
@@ -312,7 +332,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_offices_by_topic`·`search_offices_by_entity` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
+| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_development_by_place`는 `knowledge_graph`·`map` 각 20, `search_offices_by_topic`·`search_offices_by_entity` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -350,7 +370,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
+| `development-documents` | `list_available_corpora`, `search_development_by_place`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 
 `korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
