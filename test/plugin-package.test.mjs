@@ -283,7 +283,7 @@ test("named-geography project questions gather local evidence before DAC and CRS
   assert.match(section, /geography alone/u);
   assert.match(section, /does not itself assign an official CRS code/u);
   assert.match(section, /empty place or document search[\s\S]+does not prove/u);
-  assert.match(internationalAgent, /Classify projects with OECD, DAC, CRS, and IATI evidence/u);
+  assert.match(internationalAgent, /Classify and trace projects with OECD, CRS, and IATI evidence/u);
   assert.match(portfolioSkill, /do not hand off before reading the project/u);
   assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
   assert.match(portfolioProtocol, /empty `transaction_sector_code`[\s\S]+no sector absence/u);
@@ -347,6 +347,47 @@ test("reported sectors distinguish current IATI evidence from OECD CRS submissio
     /`transaction_sector_code` alone[\s\S]+must never be labelled CRS/u,
   );
   assert.match(internationalAgent, /current IATI-reported sector[\s\S]+official OECD CRS/u);
+});
+
+test("historical reported-code questions use official OECD project microdata", async () => {
+  const internationalSkill = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "SKILL.md",
+    ),
+    "utf8",
+  );
+  const internationalAgent = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "agents",
+      "openai.yaml",
+    ),
+    "utf8",
+  );
+
+  const section = internationalSkill.match(
+    /## Historical reported-code verification(?<body>[\s\S]+?)(?=\n## )/u,
+  )?.groups?.body;
+  assert.ok(section, "reported-code history needs an explicit verification route");
+  assert.match(section, /current IATI[\s\S]+not a\s+version history/u);
+  assert.match(section, /`OECD\.DCD\.FSD,DSD_CRS@DF_CRS`/u);
+  assert.match(section, /`MD_DIM=DD` \(Project\/programme\)/u);
+  assert.match(section, /exact `DONOR_PROJECT_ID`/u);
+  assert.match(section, /`TIME_PERIOD`[\s\S]+`SECTOR`/u);
+  assert.match(
+    section,
+    /Commitment\/disbursement[\s\S]+not code changes/u,
+  );
+  assert.match(section, /`NATURE_OF_SUBMISSION`[\s\S]+revision/u);
+  assert.match(section, /does not expose the\s+superseded value/u);
+  assert.match(section, /not an archive of every past database revision/u);
+  assert.match(section, /No matching row[\s\S]+not proof/u);
+  assert.match(internationalAgent, /annual official OECD CRS purpose-code assignments/u);
 });
 
 test("place-led questions resolve place evidence before country portfolio detail", async () => {

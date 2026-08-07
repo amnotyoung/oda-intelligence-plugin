@@ -1,7 +1,7 @@
 interface:
   display_name: "International ODA Data Lookup"
-  short_description: "Classify projects with OECD, DAC, CRS, and IATI evidence"
-  default_prompt: "Use $international-oda-data-lookup to classify a project, verify its current IATI-reported sector, or separately verify official OECD CRS submission evidence."
+  short_description: "Classify and trace projects with OECD, CRS, and IATI evidence"
+  default_prompt: "Use $international-oda-data-lookup to classify a project, verify its current IATI-reported sector, or trace its annual official OECD CRS purpose-code assignments."
 dependencies:
   tools:
     - type: "mcp"

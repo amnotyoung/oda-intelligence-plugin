@@ -205,6 +205,12 @@ OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 �
 수 있으며 다른 접두사를 만들면 안 됩니다. 잘림 표지가 참이면 목록은 부분 결과입니다. 빈 `activity_sectors`는 거래 수준 보고를
 확인해야 한다는 뜻이지 sector 부재가 아닙니다. 이 값은 OECD CRS 제출자료나 최초 제출
 이력을 자동으로 증명하지 않습니다.
+기존 코드 이력은 IATI 최신본의 갱신일로 추정하지 않습니다. Skill은 OECD 공식
+`DSD_CRS@DF_CRS`의 프로젝트/프로그램 마이크로데이터(`MD_DIM=DD`)를 공여국·수원국·
+연도로 좁힌 뒤, `DONOR_PROJECT_ID`와 사업명·기관을 교차검증하고 `TIME_PERIOD`별
+고유 `SECTOR`를 비교합니다. 약정/지출 및 경상/불변가격 행은 코드 변경으로 중복
+계산하지 않습니다. 이는 OECD의 연도별 공식 CRS 기록이며 IATI XML 개정 이력은
+아닙니다. `NATURE_OF_SUBMISSION=2`가 있어도 바뀌기 전 값 자체는 복원되지 않습니다.
 `country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
 채널·활동 세부자료 전용 조회는 별도 범위입니다.
 

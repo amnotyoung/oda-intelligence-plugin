@@ -1,6 +1,6 @@
 ---
 name: international-oda-data-lookup
-description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and local development-document or project evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, and IATI discovery or filtering. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
+description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and local development-document or project evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, historical annual OECD CRS purpose-code assignments, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, and IATI discovery or filtering. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
 ---
 
 # Look Up International ODA Data
@@ -28,10 +28,12 @@ design facts before the official code list can be interpreted.
    `iati_identifier`; never invent an identifier prefix. If
    `activity_sectors` is empty, check transaction-level sector evidence because IATI permits sector
    reporting at either activity level or for every transaction.
-5. **OECD CRS donor, sector, channel, or activity detail** — use the current official OECD Data
-   Explorer or OECD API through an available web or browser tool. The gateway has no dedicated CRS
-   detail query. An IATI sector does not by itself prove what was submitted to the OECD CRS database;
-   do not substitute an IATI count or record for OECD CRS evidence.
+5. **OECD CRS donor, sector, channel, activity detail, or annual project history** — use the current
+   official OECD Data Explorer or OECD API through an available web or browser tool. For a named
+   project's reported-code history, follow `Historical reported-code verification` below and use
+   project/programme microdata (`MD_DIM=DD`), not an aggregate sector series. The gateway has no
+   dedicated CRS detail query. An IATI sector does not by itself prove what was submitted to the OECD
+   CRS database; do not substitute an IATI count or record for OECD CRS evidence.
 
 If `dac_purpose_code_lookup` is absent from the current tool snapshot, explain that the gateway
 upgrade is not active in this conversation and use the official OECD API through an available web
@@ -106,6 +108,50 @@ An empty place or document search means only that the indexed local evidence did
 question. It does not prove that the place, project, or design feature is absent. Continue from
 verified user-supplied facts, state the evidence gap, and keep any code choice conditional.
 
+## Historical reported-code verification
+
+When the user asks whether a named activity used the same code before, what it was originally
+reported under, or when its code changed, separate three claims: the publisher's current IATI value,
+the unavailable IATI revision timeline, and the OECD's annual CRS project records. Current IATI
+Datastore and d-portal records replace earlier publisher XML; `last_updated_datetime` is not a
+version history. Do not describe a current IATI record as an original submission or infer an earlier
+sector from a title, transaction date, cached search snippet, or current XML.
+
+Use this official OECD route when the activity may have been reported to CRS:
+
+1. Resolve the reporting provider, recipient, donor agency, project title, and a stable donor project
+   number from the matched project record. Keep the full IATI identifier for cross-checking, but do
+   not assume it is identical to `DONOR_PROJECT_ID` or strip prefixes until an OECD row independently
+   confirms the resulting number.
+2. Read the current `OECD.DCD.FSD,DSD_CRS@DF_CRS` dataflow structure and its version. Query only the
+   provider-recipient pair and relevant reporting years with drilldown dimension
+   `MD_DIM=DD` (Project/programme), requesting labelled CSV. Use the current OECD codelists to resolve
+   provider and recipient codes; an IATI ISO2 code is not the CRS query key. The SDMX key has the
+   form `{provider}.{recipient}.......DD..`; bound it with `startPeriod` and `endPeriod`, and request
+   `dimensionAtObservation=AllDimensions&format=csvfilewithlabels`.
+3. Filter the returned microdata by exact `DONOR_PROJECT_ID` when available. If discovery starts from
+   a title, require corroboration across donor agency, recipient, title or description, and the local
+   or IATI project record before treating it as the same activity. A title-only near match is not
+   enough.
+4. Collapse financial duplicates by grouping on `TIME_PERIOD`, `DONOR_PROJECT_ID`, and `SECTOR`.
+   Commitment/disbursement, current/constant-price, and measure variants are observations of the same
+   annual purpose-code assignment, not code changes. Preserve every distinct sector when a project
+   legitimately has multiple purpose codes or shares.
+5. Read `NATURE_OF_SUBMISSION` with the official OECD codelist: `1` is a new activity, `2` is a
+   revision, and `3` is a previously reported activity. A revision flag does not expose the
+   superseded value. The current OECD historical series can show which code each reporting year now
+   carries, but it is not an archive of every past database revision.
+6. Verify every five-digit `SECTOR` label with `dac_purpose_code_lookup`. Report the dataflow version,
+   retrieval time, queried year range, stable identifiers, distinct year-code pairs, and any missing
+   years. No matching row means only that the bounded OECD query did not identify the activity; it is
+   not proof that the activity or a prior code never existed.
+
+Lead the answer with the earliest verified year and code, then show later distinct year-code pairs.
+State explicitly whether the finding is an official annual OECD CRS record, a current IATI-reported
+sector, or an external archived publisher snapshot. If the user specifically needs the literal
+sequence of IATI XML revisions, say that the official current IATI services do not provide it and
+name any external archive used; do not silently substitute OECD annual records for IATI revisions.
+
 ## DAC and CRS code rules
 
 - Distinguish a three-digit DAC sector category from a five-digit CRS purpose code.
@@ -117,6 +163,9 @@ verified user-supplied facts, state the evidence gap, and keep any code choice c
 - Treat an IATI sector as a current publisher-reported IATI value only when it comes from the uniquely
   matched named activity. It is not proof of an OECD CRS database submission. An unrelated country
   search hit is not assignment evidence.
+- Treat annual OECD CRS project rows as official reporting-year evidence after exact project
+  matching. They are stronger than IATI for an OECD submission claim, but the current historical
+  series still does not preserve every superseded database revision.
 - IATI permits sector reporting either at activity level or for every transaction. A missing
   `transaction_sector_code` on an activity response is not activity-sector evidence, while an empty
   `activity_sectors` array requires a transaction-level check before any absence conclusion.
@@ -153,4 +202,5 @@ which evidence came from the gateway. For DAC/CRS code results, link or name the
 IATI-reported assignment, state every vocabulary `1` code and percentage plus the activity record's
 `last_updated_datetime`, and label it the **current IATI-reported activity or transaction sector**.
 Do not call it the original submission or the OECD CRS submission unless a versioned historical or
-official OECD activity record proves that claim.
+official OECD activity record proves that claim. For OECD project history, report one row per
+distinct reporting-year and purpose-code combination rather than repeating financial-flow variants.

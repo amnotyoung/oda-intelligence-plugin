@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "oda-intelligence",
   "displayName": "ODA Intelligence",
-  "version": "0.2.25",
+  "version": "0.2.26",
   "description": "Evidence-based development cooperation research across international aid, Korean projects, development documents, and KOICA regulations.",
   "author": {
     "name": "amnotyoung",

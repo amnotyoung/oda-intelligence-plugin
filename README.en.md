@@ -211,7 +211,15 @@ verified project identifier, require one match, verify the returned canonical
 `iati:` namespace; never synthesize another prefix. A true truncation flag means the list is partial. An empty `activity_sectors`
 array requires a transaction-level check because IATI permits sector reporting
 at either level. This current IATI value does not by itself prove an OECD CRS
-submission or the first historical submission. The OECD observations in
+submission or the first historical submission. For earlier reported codes, the
+Skill does not infer history from an IATI update
+timestamp. It narrows official OECD `DSD_CRS@DF_CRS` project/programme microdata
+(`MD_DIM=DD`) by provider, recipient, and year; verifies `DONOR_PROJECT_ID` against
+the title and agency; and compares distinct `SECTOR` values by `TIME_PERIOD`.
+Commitment/disbursement and current/constant-price rows are collapsed instead of
+being counted as code changes. This is official annual OECD CRS evidence, not an
+IATI XML revision log, and `NATURE_OF_SUBMISSION=2` does not reveal the superseded
+value. The OECD observations in
 `country_report_context` are country-level DAC2A totals; donor, sector,
 channel, and activity-level CRS detail remains a separate query surface.
 
