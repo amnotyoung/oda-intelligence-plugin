@@ -206,6 +206,89 @@ test("standalone DAC and CRS questions route away from KOICA regulations", async
   );
 });
 
+test("named-geography project questions gather local evidence before DAC and CRS classification", async () => {
+  const internationalSkill = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "SKILL.md",
+    ),
+    "utf8",
+  );
+  const internationalAgent = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "international-oda-data-lookup",
+      "agents",
+      "openai.yaml",
+    ),
+    "utf8",
+  );
+  const portfolioSkill = await readFile(
+    resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),
+    "utf8",
+  );
+  const portfolioProtocol = await readFile(
+    resolve(
+      pluginRoot,
+      "skills",
+      "korean-oda-portfolio-lookup",
+      "references",
+      "portfolio-lookup-protocol.md",
+    ),
+    "utf8",
+  );
+  const gatewayContract = await readJson("contracts", "gateway-contract.json");
+  const section = internationalSkill.match(
+    /## Geography-first applied classification(?<body>[\s\S]+?)(?=\n## )/u,
+  )?.groups?.body;
+
+  assert.ok(section, "applied classification needs an explicit geography-first route");
+  assert.match(section, /피지에서 태양광 사업[\s\S]+CRS 코드/u);
+  assert.match(section, /country name is not a subnational place/u);
+  assert.match(section, /`search_offices_by_topic`/u);
+  assert.match(section, /`search_development_by_place`/u);
+  assert.match(section, /`oda_map_project_detail`/u);
+  assert.match(section, /`dac_purpose_code_lookup`/u);
+  assert.ok(
+    section.indexOf("`oda_map_project_detail`") <
+      section.indexOf("`search_development_by_place`"),
+    "named Korean project evidence must outrank the place route",
+  );
+  assert.ok(
+    section.indexOf("`search_development_by_place`") <
+      section.indexOf("`search_offices_by_topic`"),
+    "subnational-place evidence must outrank the country-topic route",
+  );
+  assert.ok(
+    section.indexOf("`search_offices_by_topic`") <
+      section.indexOf("`dac_purpose_code_lookup`"),
+    "every local-evidence route must precede the code-list lookup",
+  );
+  assert.match(section, /material\s+document[\s\S]+`get_trend_document`/u);
+  assert.match(section, /material\s+mapped project[\s\S]+`oda_map_project_detail`/u);
+  assert.match(section, /neither a country nor an identifier[\s\S]+ask for the recipient country/u);
+  assert.match(section, /same original `country`[\s\S]+wrong\s+recipient/u);
+  assert.match(section, /actually reported under[\s\S]+matched activity-level OECD CRS or IATI record/u);
+  assert.match(section, /geography alone/u);
+  assert.match(section, /does not itself assign an official CRS code/u);
+  assert.match(section, /empty place or document search[\s\S]+does not prove/u);
+  assert.match(internationalAgent, /Classify projects with OECD, DAC, CRS, and IATI evidence/u);
+  assert.match(portfolioSkill, /do not hand off before reading the project/u);
+  assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
+
+  const countryTopicTool = gatewayContract.tools.search_offices_by_topic;
+  assert.ok(countryTopicTool, "country-topic document discovery must be approved");
+  assert.deepEqual(countryTopicTool.allowed_required_inputs, ["query"]);
+  assert.equal(countryTopicTool.input_properties.country, "string");
+  assert.equal(countryTopicTool.input_properties.query, "string");
+  assert.ok(gatewayContract.tools.search_development_by_place);
+  assert.ok(gatewayContract.tools.oda_map_project_detail);
+  assert.ok(gatewayContract.tools.dac_purpose_code_lookup);
+});
+
 test("place-led questions resolve place evidence before country portfolio detail", async () => {
   const portfolioSkill = await readFile(
     resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),

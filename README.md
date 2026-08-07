@@ -202,6 +202,14 @@ OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 �
 `country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
 채널·활동 세부자료 전용 조회는 별도 범위입니다.
 
+`피지에서 태양광 사업을 하려는데 CRS 코드를 무엇으로 써야 하나`처럼 국가명과
+사업주제가 함께 있는 적용형 분류 질문은 코드표부터 보지 않습니다. 국가명은
+`search_offices_by_topic(country, query)`으로 국가별 개발협력 문서를 먼저 찾고,
+도시·주·군 같은 하위 지명은 `search_development_by_place`로 먼저 해소하며, 특정
+한국 사업은 ODA Map 상세를 먼저 읽습니다. 그 뒤 `dac_purpose_code_lookup`으로
+후보 코드의 공식 명칭을 확인합니다. 앞 단계의 지역·사업 근거는 후보를 판별하는
+자료이지, 그 사업에 공식 CRS 코드가 부여됐다는 증거는 아닙니다.
+
 > 지금 미얀마에 대해 국제 근거가 얼마나 확보되는지, IATI에는 무엇이 있는지
 > 알려줘.
 

@@ -5,6 +5,7 @@
 | Question | Source | Tool |
 |---|---|---|
 | What Korean agencies fund and implement in a country | ODA Map | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` |
+| Project facts needed before classifying a named Korean activity | ODA Map, then the OECD codelist | `oda_map_data_status`, `oda_map_projects`, `oda_map_project_detail`, then `dac_purpose_code_lookup` |
 | Which documents mention a named place and which projects are mapped there | Development documents plus a dated map snapshot | `search_development_by_place` |
 | Comparable country-level ODA totals across donors | OECD DAC2A behind international data | `country_report_context` |
 | Multi-donor activity discovery | IATI | `iati_query_country` |
@@ -14,6 +15,12 @@
 The ODA Map row is the only row that answers a Korean project-inventory question. The place row is
 bounded discovery across two evidence branches, not an inventory, and the other rows cannot confirm
 or deny a Korean project.
+
+For a CRS question about one named Korean project, preserve that same source order. Read the
+project's `description` and detail before looking up candidate codes. The map's sector label can
+describe the source category but cannot prove an officially reported five-digit CRS assignment;
+neither can an empty IATI `sector_code`. Use the OECD codelist to verify meanings, and label the
+result as a recommendation unless an activity-level official source records the assignment.
 
 ## Source attribution
 

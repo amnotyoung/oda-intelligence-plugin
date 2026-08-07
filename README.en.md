@@ -208,6 +208,15 @@ five-digit code to country-level IATI records. The OECD observations in
 `country_report_context` are country-level DAC2A totals; donor, sector,
 channel, and activity-level CRS detail remains a separate query surface.
 
+An applied classification question that combines a country and project topic,
+such as "Which CRS code fits a solar project in Fiji?", does not start with the
+codelist. A country routes first through `search_offices_by_topic(country,
+query)`, a city, province, or district through `search_development_by_place`,
+and a named Korean project through its ODA Map detail. Only then does
+`dac_purpose_code_lookup` verify the candidate labels. The geographic and
+project evidence distinguishes candidates; it does not prove that an official
+CRS code was assigned to that activity.
+
 > How much international evidence is available for Myanmar right now, and what
 > does IATI hold for it?
 
