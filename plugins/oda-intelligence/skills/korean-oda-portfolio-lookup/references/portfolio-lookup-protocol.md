@@ -22,6 +22,26 @@ describe the source category but cannot prove an officially reported five-digit 
 neither can an empty IATI `sector_code`. Use the OECD codelist to verify meanings, and label the
 result as a recommendation unless an activity-level official source records the assignment.
 
+When the question asks what the publisher currently reports in IATI, use the map only to resolve a
+verified stable activity identifier. Remove only a literal leading `iati:` namespace from the map
+`project_id`; never synthesize a reporting-organisation prefix. Pass that value to an identifier-
+scoped `collection: "activity"` query, require `total_found: 1`, and verify the returned canonical
+`iati_identifier`, title, and recipient before reading `activity_sectors` and
+`activity_sectors_truncated`. Report every vocabulary
+`1` code and percentage; vocabulary `1` may be explicit or the IATI default. This proves the current
+IATI-reported sector, not an OECD CRS database submission or the first historical submission.
+
+If `activity_sectors_truncated` is true, label the list partial and inspect the publisher XML before
+claiming completeness. A transaction collection's flattened `transaction_sector_code` does not
+preserve vocabulary association, so verify the structured code and vocabulary together in publisher
+XML or d-portal before calling a transaction-level value CRS.
+
+The `sectorCode` filter is exact, so a miss for `311` says nothing about a record filed as `31120`.
+An empty `transaction_sector_code` in an activity response proves no sector absence. If
+`activity_sectors` is absent, open the matched publisher XML or d-portal activity HTML/XML. If it is
+present but empty, check the exact activity's transactions because IATI permits sector reporting at
+activity level or for every transaction. Do not guess candidate codes at either level.
+
 ## Source attribution
 
 A reader who cannot open the source cannot check the answer. Name the source in the chat reply
