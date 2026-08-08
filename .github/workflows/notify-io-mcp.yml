@@ -1,6 +1,7 @@
 name: Notify io-mcp of consumer contract changes
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
