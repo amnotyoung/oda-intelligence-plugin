@@ -12,6 +12,7 @@ const expectedPublicFiles = [
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json",
   ".github/workflows/ci.yml",
+  ".github/workflows/notify-io-mcp.yml",
   ".github/workflows/update-gateway-contract.yml",
   ".github/workflows/sync-public-skill.yml",
   ".gitignore",
