@@ -220,6 +220,35 @@ export function buildObservedLock(contract, observed) {
   };
 }
 
+// The v1 observation lock stores one hash for each complete tool contract. A
+// changed tool hash can therefore include a schema or detailed constraint
+// change that the compatibility floor above does not prove safe. Keep those
+// changes for human review. Only lock-only metadata drift (currently the
+// gateway instructions hash) may be released automatically.
+export function canAutoMergeObservedLock(previous, next) {
+  if (!previous || !next) return false;
+  return isDeepStrictEqual(
+    {
+      schema_version: previous.schema_version,
+      gateway: {
+        url: previous.gateway?.url,
+        server_name: previous.gateway?.server_name,
+        tool_count: previous.gateway?.tool_count,
+        tools: previous.gateway?.tools,
+      },
+    },
+    {
+      schema_version: next.schema_version,
+      gateway: {
+        url: next.gateway?.url,
+        server_name: next.gateway?.server_name,
+        tool_count: next.gateway?.tool_count,
+        tools: next.gateway?.tools,
+      },
+    },
+  );
+}
+
 export function validatePluginConfiguration(contract, config) {
   const gateway = config.mcpServers?.[contract.gateway.id];
   const failures = [];
@@ -492,9 +521,18 @@ async function main() {
     );
   }
 
-  const nextLock = `${stableJson(buildObservedLock(contract, observed))}\n`;
+  const nextLockValue = buildObservedLock(contract, observed);
+  const nextLock = `${stableJson(nextLockValue)}\n`;
   const previousLock = await readFile(LOCK_PATH, "utf8").catch(() => "");
   const changed = previousLock !== nextLock;
+  let previousLockValue = null;
+  try {
+    previousLockValue = JSON.parse(previousLock);
+  } catch {
+    // A missing or malformed baseline must be reviewed, never auto-merged.
+  }
+  const autoMerge =
+    changed && canAutoMergeObservedLock(previousLockValue, nextLockValue);
   if (updateLock && changed) await writeFile(LOCK_PATH, nextLock, "utf8");
 
   console.log(
@@ -505,9 +543,11 @@ async function main() {
       : "Live gateway contract matches observed.lock.json.",
   );
   if (process.env.GITHUB_OUTPUT) {
-    await writeFile(process.env.GITHUB_OUTPUT, `changed=${changed}\n`, {
-      flag: "a",
-    });
+    await writeFile(
+      process.env.GITHUB_OUTPUT,
+      `changed=${changed}\nauto_merge=${autoMerge}\n`,
+      { flag: "a" },
+    );
   }
   if (changed && !updateLock) process.exitCode = 2;
 }

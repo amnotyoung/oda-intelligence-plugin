@@ -1,0 +1,7 @@
+/.github/CODEOWNERS @amnotyoung
+/.github/workflows/ @amnotyoung
+/contracts/gateway-contract.json @amnotyoung
+/scripts/bump-plugin-version.mjs @amnotyoung
+/scripts/check-gateway-contract.mjs @amnotyoung
+/scripts/check-plugin-version.mjs @amnotyoung
+/scripts/sync-public-skill.mjs @amnotyoung

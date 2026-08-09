@@ -388,10 +388,15 @@ enforced by the gateway, not by the client:
 - The versioned `v2` endpoint fixes the approved tool surface. Tool names,
   required inputs, required outputs, read-only guarantees, and forbidden
   high-exposure tools are checked against `contracts/gateway-contract.json`.
-- A daily workflow records compatible metadata drift for review.
+- A daily workflow auto-merges generated lock metadata updates only when the
+  exact tool contract hashes stay unchanged. Tool schema/detail hash drift is
+  left as an open pull request for human review.
+- Canonical public Skill changes follow the same generated-build, lock-file,
+  test, patch-version, and automatic-merge gate.
 - Breaking contract drift fails instead of rewriting the accepted contract.
 - Skill routing and accepted contract changes require a versioned plugin
-  update.
+  update; installed caches still need a marketplace upgrade and a new
+  conversation.
 
 ## Data sources and attribution
 
