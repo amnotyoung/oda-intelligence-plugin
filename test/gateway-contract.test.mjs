@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   buildObservedLock,
+  canAutoMergeObservedLock,
   evaluateSmokeResults,
   validateGatewayCompatibility,
   validatePluginConfiguration,
@@ -136,6 +137,22 @@ test("observed lock excludes repositories and source implementation details", ()
   assert.match(lock.gateway.instructions_sha256, /^[a-f0-9]{64}$/);
   assert.ok(!Object.hasOwn(lock.gateway, "server_version"));
   assert.doesNotMatch(JSON.stringify(lock), /repository|commit|source_repo/i);
+});
+
+test("only metadata-only observation drift is eligible for auto-merge", () => {
+  const previous = buildObservedLock(contract, observedSearch());
+  const metadataOnly = structuredClone(previous);
+  metadataOnly.gateway.instructions_sha256 = "a".repeat(64);
+  assert.equal(canAutoMergeObservedLock(previous, metadataOnly), true);
+
+  const changedTool = structuredClone(metadataOnly);
+  changedTool.gateway.tools.search = "b".repeat(64);
+  assert.equal(canAutoMergeObservedLock(previous, changedTool), false);
+
+  const changedToolCount = structuredClone(metadataOnly);
+  changedToolCount.gateway.tool_count += 1;
+  assert.equal(canAutoMergeObservedLock(previous, changedToolCount), false);
+  assert.equal(canAutoMergeObservedLock(null, metadataOnly), false);
 });
 
 test("plugin configuration permits one credential-free gateway only", () => {

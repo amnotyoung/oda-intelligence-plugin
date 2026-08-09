@@ -1,8 +1,8 @@
 name: Sync public skill
 
 # 공개 스킬 본문은 이 저장소에서 쓰지 않고 상류 canonical에서 생성해 받는다.
-# 상류가 푸시하면 dispatch로, 그렇지 않으면 매일 한 번 확인한다. 손으로 두 벌을
-# 관리하면 상류가 바뀔 때마다 격차가 조용히 벌어진다.
+# 외부 빌드는 읽기 전용 job에서 끝내고 생성물만 새 runner로 넘긴다. 저장소 쓰기
+# 토큰이 있는 job에서는 상류 코드를 실행하지 않는다.
 
 on:
   repository_dispatch:
@@ -12,24 +12,24 @@ on:
     - cron: "41 1 * * *"
 
 concurrency:
-  group: oda-intelligence-public-skill-sync
+  # Serialize every version-writing automation with the gateway observation
+  # job (and its rate-limited CI smoke run) so two release PRs cannot race.
+  group: oda-intelligence-gateway-smoke
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  sync:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
     steps:
-      # GITHUB_TOKEN이 만든 PR은 추가 워크플로를 발동시키지 않아 CI가 붙지 않는다.
-      # PAT로 밀고 열어야 pull_request 이벤트가 정상적으로 잡힌다. 시크릿이
-      # 없으면 기본 토큰으로 떨어지되, 그 경우 자동 PR에는 CI가 없다.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          token: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
+          persist-credentials: false
 
       - name: Checkout the canonical skill source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -38,41 +38,153 @@ jobs:
           ref: main
           token: ${{ secrets.DEPENDENCY_READ_TOKEN }}
           path: .skill-source
+          persist-credentials: false
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: "20"
           cache: npm
 
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: npm ci
 
       - id: source
         name: Resolve the source commit
-        run: |
-          echo "sha=$(git -C .skill-source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: echo "sha=$(git -C .skill-source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      # 빌드 스크립트는 자기 파일 위치를 기준으로 경로를 잡으므로 어디서 실행해도
-      # 된다. working-directory를 함께 주면 경로가 겹친다.
+      # The upstream script resolves paths relative to its own file. This job
+      # has read-only repository permissions and is discarded after upload.
       - name: Build the public skill upstream
-        run: node .skill-source/scripts/build-public-skill.mjs
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "Repository was not clean before the external build." >&2
+            git status --short
+            exit 1
+          fi
+          env \
+            -u GITHUB_ENV \
+            -u GITHUB_OUTPUT \
+            -u GITHUB_PATH \
+            -u GITHUB_STATE \
+            -u ACTIONS_ID_TOKEN_REQUEST_TOKEN \
+            -u ACTIONS_RUNTIME_TOKEN \
+            node .skill-source/scripts/build-public-skill.mjs
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "External build modified the receiving repository." >&2
+            git status --short
+            exit 1
+          fi
+
+      - name: Validate generated artifact file types
+        run: |
+          artifact=.skill-source/dist/public-skill
+          if [ ! -d "$artifact" ]; then
+            echo "Canonical build did not create $artifact." >&2
+            exit 1
+          fi
+          if [ -n "$(find "$artifact" -type l -print -quit)" ]; then
+            echo "Generated public Skill may not contain symbolic links." >&2
+            exit 1
+          fi
+          if [ -n "$(find "$artifact" ! -type d ! -type f -print -quit)" ]; then
+            echo "Generated public Skill contains an unsupported file type." >&2
+            exit 1
+          fi
+
+      - name: Upload the generated public skill only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-skill-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .skill-source/dist/public-skill/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          token: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
+          persist-credentials: false
+
+      - name: Download the generated public skill
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: public-skill-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .skill-source/dist/public-skill
+
+      - name: Validate downloaded artifact file types
+        run: |
+          artifact=.skill-source/dist/public-skill
+          if [ ! -d "$artifact" ] || [ -n "$(find "$artifact" -type l -print -quit)" ]; then
+            echo "Downloaded public Skill is missing or contains a symbolic link." >&2
+            exit 1
+          fi
+          if [ -n "$(find "$artifact" ! -type d ! -type f -print -quit)" ]; then
+            echo "Downloaded public Skill contains an unsupported file type." >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
 
       - id: sync
         name: Sync the generated public skill
         run: |
           node scripts/sync-public-skill.mjs \
             --source-dir .skill-source \
-            --sha "${{ steps.source.outputs.sha }}"
+            --sha "${{ needs.build.outputs.source_sha }}"
 
       - name: Bump plugin patch version
         if: steps.sync.outputs.changed == 'true'
         run: node scripts/bump-plugin-version.mjs
+
+      - name: Enforce the generated change allowlist
+        if: steps.sync.outputs.changed == 'true'
+        shell: bash
+        run: |
+          mapfile -t changed_paths < <(
+            {
+              git diff --name-only
+              git ls-files --others --exclude-standard
+            } | sort -u
+          )
+          for path in "${changed_paths[@]}"; do
+            case "$path" in
+              contracts/public-skill.lock.json | \
+              package.json | \
+              package-lock.json | \
+              plugins/oda-intelligence/.codex-plugin/plugin.json | \
+              plugins/oda-intelligence/.claude-plugin/plugin.json | \
+              .claude-plugin/marketplace.json | \
+              .agents/plugins/marketplace.json | \
+              plugins/oda-intelligence/skills/generate-development-country-report/*)
+                ;;
+              *)
+                echo "Generated sync changed a disallowed path: $path" >&2
+                exit 1
+                ;;
+            esac
+          done
 
       - name: Test updated public package
         if: steps.sync.outputs.changed == 'true'
         run: |
           rm -rf .skill-source
           npm test
+          npm audit --omit=dev
 
       - id: branch
         if: steps.sync.outputs.changed == 'true'
@@ -81,38 +193,106 @@ jobs:
           digest="$(sha256sum contracts/public-skill.lock.json | cut -c1-12)"
           echo "name=automation/public-skill-$digest" >> "$GITHUB_OUTPUT"
 
-      - name: Create review pull request
+      - name: Create and merge a generated public skill update
         if: steps.sync.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
           BRANCH: ${{ steps.branch.outputs.name }}
-          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          SOURCE_SHA: ${{ needs.build.outputs.source_sha }}
         run: |
-          if gh pr list --state open --head "$BRANCH" --json number --jq 'length > 0' | grep -q true; then
-            echo "Public skill update PR already exists for $BRANCH"
-            exit 0
-          fi
-
-          rm -rf .skill-source
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$BRANCH"
+          mkdir -p "$RUNNER_TEMP/empty-hooks"
+          git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" switch -c "$BRANCH"
           git add contracts/public-skill.lock.json
           git add plugins/oda-intelligence/skills/generate-development-country-report
           git add package.json package-lock.json
           git add plugins/oda-intelligence/.codex-plugin/plugin.json
           git add plugins/oda-intelligence/.claude-plugin/plugin.json
           git add .claude-plugin/marketplace.json .agents/plugins/marketplace.json
-          git commit -m "chore: sync the generated public skill"
-          git push --set-upstream origin "$BRANCH"
 
-          {
-            echo "Automated public skill sync."
-            echo
-            echo "- Source commit: \`$SOURCE_SHA\`"
-            echo "- Generated by the upstream public-skill build"
-            echo "- Public package tests: passed"
-          } > "$RUNNER_TEMP/body.md"
-          gh pr create --base main --head "$BRANCH" \
-            --title "Sync the generated public skill" \
-            --body-file "$RUNNER_TEMP/body.md"
+          mapfile -t staged_paths < <(git diff --cached --name-only)
+          for path in "${staged_paths[@]}"; do
+            case "$path" in
+              contracts/public-skill.lock.json | \
+              package.json | \
+              package-lock.json | \
+              plugins/oda-intelligence/.codex-plugin/plugin.json | \
+              plugins/oda-intelligence/.claude-plugin/plugin.json | \
+              .claude-plugin/marketplace.json | \
+              .agents/plugins/marketplace.json | \
+              plugins/oda-intelligence/skills/generate-development-country-report/*)
+                ;;
+              *)
+                echo "Refusing to commit disallowed staged path: $path" >&2
+                exit 1
+                ;;
+            esac
+          done
+          if [ -n "$(git diff --name-only)" ] || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+            echo "Refusing to commit with unstaged generated changes." >&2
+            git status --short
+            exit 1
+          fi
+
+          git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" commit \
+            -m "chore: sync the generated public skill"
+          commit_sha="$(git rev-parse HEAD)"
+
+          gh auth setup-git
+          remote_sha="$(git ls-remote --heads origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          if [ -n "$remote_sha" ]; then
+            git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" push \
+              --force-with-lease="refs/heads/$BRANCH:$remote_sha" \
+              --set-upstream origin "$BRANCH"
+          else
+            git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" push \
+              --set-upstream origin "$BRANCH"
+          fi
+
+          open_prs="$(gh api --method GET \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f state=open \
+            -f base=main \
+            -f head="$GITHUB_REPOSITORY_OWNER:$BRANCH")"
+          pr_count="$(jq 'length' <<<"$open_prs")"
+          if [ "$pr_count" -gt 1 ]; then
+            echo "Refusing ambiguous automation branch with $pr_count open PRs." >&2
+            exit 1
+          fi
+          pr_url="$(jq -r '.[0].html_url // empty' <<<"$open_prs")"
+          if [ -z "$pr_url" ]; then
+            {
+              echo "Automated public skill sync."
+              echo
+              echo "- Source commit: \`$SOURCE_SHA\`"
+              echo "- Built without repository write credentials"
+              echo "- Public package tests and production dependency audit: passed"
+              echo "- Plugin patch version: updated"
+            } > "$RUNNER_TEMP/body.md"
+            pr_url="$(gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$GITHUB_REPOSITORY_OWNER:$BRANCH" \
+              --title "Sync the generated public skill" \
+              --body-file "$RUNNER_TEMP/body.md")"
+          fi
+
+          pr_number="${pr_url##*/}"
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number" | jq -e \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg owner "$GITHUB_REPOSITORY_OWNER" \
+            --arg branch "$BRANCH" \
+            --arg sha "$commit_sha" \
+            '.base.ref == "main" and
+             .base.repo.full_name == $repo and
+             .head.ref == $branch and
+             .head.sha == $sha and
+             .head.repo.full_name == $repo and
+             .head.repo.owner.login == $owner' >/dev/null
+
+          gh pr merge "$pr_url" \
+            --repo "$GITHUB_REPOSITORY" \
+            --squash \
+            --delete-branch \
+            --match-head-commit "$commit_sha"

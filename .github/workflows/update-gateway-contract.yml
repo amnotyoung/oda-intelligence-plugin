@@ -27,6 +27,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           token: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
+          persist-credentials: false
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -57,17 +58,13 @@ jobs:
           digest="$(sha256sum contracts/observed.lock.json | cut -c1-12)"
           echo "name=automation/gateway-contract-$digest" >> "$GITHUB_OUTPUT"
 
-      - name: Create review pull request
+      - name: Create the gateway observation pull request
         if: steps.contract.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.DEPENDENCY_PR_TOKEN || github.token }}
           BRANCH: ${{ steps.branch.outputs.name }}
+          AUTO_MERGE: ${{ steps.contract.outputs.auto_merge }}
         run: |
-          if gh pr list --state open --head "$BRANCH" --json number --jq 'length > 0' | grep -q true; then
-            echo "Gateway contract update PR already exists for $BRANCH"
-            exit 0
-          fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BRANCH"
@@ -78,10 +75,66 @@ jobs:
           git add plugins/oda-intelligence/.claude-plugin/plugin.json
           git add .claude-plugin/marketplace.json
           git commit -m "Update observed ODA Intelligence gateway contract"
-          git push --set-upstream origin "$BRANCH"
+          commit_sha="$(git rev-parse HEAD)"
 
-          gh pr create \
-            --base main \
-            --head "$BRANCH" \
-            --title "Review ODA Intelligence gateway contract drift" \
-            --body "Compatible public gateway metadata drift was detected. Review the changed tool hashes and update the accepted contract or Skills when routing behavior changed."
+          gh auth setup-git
+          mkdir -p "$RUNNER_TEMP/empty-hooks"
+          remote_sha="$(git ls-remote --heads origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          if [ -n "$remote_sha" ]; then
+            git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" push \
+              --force-with-lease="refs/heads/$BRANCH:$remote_sha" \
+              --set-upstream origin "$BRANCH"
+          else
+            git -c core.hooksPath="$RUNNER_TEMP/empty-hooks" push \
+              --set-upstream origin "$BRANCH"
+          fi
+
+          open_prs="$(gh api --method GET \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f state=open \
+            -f base=main \
+            -f head="$GITHUB_REPOSITORY_OWNER:$BRANCH")"
+          pr_count="$(jq 'length' <<<"$open_prs")"
+          if [ "$pr_count" -gt 1 ]; then
+            echo "Refusing ambiguous automation branch with $pr_count open PRs." >&2
+            exit 1
+          fi
+          pr_url="$(jq -r '.[0].html_url // empty' <<<"$open_prs")"
+          if [ -z "$pr_url" ]; then
+            if [ "$AUTO_MERGE" = "true" ]; then
+              title="Update compatible ODA Intelligence gateway metadata"
+              body="The exact tool contract hashes are unchanged. The compatibility check, contracted smoke calls, package tests, and production dependency audit passed."
+            else
+              title="Review ODA Intelligence gateway contract drift"
+              body="A tool contract hash or another reviewed gateway constraint changed. Compatibility-floor checks and smoke calls passed, but schema/detail drift requires human review before merge."
+            fi
+            pr_url="$(gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$GITHUB_REPOSITORY_OWNER:$BRANCH" \
+              --title "$title" \
+              --body "$body")"
+          fi
+
+          pr_number="${pr_url##*/}"
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number" | jq -e \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg owner "$GITHUB_REPOSITORY_OWNER" \
+            --arg branch "$BRANCH" \
+            --arg sha "$commit_sha" \
+            '.base.ref == "main" and
+             .base.repo.full_name == $repo and
+             .head.ref == $branch and
+             .head.sha == $sha and
+             .head.repo.full_name == $repo and
+             .head.repo.owner.login == $owner' >/dev/null
+
+          if [ "$AUTO_MERGE" = "true" ]; then
+            gh pr merge "$pr_url" \
+              --repo "$GITHUB_REPOSITORY" \
+              --squash \
+              --delete-branch \
+              --match-head-commit "$commit_sha"
+          else
+            echo "Tool contract drift left open for human review: $pr_url"
+          fi

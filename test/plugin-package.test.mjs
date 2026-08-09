@@ -11,6 +11,7 @@ const gatewayUrl = "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp";
 const expectedPublicFiles = [
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json",
+  ".github/CODEOWNERS",
   ".github/workflows/ci.yml",
   ".github/workflows/update-gateway-contract.yml",
   ".github/workflows/sync-public-skill.yml",
