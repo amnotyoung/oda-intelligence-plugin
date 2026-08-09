@@ -38,8 +38,12 @@ jobs:
   # which rate-limits per minute. Two overlapping runs report a limit breach
   # as many simultaneously broken tools, so every gateway-smoking job in this
   # repository shares one concurrency group and runs alone. Offline tests
-  # stay in the job above and keep their fast feedback.
+  # stay in the job above and keep their fast feedback. The same head is not
+  # smoked again on the immediate main push: the gateway's minute window can
+  # still contain the successful pull-request calls. Scheduled contract jobs
+  # continue to provide independent post-merge live coverage.
   gateway-smoke:
+    if: github.event_name == 'pull_request'
     concurrency:
       group: oda-intelligence-gateway-smoke
       cancel-in-progress: false
