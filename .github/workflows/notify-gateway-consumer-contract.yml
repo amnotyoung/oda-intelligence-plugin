@@ -1,0 +1,40 @@
+name: Notify the gateway of consumer contract changes
+
+# The io-mcp gateway snapshots this repository's contracts/gateway-contract.json
+# into its consumers/ directory. Its sync workflow already listens for the
+# plugin-contract-updated repository_dispatch event, but nothing ever sent it,
+# so a published contract change only reached the gateway on its nightly cron.
+# This closes that gap at publish time; the cron remains the safety net.
+on:
+  push:
+    branches: [main]
+    paths:
+      - contracts/gateway-contract.json
+
+concurrency:
+  group: oda-mcp-consumer-contract-dispatch
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch plugin-contract-updated to amnotyoung/oda-mcp
+        env:
+          GH_TOKEN: ${{ secrets.ODA_MCP_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::ODA_MCP_DISPATCH_TOKEN is not configured; the gateway will still pick this contract up on its nightly sync."
+            exit 0
+          fi
+          jq -n \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg commit "$GITHUB_SHA" \
+            '{
+               event_type: "plugin-contract-updated",
+               client_payload: { repository: $repository, commit: $commit }
+             }' |
+            gh api --method POST repos/amnotyoung/oda-mcp/dispatches --input -
