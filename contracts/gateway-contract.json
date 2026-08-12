@@ -577,6 +577,60 @@
         "country": "베트남"
       }
     },
+    "oecd_crs_query_country": {
+      "allowed_required_inputs": [
+        "countryCode",
+        "year"
+      ],
+      "input_properties": {
+        "breakdown": "string",
+        "countryCode": "string",
+        "flowType": "string",
+        "limit": "integer",
+        "refresh": "boolean",
+        "sectorCode": "string",
+        "year": "integer"
+      },
+      "output_required": [
+        "activities",
+        "activities_truncated",
+        "cache_hit",
+        "cached_at",
+        "caveats",
+        "coverage",
+        "dataflow",
+        "donor",
+        "fetched_at",
+        "flow_type",
+        "flow_type_label",
+        "methodology_version",
+        "observed_at",
+        "ok",
+        "price_base",
+        "public_url",
+        "purpose_code_count",
+        "purpose_codes",
+        "purpose_codes_truncated",
+        "query",
+        "recipient",
+        "record_count",
+        "returned_activities",
+        "source",
+        "stale",
+        "status",
+        "total_activities",
+        "total_value_usd_millions",
+        "unit",
+        "year"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "FJ",
+        "year": 2023,
+        "flowType": "D",
+        "breakdown": "sector"
+      }
+    },
     "procurement_country_context": {
       "allowed_required_inputs": [
         "country"
