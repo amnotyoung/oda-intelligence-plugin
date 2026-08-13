@@ -55,10 +55,10 @@ routes only when the less-specific search can supply a design fact the more-spec
    d-portal, or official OECD activity evidence before making an assignment claim. Do not route it
    through the Korean ODA Map and do not manufacture an identifier from the title.
 2. **Named Korean or KOICA project** — call `oda_map_data_status`, find the project with
-   `oda_map_projects` while requesting `id`, `name`, `description`, and `source`, and read the material
-   record with `oda_map_project_detail`. Use the recipient country from the request or conversation
-   because `oda_map_projects` is country-scoped. If the user supplied a stable `project_id`, call
-   detail directly; if neither a country nor an identifier is available, ask for the recipient country
+   `oda_map_projects` while requesting `description` and `source`, and read the material record with
+   `oda_map_project_detail`. Use the recipient country from the request or conversation because
+   `oda_map_projects` is country-scoped. If the user supplied a stable `project_id`, call detail
+   directly; if neither a country nor an identifier is available, ask for the recipient country
    rather than pretending there is a cross-country title search. Use `korean-oda-portfolio-lookup`
    for the source and field rules.
 3. **City, province, state, county, district, or other subnational place** — call

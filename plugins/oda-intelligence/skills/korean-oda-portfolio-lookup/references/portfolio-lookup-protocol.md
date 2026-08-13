@@ -175,11 +175,9 @@ what the record does not carry.
 
 `PUBLIC_RESPONSE_BLOCKED` is not a row in that table. It says the gateway withheld one response and
 says nothing about whether the evidence exists — the source status for the same country is often
-`fresh`. On `oda_map_projects`, inspect the `fields` array before anything else: a request that
-omits `id` or `name` is blocked every time, and narrowing it further leaves it blocked. Add both,
-or drop `fields` entirely. Otherwise narrow the request before recording anything as `판단 불충분`: fewer
-sections, a smaller sample, or a different tool covering the same field. Record only the fields
-still missing after that, and tell the reader it is a gateway limitation rather than a data gap.
+`fresh`. Narrow the request before recording anything as `판단 불충분`: fewer sections, a smaller
+sample, or a different tool covering the same field. Record only the fields still missing after
+that, and tell the reader it is a gateway limitation rather than a data gap.
 
 `observed_at` on the ODA Map source is the map asset build time, not the observation time of each
 underlying project record. Say so when the age of an individual project matters.
@@ -196,12 +194,9 @@ id  name  agency  sector  dates  status  location_summary
 Seven of the fourteen the schema allows are therefore absent by default — `description`, `amounts`,
 `locations`, `stage`, `aid_type`, `markers`, and `source`.
 
-- `id` and `name` are mandatory whenever `fields` is present. The schema lists them as two enum
-  values among fourteen with nothing marking either required, but every returned item must carry
-  both, and a gateway build that has not yet taken the identity fix answers a `fields` array
-  missing either one with `PUBLIC_RESPONSE_BLOCKED`, regardless of what else the array holds.
-  Write `id` and `name` first in any `fields` array you send. Omitting `fields` altogether stays
-  safe: the default set already carries both.
+- `id` and `name` arrive whether or not you list them. Every item has to carry both, so the
+  gateway fills them into any `fields` array before the call leaves. The response echoes the
+  applied set, which is why it can come back longer than what you asked for.
 - `description` carries the project's outputs and expected results — what gets built, what equipment
   is installed, who gets trained. That is what a question about project content is asking for, and
   what makes two projects comparable or not. The field is populated; the default call drops it
