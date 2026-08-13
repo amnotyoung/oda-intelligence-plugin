@@ -63,12 +63,14 @@ report Skill: a single answer has no other section to fall back on. When a call 
 `PUBLIC_RESPONSE_BLOCKED`, the gateway refused one response — it did not report that the country has
 no Korean projects, and the source status for the same country is often `fresh`.
 
-1. Retry `oda_map_country_context` section by section. The block usually comes from one section, not
+1. On `oda_map_projects`, check `fields` first. An array without `id` or `name` is blocked every
+   time, and shrinking it further keeps it blocked. Add both, or drop `fields` entirely.
+2. Retry `oda_map_country_context` section by section. The block usually comes from one section, not
    the tool.
-2. Recover a blocked `portfolio` from `oda_map_projects`: the per-status `total` for `active`,
+3. Recover a blocked `portfolio` from `oda_map_projects`: the per-status `total` for `active`,
    `planned`, `unknown`, and `ended` reconstructs the status counts, and their sum is the
    unique-project count.
-3. Report only the fields still missing after those attempts as `판단 불충분`, and name them.
+4. Report only the fields still missing after those attempts as `판단 불충분`, and name them.
 
 When the source status is `fresh` and a response stays blocked, say that the gateway withheld it.
 A reader told the evidence does not exist stops looking.
@@ -113,8 +115,9 @@ topic, sector, document kind, month range, or result limit into the same call.
 4. Call `oda_map_projects` for the project list. Filter with `agency`, `sector`, `status`, or
    `query`, and page with `limit` and `offset`. Set `fields` to what the question needs: the default
    set omits `description` and `amounts`, so a question about what a project does or what it costs
-   comes back empty-handed unless you ask for those fields by name. State that a returned page is a
-   page when `has_more` is true.
+   comes back empty-handed unless you ask for those fields by name. Always include `id` and `name`
+   when you send `fields` — every item carries them, and a gateway that has not taken the identity
+   fix blocks an array without them. State that a returned page is a page when `has_more` is true.
 5. Call `oda_map_project_detail` only for the projects the answer actually turns on.
 6. Add international context from `country_report_context` or `iati_query_country` only when the
    user asked to compare Korea against other donors. Keep the two evidence bases labelled
@@ -129,10 +132,10 @@ Every ODA Map call that reads the portfolio — `oda_map_country_context`, `oda_
 takes exactly one `country`, and nothing searches the whole portfolio at once. A comparison
 question is therefore assembled country by country rather than answered by one query.
 
-1. Read the reference project first — `oda_map_projects` for its country with `description` in
-   `fields`, or `oda_map_project_detail` for the single activity. Its sector label and description
-   are what make the following queries mean anything. A comparison built from the project title
-   alone matches on wording, not on what the projects do.
+1. Read the reference project first — `oda_map_projects` for its country with `id`, `name`, and
+   `description` in `fields`, or `oda_map_project_detail` for the single activity. Its sector
+   label and description are what make the following queries mean anything. A comparison built
+   from the project title alone matches on wording, not on what the projects do.
 2. Choose the countries to search, and say why you chose them: the countries the user named, the
    region, the partner countries from `country_list` — or, for a sector-shaped comparison, the
    office ranking from `search_offices_by_topic`. That tool reads the development-documents
