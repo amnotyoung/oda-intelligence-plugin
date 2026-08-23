@@ -15,6 +15,8 @@ Determine these inputs from the request and workspace before asking questions:
 - reference date
 - desired language
 - existing report to preserve or revise
+- output design profile and document status; keep the neutral profile unless the
+  user explicitly requests KOICA branding or supplies a KOICA design kit
 - available country-data, portfolio, document-search, and web research tools
 
 When no output path is specified, write:
@@ -32,6 +34,7 @@ Read [references/data-source-routing.md](references/data-source-routing.md) befo
 Read [references/procurement-model-integration.md](references/procurement-model-integration.md) before writing section 6.
 Read [references/chart-rendering.md](references/chart-rendering.md) before producing any chart image.
 Read [references/docx-generation.md](references/docx-generation.md) before creating or revising a DOCX.
+Read [references/koica-design-profile.md](references/koica-design-profile.md) when the user explicitly requests KOICA-branded DOCX/PDF output or supplies a KOICA design kit.
 Start from [assets/country-report-template.md](assets/country-report-template.md) when creating a new report.
 
 ## Workflow
@@ -225,6 +228,17 @@ When the report cites KOICA internal rules:
 ### 9. Produce DOCX when requested
 
 Follow [references/docx-generation.md](references/docx-generation.md). Use the available document-creation skill and its workspace runtime rather than system Python or global packages.
+
+- Treat branding as an explicit presentation profile, not as evidence that the
+  report is an approved or official KOICA publication. Keep the neutral profile
+  by default.
+- For an explicitly selected KOICA profile, follow
+  [references/koica-design-profile.md](references/koica-design-profile.md),
+  resolve the user-supplied kit at run time, and fail the branded build when its
+  required assets or an approved font are unavailable. Never fabricate a mark
+  or substitute the Authority Mark.
+- Do not persist a workstation-specific design-kit path in the skill, report,
+  DOCX metadata, or technical evidence.
 
 - Preserve the validated report structure, hyperlinks, citations, tables, and evidence-bearing visuals.
 - Apply explicit fonts and sizes to every run, including runs nested inside hyperlinks.

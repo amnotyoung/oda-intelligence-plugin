@@ -233,6 +233,14 @@ for (const match of localImages) {
         `Chart ${relativePath} has no chart-spec digest, so its rendered layout cannot be reproduced.`,
       );
     }
+    if (
+      sidecar.design_profile !== undefined
+      && !new Set(["neutral", "koica"]).has(sidecar.design_profile)
+    ) {
+      errors.push(
+        `Chart ${relativePath} has unknown design_profile ${String(sidecar.design_profile)}.`,
+      );
+    }
   }
 }
 

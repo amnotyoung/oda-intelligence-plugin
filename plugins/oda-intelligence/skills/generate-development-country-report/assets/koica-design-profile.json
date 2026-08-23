@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "profile_id": "koica",
+  "profile_version": "2.0",
+  "activation": "explicit",
+  "source_date": "2026-08-20",
+  "document": {
+    "page_size": "A4",
+    "width_mm": 210,
+    "height_mm": 297,
+    "margins_mm": {
+      "top": 22,
+      "right": 25,
+      "bottom": 22,
+      "left": 25
+    },
+    "header_distance_mm": 12.5,
+    "footer_distance_mm": 12.5
+  },
+  "typography": {
+    "primary": "Noto Sans KR",
+    "fallbacks": [
+      "Apple SD Gothic Neo",
+      "Malgun Gothic"
+    ],
+    "roles_pt": {
+      "cover_title": 24,
+      "cover_subtitle": 13,
+      "section_heading": 17,
+      "subsection_heading": 13,
+      "minor_heading": 12,
+      "body": 10.5,
+      "table_portrait": 9,
+      "table_landscape": 8.5,
+      "risk_table": 8,
+      "caption": 8.5,
+      "footer": 8.5
+    }
+  },
+  "colors": {
+    "primary": "#0A46A5",
+    "sky": "#0096E6",
+    "yellow": "#FFB40A",
+    "teal": "#0ABEAA",
+    "orange": "#FA6E00",
+    "lime": "#C8E123",
+    "red": "#C80A2D",
+    "purple": "#551E82",
+    "ink": "#19202C",
+    "gray_600": "#67717C",
+    "gray_300": "#DCE2E8",
+    "gray_100": "#F5F7F9",
+    "white": "#FFFFFF",
+    "soft_blue": "#E7EDF7",
+    "soft_teal": "#E7F8F6",
+    "soft_orange": "#FFF0E6"
+  },
+  "logo": {
+    "kind": "communication_mark",
+    "minimum_print_width_mm": 20,
+    "document_width_mm": 28,
+    "clear_space_ratio_to_height": 0.2
+  },
+  "assets": {
+    "required": {
+      "communication_blue": {
+        "path": "01_Communication_Mark/KOICA_BLUE.png",
+        "minimum_width_px": 1000,
+        "requires_alpha": true
+      },
+      "communication_white": {
+        "path": "01_Communication_Mark/KOICA_WHITE.png",
+        "minimum_width_px": 1000,
+        "requires_alpha": true
+      },
+      "vi_logotype_blue": {
+        "path": "02_Visual_Identity/VI_LOGOTYPE_BLUE.png",
+        "minimum_width_px": 1200,
+        "requires_alpha": true
+      },
+      "vi_logotype_white": {
+        "path": "02_Visual_Identity/VI_LOGOTYPE_WHITE.png",
+        "minimum_width_px": 1200,
+        "requires_alpha": true
+      }
+    },
+    "conditional": {
+      "core_values_color": "03_Core_Values/CORE_VALUES_KR_COLOR.png",
+      "core_values_white": "03_Core_Values/CORE_VALUES_KR_WHITE.png"
+    },
+    "reference_only": [
+      "02_Visual_Identity/VI_GRID_1.png",
+      "02_Visual_Identity/VI_GRID_2.png",
+      "02_Visual_Identity/VI_GRID_3.png",
+      "02_Visual_Identity/VI_GRID_4.png"
+    ],
+    "restricted": {
+      "authority_mark": "Optional/Authority_Mark/AUTHORITY_MARK.png",
+      "wfk_ci": "Optional/WFK_CI/WFK_CI.png"
+    }
+  },
+  "usage": {
+    "communication_mark": [
+      "cover",
+      "header_when_needed"
+    ],
+    "vi_logotype": [
+      "cover",
+      "section_divider",
+      "appendix_cover"
+    ],
+    "core_values": "conditional_on_direct_content_relevance",
+    "authority_mark_automatic": false,
+    "wfk_ci_automatic": false,
+    "body_background_motif": false,
+    "maximum_point_colors_per_page": 1
+  }
+}

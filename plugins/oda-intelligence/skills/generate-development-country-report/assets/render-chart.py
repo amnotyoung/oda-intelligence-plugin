@@ -17,6 +17,7 @@ Spec (schema_version 1):
     {
       "schema_version": 1,
       "type": "bar",                  // "bar" or "line"
+      "design_profile": "koica",      // optional: "neutral" or "koica"
       "title": "우즈베키스탄 한국 개발협력 시행기관 구성",
       "value_label": "사업 건수",
       "categories": ["KOICA", "EDCF", ...],
@@ -51,6 +52,7 @@ from matplotlib import font_manager  # noqa: E402
 
 SCHEMA_VERSION = 1
 RENDERER = "render-chart.py"
+KOICA_PROFILE_PATH = Path(__file__).with_name("koica-design-profile.json")
 
 # Korean glyphs render as tofu when none of these is installed, and matplotlib
 # reports that only as a warning. Resolve it up front and fail loudly instead.
@@ -103,6 +105,11 @@ def load_spec(path: Path) -> dict:
     if chart_type not in {"bar", "line"}:
         raise SystemExit("Chart type must be 'bar' or 'line'.")
 
+    design_profile = spec.get("design_profile", "neutral")
+    if design_profile not in {"neutral", "koica"}:
+        raise SystemExit("Chart design_profile must be 'neutral' or 'koica'.")
+    spec["design_profile"] = design_profile
+
     categories = spec.get("categories")
     values = spec.get("values")
     if not isinstance(categories, list) or not isinstance(values, list):
@@ -131,6 +138,28 @@ def load_spec(path: Path) -> dict:
         raise SystemExit("Chart 'highlight' must be a valid category index.")
 
     return spec
+
+def apply_design_profile(profile_id: str) -> None:
+    """Select a shared chart palette without duplicating brand tokens."""
+
+    global ACCENT, NEUTRAL, INK, GRID
+    if profile_id == "neutral":
+        ACCENT = "#1f4e79"
+        NEUTRAL = "#9fb0c0"
+        INK = "#1a1a1a"
+        GRID = "#d9dee3"
+        return
+    try:
+        profile = json.loads(KOICA_PROFILE_PATH.read_text(encoding="utf-8"))
+        colors = profile["colors"]
+        if profile["profile_id"] != "koica":
+            raise KeyError("profile_id")
+        ACCENT = colors["primary"]
+        NEUTRAL = colors["gray_300"]
+        INK = colors["ink"]
+        GRID = colors["gray_300"]
+    except (OSError, json.JSONDecodeError, KeyError) as error:
+        raise SystemExit(f"Cannot load KOICA chart design profile: {error}") from error
 
 def wrap_vertical(label: str) -> str:
     lines = textwrap.wrap(str(label), width=VERTICAL_WRAP) or [""]
@@ -261,6 +290,7 @@ def render_line(spec: dict, categories: list[str], values: list[float]):
     return figure, axes
 
 def render(spec: dict, output: Path) -> None:
+    apply_design_profile(spec["design_profile"])
     plt.rcParams["font.family"] = resolve_korean_font()
     # Korean fonts usually lack U+2212, which matplotlib uses for negatives.
     plt.rcParams["axes.unicode_minus"] = False
@@ -303,6 +333,7 @@ def write_sidecar(spec: dict, spec_path: Path, output: Path) -> Path:
                 "schema_version": SCHEMA_VERSION,
                 "kind": "chart",
                 "renderer": RENDERER,
+                "design_profile": spec["design_profile"],
                 "spec_sha256": digest,
                 "source": spec["source"],
                 "unit": spec["unit"],

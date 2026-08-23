@@ -16,6 +16,10 @@ because the surrounding prose is correct. Layout is therefore decided by
 ```
 
 Use the workspace document runtime, not system Python or global packages.
+That runtime must provide the dependency pinned in
+[`requirements-chart.txt`](../requirements-chart.txt). If it does not, create
+a task-local environment from that file; do not silently switch to a global
+Python whose fonts or rendering libraries differ.
 
 The script writes the PNG and a `<chart>.png.meta.json` sidecar. The validator
 requires that sidecar for every local image in the report, so a chart drawn by
@@ -28,6 +32,7 @@ validation. That is deliberate.
 {
   "schema_version": 1,
   "type": "bar",
+  "design_profile": "koica",
   "title": "우즈베키스탄 한국 개발협력 시행기관 구성 (상위 10개)",
   "value_label": "사업 건수",
   "categories": ["KOICA", "EDCF", "교육부"],
@@ -44,6 +49,11 @@ validation. That is deliberate.
 the adjacent prose argues about. `source`, `unit`, `period`, and `coverage` are
 required and are copied into the sidecar; they must match the evidence caption
 beside the figure.
+
+`design_profile` is optional and defaults to `neutral`. Set it to `koica` only
+for an explicitly selected KOICA-branded report. The renderer then reads the
+shared KOICA token file; do not copy its colours into an ad-hoc chart script.
+The selected profile is written to the sidecar.
 
 Keep the spec beside the technical evidence for the run so the chart can be
 rebuilt from the same snapshot.

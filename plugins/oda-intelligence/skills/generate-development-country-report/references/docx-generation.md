@@ -6,14 +6,22 @@ Use this workflow only when the user requests a Word or `.docx` country report.
 
 1. Read and follow the available document-creation skill, including its render-and-inspect gate.
 2. Load the workspace document runtime and libraries. Do not use system Python or globally installed packages.
-3. Build from the validated Markdown report and the same dated visual assets. Keep the Markdown source unless the user explicitly requests DOCX only.
-4. Write the DOCX beside the Markdown source with the same basename.
+3. Select the presentation profile. Keep the neutral profile unless the user
+   explicitly requests KOICA branding or supplies a KOICA design kit. For that
+   case, read [koica-design-profile.md](koica-design-profile.md) and pass the kit
+   path only at run time.
+4. Build from the validated Markdown report and the same dated visual assets. Keep the Markdown source unless the user explicitly requests DOCX only.
+5. Write the DOCX beside the Markdown source with the same basename. When
+   applying a new design to an existing report, add a profile or version suffix
+   unless the user explicitly authorizes overwriting.
 
 ## Apply deterministic Word formatting
 
 - Set the font family and size explicitly on paragraph styles and runs. For Korean text, set `ascii`, `hAnsi`, and `eastAsia` font mappings.
 - Use whole- or half-point role sizes that Word can represent exactly. Avoid values such as `8.8 pt`, which may serialize differently for ordinary and hyperlink runs.
 - Give title, headings, body, table header, table body, caption, source, and footer distinct named roles with fixed sizes.
+- Load page geometry, role sizes, colours, font choices, and asset roles from a
+  shared profile. Do not retype them in a country-specific builder.
 - Use exact table widths, column widths, indentation, cell margins, repeatable header rows, and non-splitting rows. Do not rely on autofit.
 - Embed evidence-bearing PNG/JPEG visuals at a deliberate width. Add descriptive alt text, a source, units, period, and coverage near each visual.
 - Use Word's built-in `List Number` style for the manual contents list and `List Bullet` for body and source lists. Do not put direct custom `w:numPr` numbering on report paragraphs.
@@ -59,6 +67,17 @@ Fix any defect in the builder, regenerate the DOCX, and rerender all pages.
 
 Run the document skill's `images_audit.py` and `table_geometry.py`, then run `unzip -t` on the DOCX.
 
+For an explicitly selected KOICA profile, also run:
+
+```bash
+<workspace-python> <skill-directory>/scripts/validate_koica_docx.py \
+  <report.docx> --kit <koica-design-kit-directory> \
+  [--font-file <font-file-used-by-the-builder>]
+```
+
+Add `--require-vi-logotype` only when the selected cover design actually uses
+that optional motif.
+
 Also assert:
 
 - every hyperlink run has explicit font and size properties
@@ -68,5 +87,10 @@ Also assert:
 - numbered body/endnote items are separate paragraphs, use a list style distinct from the contents, and visibly restart at 1
 - report paragraphs contain no direct custom numbering properties
 - the DOCX contains the expected tables, images, sections, and prohibited-phrase checks
+- when the KOICA profile is selected: A4 geometry and profile margins are
+  present in every section; all visible runs use the resolved Noto Sans KR or
+  approved fallback; the Communication Mark is present at the specified width
+  with alt text; the Authority Mark and reference-only grid PNGs are absent;
+  and chart sidecars identify `design_profile: koica`
 
 Deliver the DOCX only. Do not expose QA PNGs or the temporary PDF unless the user asks for them.
