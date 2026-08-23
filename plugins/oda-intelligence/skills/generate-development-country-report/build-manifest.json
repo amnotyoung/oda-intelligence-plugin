@@ -4,14 +4,19 @@
     "SKILL.md",
     "agents/openai.yaml",
     "assets/country-report-template.md",
+    "assets/koica-design-profile.json",
     "assets/render-chart.py",
     "references/chart-rendering.md",
     "references/data-source-routing.md",
     "references/docx-generation.md",
+    "references/koica-design-profile.md",
     "references/procurement-model-integration.md",
     "references/report-standard.md",
-    "scripts/validate-report.mjs"
+    "requirements-chart.txt",
+    "scripts/koica_design_profile.py",
+    "scripts/validate-report.mjs",
+    "scripts/validate_koica_docx.py"
   ],
   "excluded_count": 3,
-  "source_skill_bytes": 20838
+  "source_skill_bytes": 21780
 }
