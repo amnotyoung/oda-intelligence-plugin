@@ -60,7 +60,9 @@ const expectedPublicFiles = [
   "scripts/check-gateway-contract.mjs",
   "scripts/sync-public-skill.mjs",
   "scripts/check-plugin-version.mjs",
+  "scripts/gateway-fetch.mjs",
   "test/gateway-contract.test.mjs",
+  "test/gateway-fetch.test.mjs",
   "test/plugin-package.test.mjs",
 ];
 
