@@ -7,6 +7,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
+import { createGatewayFetch } from "./gateway-fetch.mjs";
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PACKAGE_PATH = resolve(ROOT, "package.json");
 const CONTRACT_PATH = resolve(ROOT, "contracts", "gateway-contract.json");
@@ -461,6 +463,7 @@ export async function inspectGateway(contract, { smoke = false } = {}) {
   const packageMetadata = await readJson(PACKAGE_PATH);
   const transport = new StreamableHTTPClientTransport(
     new URL(contract.gateway.url),
+    { fetch: createGatewayFetch() },
   );
   const client = new Client({
     name: "oda-intelligence-plugin-contract-check",
