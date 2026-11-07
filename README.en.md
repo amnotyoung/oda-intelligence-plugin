@@ -2,8 +2,8 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-Public Claude, Codex, and ChatGPT packaging for evidence-based development
-cooperation research.
+Public Claude, Codex, Antigravity, and ChatGPT packaging for evidence-based
+development cooperation research.
 
 The plugin installs three Skills and connects exactly one public, read-only MCP
 gateway:
@@ -88,6 +88,53 @@ codex plugin add oda-intelligence@oda-intelligence-plugin
 After changing the local source, update the plugin version or Codex cachebuster
 and run `codex plugin add` again. Start a new task after installation or
 reinstallation so Codex loads the updated Skills and MCP configuration.
+
+## Antigravity
+
+In Google Antigravity, install straight from the GitHub repository with the
+`agy` CLI (1.3.3 or later):
+
+```bash
+agy plugin install https://github.com/amnotyoung/oda-intelligence-plugin
+```
+
+`agy` finds `oda-intelligence` in the repository's `plugins/` folder and
+installs it from the Antigravity manifest (`.antigravity-plugin/plugin.json`)
+and MCP configuration (`mcp_config.json`). The four Skills come from the same
+`skills/` folder as the Claude and Codex packages. The gateway is connected
+through `serverUrl`, Antigravity's remote MCP field, and the agent sees it as
+the `oda-intelligence_oda-intelligence` server.
+
+Check the installation with:
+
+```bash
+agy plugin list
+```
+
+It should show `oda-intelligence (enabled, …)`, `Source: antigravity`, and
+`4 skills, 1 MCP server`. Allow the MCP permission prompt on the first tool
+call. To update, run the same `agy plugin install` command again and start a
+new conversation.
+
+From a local copy, point at the plugin folder from the repository root:
+
+```bash
+agy plugin install ./plugins/oda-intelligence
+```
+
+To connect only the tools without the CLI, add this entry under `mcpServers`
+in Antigravity's MCP configuration (`mcp_config.json`). This does not install
+the Skills. Put the remote address in `serverUrl`; `httpUrl` is not supported.
+
+```json
+{
+  "mcpServers": {
+    "oda-intelligence": {
+      "serverUrl": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
+    }
+  }
+}
+```
 
 ## ChatGPT
 
@@ -507,6 +554,11 @@ npm ci
 npm test
 npm run contracts:check
 ```
+
+Check the Antigravity package with `agy plugin validate plugins/oda-intelligence`.
+With `--strict` it fails on one warning because Claude Code's `.mcp.json` sits
+in the same folder. Antigravity never reads that file and the Claude package
+needs it, so the warning is expected.
 
 Source code is licensed under the [Apache License 2.0](LICENSE). Data returned
 by MCP tools is not relicensed by this repository. See the
