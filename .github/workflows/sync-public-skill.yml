@@ -168,6 +168,7 @@ jobs:
               package-lock.json | \
               plugins/oda-intelligence/.codex-plugin/plugin.json | \
               plugins/oda-intelligence/.claude-plugin/plugin.json | \
+              plugins/oda-intelligence/.antigravity-plugin/plugin.json | \
               .claude-plugin/marketplace.json | \
               .agents/plugins/marketplace.json | \
               plugins/oda-intelligence/skills/generate-development-country-report/*)
@@ -209,6 +210,7 @@ jobs:
           git add package.json package-lock.json
           git add plugins/oda-intelligence/.codex-plugin/plugin.json
           git add plugins/oda-intelligence/.claude-plugin/plugin.json
+          git add plugins/oda-intelligence/.antigravity-plugin/plugin.json
           git add .claude-plugin/marketplace.json .agents/plugins/marketplace.json
 
           mapfile -t staged_paths < <(git diff --cached --name-only)
@@ -219,6 +221,7 @@ jobs:
               package-lock.json | \
               plugins/oda-intelligence/.codex-plugin/plugin.json | \
               plugins/oda-intelligence/.claude-plugin/plugin.json | \
+              plugins/oda-intelligence/.antigravity-plugin/plugin.json | \
               .claude-plugin/marketplace.json | \
               .agents/plugins/marketplace.json | \
               plugins/oda-intelligence/skills/generate-development-country-report/*)

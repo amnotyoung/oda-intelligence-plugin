@@ -73,6 +73,7 @@ jobs:
           git add package-lock.json
           git add plugins/oda-intelligence/.codex-plugin/plugin.json
           git add plugins/oda-intelligence/.claude-plugin/plugin.json
+          git add plugins/oda-intelligence/.antigravity-plugin/plugin.json
           git add .claude-plugin/marketplace.json
           git commit -m "Update observed ODA Intelligence gateway contract"
           commit_sha="$(git rev-parse HEAD)"

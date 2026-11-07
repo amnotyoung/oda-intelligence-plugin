@@ -27,10 +27,12 @@ const expectedPublicFiles = [
   "docs/assets/install-demo.gif",
   "package-lock.json",
   "package.json",
+  "plugins/oda-intelligence/.antigravity-plugin/plugin.json",
   "plugins/oda-intelligence/.claude-plugin/plugin.json",
   "plugins/oda-intelligence/.app.json",
   "plugins/oda-intelligence/.codex-plugin/plugin.json",
   "plugins/oda-intelligence/.mcp.json",
+  "plugins/oda-intelligence/mcp_config.json",
   "plugins/oda-intelligence/skills/generate-development-country-report/SKILL.md",
   "plugins/oda-intelligence/skills/generate-development-country-report/agents/openai.yaml",
   "plugins/oda-intelligence/skills/generate-development-country-report/assets/country-report-template.md",
@@ -132,6 +134,96 @@ test("Claude and Codex manifests point only to the public plugin repository", as
   assert.equal(packageLock.version, codex.version);
   assert.equal(packageLock.packages[""].version, codex.version);
   assert.equal(marketplace.plugins[0].version, codex.version);
+  const antigravity = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".antigravity-plugin",
+    "plugin.json",
+  );
+  assert.equal(antigravity.repository, claude.repository);
+  assert.equal(antigravity.version, codex.version);
+});
+
+// Antigravity의 매니페스트 schema는 additionalProperties: false라서 Claude·Codex
+// 전용 키(skills 경로, mcpServers, interface 등)를 그대로 옮기면 검증에 걸린다.
+// 키 목록은 https://antigravity.google/schemas/v1/plugin.json 의 properties다.
+const antigravityManifestKeys = new Set([
+  "$schema",
+  "name",
+  "displayName",
+  "display_name",
+  "description",
+  "version",
+  "disabled",
+  "logo",
+  "suggestedPrompts",
+  "suggested_prompts",
+  "skills",
+  "author",
+  "homepage",
+  "repository",
+  "license",
+  "keywords",
+  "extensions",
+]);
+
+test("Antigravity package shares the skills and the one gateway", async () => {
+  const antigravity = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".antigravity-plugin",
+    "plugin.json",
+  );
+  const codex = await readJson(
+    "plugins",
+    "oda-intelligence",
+    ".codex-plugin",
+    "plugin.json",
+  );
+  const mcpConfig = await readJson(
+    "plugins",
+    "oda-intelligence",
+    "mcp_config.json",
+  );
+
+  for (const key of Object.keys(antigravity)) {
+    assert.ok(antigravityManifestKeys.has(key), `unknown Antigravity key: ${key}`);
+  }
+  assert.equal(antigravity.$schema, "https://antigravity.google/schemas/v1/plugin.json");
+  assert.match(antigravity.name, /^[a-z0-9]+(-[a-z0-9]+)*$/u);
+  assert.equal(antigravity.name, codex.name);
+  assert.equal(antigravity.description, codex.description);
+  assert.ok(antigravity.suggestedPrompts.length <= 3);
+  assert.ok(antigravity.keywords.every((keyword) => keyword === keyword.toLowerCase()));
+  // 스킬은 플러그인 루트의 기본 skills/ 폴더를 Claude·Codex와 함께 쓴다.
+  assert.equal(antigravity.skills, undefined);
+
+  // 원격 서버는 serverUrl로만 선언한다. httpUrl(구 HTTP+SSE)은 지원되지 않는다.
+  assert.deepEqual(Object.keys(mcpConfig.mcpServers), ["oda-intelligence"]);
+  assert.deepEqual(mcpConfig.mcpServers["oda-intelligence"], {
+    serverUrl: gatewayUrl,
+  });
+  assert.doesNotMatch(JSON.stringify(mcpConfig), /authorization|token/i);
+
+  const skillNames = (
+    await readdir(resolve(pluginRoot, "skills"), { withFileTypes: true })
+  )
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+  assert.equal(skillNames.length, 4);
+  for (const skillName of skillNames) {
+    const text = await readFile(
+      resolve(pluginRoot, "skills", skillName, "SKILL.md"),
+      "utf8",
+    );
+    const frontmatter = text.match(/^---\n(?<body>[\s\S]+?)\n---\n/u)?.groups?.body;
+    assert.ok(frontmatter, `${skillName} needs YAML frontmatter`);
+    assert.equal(frontmatter.match(/^name:\s*(.+)$/mu)?.[1].trim(), skillName);
+    assert.match(skillName, /^[a-z0-9]+(-[a-z0-9]+)*$/u);
+    assert.ok(skillName.length <= 64);
+    const description = frontmatter.match(/^description:\s*([\s\S]+)$/mu)?.[1].trim();
+    assert.ok(description && description.length <= 1024, `${skillName} description length`);
+  }
 });
 
 test("plugin and every Skill depend on one credential-free gateway", async () => {
