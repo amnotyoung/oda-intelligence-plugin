@@ -66,6 +66,8 @@ codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
 
+설치한 뒤 새 작업을 열고 [동티모르 실습](#설치-확인-실습)을 실행하세요. 플러그인이 공개 MCP 서버 `oda-intelligence`를 함께 등록합니다.
+
 로컬 개발 시에는 저장소 루트에서 저장소 인자를 `.`으로 바꿉니다.
 
 ```bash
@@ -109,7 +111,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 > ODA Intelligence로 동티모르의 모성사망비를 조회해 줘. WHO GHO가 제공하는 수치와 추정 구간, 단위, 기준연도를 알려 줘.
 
-**연결 확인:** 답변의 도구 호출 내역을 펼쳐 ODA Intelligence의 `country_report_context`가 동티모르(`TL`) 데이터를 반환했는지 확인하세요. 2026년 11월 9일 조회에서는 WHO GHO의 **2023년 출생아 10만 명당 192명(추정 구간 125~288명)**이 반환됐습니다. 출처가 갱신되면 수치나 기준연도도 달라질 수 있습니다.
+도구 호출 내역에서 `oda-intelligence` 서버의 `country_report_context` 또는 `country_humanitarian_context`를 펼치세요. 동티모르(`TL`)의 WHO GHO 모성사망비가 도구 응답에 있으면 연결에 성공한 것입니다. 2026년 11월 9일 조회에서는 WHO GHO의 **2023년 출생아 10만 명당 192명(추정 구간 125~288명)**이 반환됐습니다. 출처가 갱신되면 수치나 기준연도도 달라질 수 있습니다.
 
 호출 내역이 보이지 않으면 플러그인 상세에서 `oda-intelligence` 커넥터가 활성화되어 있는지 확인한 뒤 새 대화에서 다시 질문하세요.
 

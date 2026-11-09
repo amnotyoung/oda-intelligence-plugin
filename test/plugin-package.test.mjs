@@ -480,9 +480,13 @@ test("ChatGPT compatibility maps the registered gateway app without a secret", a
   );
 
   assert.equal(codex.apps, "./.app.json");
-  assert.deepEqual(Object.keys(app.apps), ["oda-intelligence"]);
-  assert.deepEqual(app.apps["oda-intelligence"], {
-    id: "asdk_app_6a6adfc09994819187cca37e0a256e7e",
+  const mcp = await readJson("plugins", "oda-intelligence", codex.mcpServers);
+  // ChatGPT-authenticated Codex sessions omit MCP servers that share an app name.
+  for (const name of Object.keys(app.apps)) {
+    assert.ok(!Object.hasOwn(mcp.mcpServers, name), `App shadows MCP server: ${name}`);
+  }
+  assert.deepEqual(app.apps, {
+    "oda-intelligence-chatgpt": { id: "asdk_app_6a6adfc09994819187cca37e0a256e7e" },
   });
   assert.doesNotMatch(JSON.stringify(app), /plugin_asdk_app|authorization|token/i);
 });
