@@ -5,7 +5,7 @@
 근거 기반 개발협력 조사를 위한 Claude, Codex, Antigravity 및 ChatGPT 공개
 패키지입니다.
 
-이 플러그인은 세 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
+이 플러그인은 네 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
 한 개에 연결합니다.
 
 ```text
@@ -66,6 +66,8 @@ claude plugin install oda-intelligence@oda-intelligence-plugin
 codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
+
+설치한 뒤 새 작업을 열고 [동티모르 실습](#설치-확인-실습)을 실행하세요. 플러그인이 공개 MCP 서버 `oda-intelligence`를 함께 등록합니다.
 
 로컬 개발 시에는 저장소 루트에서 저장소 인자를 `.`으로 바꿉니다.
 
@@ -134,7 +136,7 @@ CLI 없이 도구만 연결하려면 Antigravity MCP 설정(`mcp_config.json`)�
 
 ## ChatGPT
 
-전체 플러그인은 번들로 제공되는 세 개의 Skill과 등록된 `ODA Intelligence`
+전체 플러그인은 번들로 제공되는 네 개의 Skill과 등록된 `ODA Intelligence`
 MCP 앱을 결합합니다. 커밋된 `.app.json`에는 앱의 기술 식별자가 들어 있으며,
 인증 정보나 인증 토큰은 포함되어 있지 않습니다.
 
@@ -149,6 +151,16 @@ ChatGPT 사용자에게 배포하려면 동일한 게이트웨이를 **With MCP*
 ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는 데이터 및 서버 동작
 변경은 같은 URL에서 사용할 수 있지만, 도구 계약의 새 버전은 워크스페이스
 관리자가 검토하고 갱신해야 합니다.
+
+## 설치 확인 실습
+
+설치를 마친 뒤 새 대화(Codex에서는 새 작업)를 열고 아래 질문을 그대로 입력하세요.
+
+> ODA Intelligence로 동티모르의 모성사망비를 조회해 줘. WHO GHO가 제공하는 수치와 추정 구간, 단위, 기준연도를 알려 줘.
+
+도구 호출 내역에서 `oda-intelligence` 서버의 `country_report_context` 또는 `country_humanitarian_context`를 펼치세요. 동티모르(`TL`)의 WHO GHO 모성사망비가 도구 응답에 있으면 연결에 성공한 것입니다. 2026년 11월 9일 조회에서는 WHO GHO의 **2023년 출생아 10만 명당 192명(추정 구간 125~288명)**이 반환됐습니다. 출처가 갱신되면 수치나 기준연도도 달라질 수 있습니다.
+
+호출 내역이 보이지 않으면 플러그인 상세에서 `oda-intelligence` 커넥터가 활성화되어 있는지 확인한 뒤 새 대화에서 다시 질문하세요.
 
 ## 도구
 
