@@ -69,6 +69,8 @@ codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
 
+After installing, open a new task and try the [Timor-Leste exercise](#check-your-installation). The plugin registers the public `oda-intelligence` MCP server for you.
+
 For local development, run the commands from the repository root and replace
 the repository argument with `.`:
 
@@ -113,7 +115,7 @@ After installing the plugin, open a new conversation (a new task in Codex) and p
 
 > Use ODA Intelligence to look up the maternal mortality ratio in Timor-Leste. Give the WHO GHO estimate, its uncertainty interval, the unit, and the reference year.
 
-Open the tool call details and check that the ODA Intelligence tool `country_report_context` returned data for Timor-Leste (`TL`). On 9 November 2026, WHO GHO returned a **2023 estimate of 192 maternal deaths per 100,000 live births (uncertainty interval 125–288)**. The estimate and reference year may change as the source is updated.
+Open the `country_report_context` or `country_humanitarian_context` call from the `oda-intelligence` server. A WHO GHO maternal mortality ratio for Timor-Leste (`TL`) in the tool response confirms the connection. On 9 November 2026, WHO GHO returned a **2023 estimate of 192 maternal deaths per 100,000 live births (uncertainty interval 125–288)**. The estimate and reference year may change as the source is updated.
 
 If you don't see a tool call, check that the `oda-intelligence` connector is enabled in the plugin details, then try the question in a new conversation.
 
