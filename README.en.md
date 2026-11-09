@@ -5,7 +5,7 @@
 Public Claude, Codex, and ChatGPT packaging for evidence-based development
 cooperation research.
 
-The plugin installs three Skills and connects exactly one public, read-only MCP
+The plugin installs four Skills and connects exactly one public, read-only MCP
 gateway:
 
 ```text
@@ -54,7 +54,7 @@ claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
 An install demo in the desktop app, at 2× speed: adding the marketplace,
-confirming that three Skills and one connector are installed, and answering a
+confirming that four Skills and one connector are installed, and answering a
 real question.
 
 ![ODA Intelligence install demo](docs/assets/install-demo.gif)
@@ -91,7 +91,7 @@ reinstallation so Codex loads the updated Skills and MCP configuration.
 
 ## ChatGPT
 
-The complete plugin combines the three bundled Skills with the registered
+The complete plugin combines the four bundled Skills with the registered
 `ODA Intelligence` MCP app. The committed `.app.json` contains the app's
 technical identifier, not a credential or authentication token.
 
@@ -106,6 +106,16 @@ gateway; a Skills-only submission would intentionally omit the app mapping.
 ChatGPT keeps an approved snapshot of tool definitions. Compatible data and
 server behavior changes are available at the same URL, while a new tool-contract
 version must be reviewed and refreshed by a workspace administrator.
+
+## Check your installation
+
+After installing the plugin, open a new conversation (a new task in Codex) and paste this question:
+
+> Use ODA Intelligence to look up the maternal mortality ratio in Timor-Leste. Give the WHO GHO estimate, its uncertainty interval, the unit, and the reference year.
+
+Open the tool call details and check that the ODA Intelligence tool `country_report_context` returned data for Timor-Leste (`TL`). On 9 November 2026, WHO GHO returned a **2023 estimate of 192 maternal deaths per 100,000 live births (uncertainty interval 125–288)**. The estimate and reference year may change as the source is updated.
+
+If you don't see a tool call, check that the `oda-intelligence` connector is enabled in the plugin details, then try the question in a new conversation.
 
 ## Tools
 
