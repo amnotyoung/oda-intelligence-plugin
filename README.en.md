@@ -5,7 +5,7 @@
 Public Claude, Codex, and ChatGPT packaging for evidence-based development
 cooperation research.
 
-The plugin installs four Skills and connects exactly one public, read-only MCP
+The plugin installs three Skills and connects exactly one public, read-only MCP
 gateway:
 
 ```text
@@ -27,11 +27,11 @@ After a marketplace sync or plugin update, start a new Claude conversation.
 Existing conversations can retain the tool snapshot they had when they were
 created. In the plugin details, the expected installed components are:
 
-- four Skills;
+- three Skills;
 - one connector named `oda-intelligence`;
 - the read-only tools supplied by that connector.
 
-If only the four Skills appear, sync the marketplace, update or reinstall the
+If only the three Skills appear, sync the marketplace, update or reinstall the
 plugin, and create another new conversation. The Skills do not call a hidden
 backend on their own; they require the bundled connector.
 
@@ -42,9 +42,7 @@ claude plugin marketplace add amnotyoung/oda-intelligence-plugin
 claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
-An install demo in the desktop app, at 2× speed: adding the marketplace,
-confirming that four Skills and one connector are installed, and answering a
-real question.
+This desktop installation demo shows an earlier version. The current version installs three Skills.
 
 ![ODA Intelligence install demo](docs/assets/install-demo.gif)
 
@@ -82,7 +80,7 @@ reinstallation so Codex loads the updated Skills and MCP configuration.
 
 ## ChatGPT
 
-The complete plugin combines the four bundled Skills with the registered
+The complete plugin combines the three bundled Skills with the registered
 `ODA Intelligence` MCP app. The committed `.app.json` contains the app's
 technical identifier, not a credential or authentication token.
 
@@ -113,7 +111,7 @@ If you don't see a tool call, check that the `oda-intelligence` connector is ena
 The connector supplies reviewed read-only tools across four source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
-The four bundled Skills route most questions to the right tools on their own,
+The three bundled Skills route most questions to the right tools on their own,
 so a plain question usually needs no tool name. The tables below are for
 choosing a call deliberately, or for reading a call someone else made.
 
@@ -137,7 +135,6 @@ kind of question:
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS codes and statistics, IATI discovery, and correct separation of international-aid evidence | `international-data` plus the official OECD source when needed |
 | `korean-oda-portfolio-lookup` | What Korean agencies are doing in a country or around a named city, province, or district: mapped project locations, country project lists, agency and sector breakdowns, active or completed counts, project detail, and comparable projects | `korean-oda-map` |
-| `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All four |
 | `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
 
 Four things make a prompt land:
@@ -326,8 +323,6 @@ enforced by the gateway, not by the client:
 - A daily workflow auto-merges generated lock metadata updates only when the
   exact tool contract hashes stay unchanged. Tool schema/detail hash drift is
   left as an open pull request for human review.
-- Canonical public Skill changes follow the same generated-build, lock-file,
-  test, patch-version, and automatic-merge gate.
 - Breaking contract drift fails instead of rewriting the accepted contract.
 - Skill routing and accepted contract changes require a versioned plugin
   update; installed caches still need a marketplace upgrade and a new

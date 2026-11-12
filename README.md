@@ -4,7 +4,7 @@
 
 근거 기반 개발협력 조사를 위한 Claude, Codex 및 ChatGPT 공개 패키지입니다.
 
-이 플러그인은 네 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
+이 플러그인은 세 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
 한 개에 연결합니다.
 
 ```text
@@ -26,11 +26,11 @@ https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 시작하세요. 기존 대화에는 대화 생성 시점의 도구 스냅샷이 남아 있을 수 있습니다.
 플러그인 상세 화면에는 다음 구성 요소가 설치된 것으로 표시되어야 합니다.
 
-- Skill 네 개
+- Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
 - 해당 커넥터가 제공하는 읽기 전용 도구
 
-Skill 네 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
+Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
 번들로 제공되는 커넥터가 필요합니다.
 
@@ -41,8 +41,7 @@ claude plugin marketplace add amnotyoung/oda-intelligence-plugin
 claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
-아래는 데스크톱 앱에서의 설치 데모입니다. 마켓플레이스를 추가하고, Skill 네 개와
-커넥터 한 개가 설치된 것을 확인한 뒤, 실제 질문에 답하기까지를 담았습니다.
+이전 버전의 데스크톱 설치 영상입니다. 현재 버전은 Skill 세 개를 설치합니다.
 
 ![ODA Intelligence 설치 데모](docs/assets/install-demo.gif)
 
@@ -79,7 +78,7 @@ Codex가 갱신된 Skill과 MCP 구성을 불러옵니다.
 
 ## ChatGPT
 
-전체 플러그인은 번들로 제공되는 네 개의 Skill과 등록된 `ODA Intelligence`
+전체 플러그인은 번들로 제공되는 세 개의 Skill과 등록된 `ODA Intelligence`
 MCP 앱을 결합합니다. 커밋된 `.app.json`에는 앱의 기술 식별자가 들어 있으며,
 인증 정보나 인증 토큰은 포함되어 있지 않습니다.
 
@@ -110,7 +109,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 커넥터는 네 개 출처 도메인에 걸쳐 검토된 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
-번들로 제공되는 Skill 네 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
+번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
 질문에는 도구 이름을 댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이
 만든 호출을 읽을 때 쓰는 자료입니다.
 
@@ -126,14 +125,13 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ### 자연어로 묻기
 
-Skill은 도구 이름이 아니라 주제로 라우팅합니다. 네 Skill이 각각 다른 종류의
+Skill은 도구 이름이 아니라 주제로 라우팅합니다. 세 Skill이 각각 다른 종류의
 질문을 맡습니다.
 
 | Skill | 맡는 질문 | 사용하는 도메인 |
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS 코드·통계, IATI 활동 탐색, 국제 원조 근거의 구분과 검증 | `international-data` + 필요한 경우 OECD 공식 원문 |
 | `korean-oda-portfolio-lookup` | 한국 기관이 한 국가 또는 특정 도시·주·군에서 무엇을 하고 있는지 — 사업별 지도 위치, 국가 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
-| `generate-development-country-report` | 국가보고서·원조 지형 검토, 중점분야 선정, 참여 경로, 조달 진입, Go/No-Go 위험 | 네 개 전부 |
 | `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
 
 프롬프트를 쓸 때 다음 네 가지가 결과를 좌우합니다.
@@ -314,8 +312,6 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 - 일일 워크플로는 도구 계약 hash가 완전히 동일할 때만 잠금 메타데이터 변경의
   patch 버전을 올리고 자동 생성 PR을 squash 병합합니다. 도구 schema·세부
   제약 hash가 바뀌면 PR을 열어 둔 채 사람 검토를 기다립니다.
-- canonical 공개 Skill 변경도 생성 결과와 잠금 파일을 검증하고 같은 방식으로
-  patch 버전을 올려 자동 병합합니다.
 - 호환성을 깨뜨리는 계약 변경이 감지되면 승인된 계약을 다시 작성하지 않고
   검사에 실패합니다.
 - Skill 라우팅 또는 승인된 계약을 변경하려면 버전이 지정된 플러그인

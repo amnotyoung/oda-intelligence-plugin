@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "source_ref": "main",
-  "source_sha": "c140e7912e5759d55f9db6ecb5f13820abe23613",
-  "build_script": "scripts/build-public-skill.mjs",
-  "files": 15,
-  "fingerprint": "de09207184172f2bb7d5fe9792c45095c63c86e13ccf03b11e449e05a8d73a12"
-}
