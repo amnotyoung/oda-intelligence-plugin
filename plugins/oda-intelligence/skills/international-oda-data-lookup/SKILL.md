@@ -1,6 +1,6 @@
 ---
 name: international-oda-data-lookup
-description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and local development-document or project evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, historical annual OECD CRS purpose-code assignments, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, and IATI discovery or filtering. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
+description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and project design and location evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, historical annual OECD CRS purpose-code assignments, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, and IATI discovery or filtering. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
 ---
 
 # Look Up International ODA Data
@@ -61,18 +61,10 @@ routes only when the less-specific search can supply a design fact the more-spec
    directly; if neither a country nor an identifier is available, ask for the recipient country
    rather than pretending there is a cross-country title search. Use `korean-oda-portfolio-lookup`
    for the source and field rules.
-3. **City, province, state, county, district, or other subnational place** — call
-   `search_development_by_place` first with the exact `place`, plus any stated country and topic.
-   Inspect `resolved_places` and disambiguate before using either evidence branch. Follow a material
-   document with `get_trend_document` and a material mapped project with
-   `oda_map_project_detail` before classifying; the place result itself is shallow discovery.
-4. **Recipient country plus project topic** — call `search_offices_by_topic` first with the user's
-   country wording in `country` and the project topic in `query`. Follow material hits with
-   `search_development_trends`, passing both the returned `office` and the same original `country`
-   filter, then `get_trend_document` when the content can distinguish candidate codes. Offices can
-   cover concurrent countries, so dropping the country filter can retrieve evidence for the wrong
-   recipient. A country name is not a subnational place: do not pass `피지` or another country name
-   as `place` merely because it appears before the topic.
+3. **Subnational place** — establish the country and confirm the project location from its record.
+   For mapped Korean projects use the country-scoped location workflow in `korean-oda-portfolio-lookup`.
+4. **Recipient country plus project topic** — read the project design supplied by the user or
+   published by the implementing agency. Identify any missing design facts before choosing a code.
 5. Only after the relevant context call `dac_purpose_code_lookup`. Base the recommendation on the
    project's principal purpose and verified design facts, not on the geography alone. If a choice
    depends on a still-unknown fact — for example centralised-grid versus isolated or standalone
@@ -100,13 +92,8 @@ routes only when the less-specific search can supply a design fact the more-spec
    the publisher XML or d-portal before calling it a CRS code. If neither level can be read, report that the assignment
    field is unavailable; do not report that the publisher omitted a code.
 
-For example, `피지에서 태양광 사업 하려는데 CRS 코드 뭐 써야 하냐` routes through the Fiji
-development-document corpus for solar evidence before the solar-purpose-code lookup. The local
-evidence helps interpret the alternatives; it does not itself assign an official CRS code.
-
-An empty place or document search means only that the indexed local evidence did not answer the
-question. It does not prove that the place, project, or design feature is absent. Continue from
-verified user-supplied facts, state the evidence gap, and keep any code choice conditional.
+For example, `피지에서 태양광 사업 하려는데 CRS 코드 뭐 써야 하냐` requires the project design:
+if grid connection is unknown, present conditional code candidates. Geography does not establish purpose.
 
 ## Historical reported-code verification
 
