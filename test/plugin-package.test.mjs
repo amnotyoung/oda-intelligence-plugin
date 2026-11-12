@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -14,7 +13,6 @@ const expectedPublicFiles = [
   ".github/CODEOWNERS",
   ".github/workflows/ci.yml",
   ".github/workflows/update-gateway-contract.yml",
-  ".github/workflows/sync-public-skill.yml",
   ".gitignore",
   "LICENSE",
   "PRIVACY.md",
@@ -31,22 +29,6 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/.app.json",
   "plugins/oda-intelligence/.codex-plugin/plugin.json",
   "plugins/oda-intelligence/.mcp.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/SKILL.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/agents/openai.yaml",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/country-report-template.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/koica-design-profile.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/render-chart.py",
-  "plugins/oda-intelligence/skills/generate-development-country-report/build-manifest.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/chart-rendering.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/data-source-routing.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/docx-generation.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/koica-design-profile.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/procurement-model-integration.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/report-standard.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/requirements-chart.txt",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/koica_design_profile.py",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate-report.mjs",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate_koica_docx.py",
   "plugins/oda-intelligence/skills/international-oda-data-lookup/SKILL.md",
   "plugins/oda-intelligence/skills/international-oda-data-lookup/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
@@ -55,10 +37,8 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/SKILL.md",
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/agents/openai.yaml",
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/references/portfolio-lookup-protocol.md",
-  "contracts/public-skill.lock.json",
   "scripts/bump-plugin-version.mjs",
   "scripts/check-gateway-contract.mjs",
-  "scripts/sync-public-skill.mjs",
   "scripts/check-plugin-version.mjs",
   "scripts/gateway-fetch.mjs",
   "test/gateway-contract.test.mjs",
@@ -68,21 +48,6 @@ const expectedPublicFiles = [
 
 async function readJson(...parts) {
   return JSON.parse(await readFile(resolve(root, ...parts), "utf8"));
-}
-
-async function listFiles(directory, prefix = "") {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    if (entry.name === "node_modules" || entry.name === ".git") continue;
-    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      files.push(...(await listFiles(resolve(directory, entry.name), relative)));
-    } else {
-      files.push(relative);
-    }
-  }
-  return files;
 }
 
 function listRepositoryFiles() {
@@ -164,7 +129,6 @@ test("plugin and every Skill depend on one credential-free gateway", async () =>
   assert.doesNotMatch(JSON.stringify(mcp), /authorization|token/i);
 
   for (const relative of [
-    "skills/generate-development-country-report/agents/openai.yaml",
     "skills/international-oda-data-lookup/agents/openai.yaml",
     "skills/koica-regulation-research/agents/openai.yaml",
     "skills/korean-oda-portfolio-lookup/agents/openai.yaml",
@@ -466,9 +430,7 @@ function withoutPublicSourceUrls(text) {
   );
 }
 
-// 상류에서 동기화되는 스킬 본문과 계약 파일이 대상이다. README는 네 백엔드
-// 식별자를 의도적으로 설명하고 있어 이 검사와 별개로 다룬다.
-test("synced skill text contains no non-public repository or internal path name", async () => {
+test("bundled plugin text contains no non-public repository or internal path name", async () => {
   const files = listRepositoryFiles().filter(
     (file) => file.startsWith("plugins/") || file.startsWith("contracts/"),
   );
@@ -575,32 +537,4 @@ test("observed lock pins exactly the 27 approved tool definitions", async () => 
       /^[a-f0-9]{64}$/u.test(hash),
     ),
   );
-});
-
-// 생성 스킬은 상류 canonical에서 받아 public-skill.lock.json이 지문으로 고정한다.
-// 스킬 사본을 이 저장소에서 직접 고치면 lock이 조용히 뒤처지고, 다음 동기화가
-// 그 수정을 상류 빌드로 되돌리거나 금지어 검사에서 멈출 때까지 아무도 모른다.
-// 지문을 실제 디렉터리 내용과 대조해 그 드리프트를 이쪽 CI에서 잡는다.
-//
-// 계산 규칙은 scripts/sync-public-skill.mjs의 fingerprint와 같아야 한다. 그
-// 스크립트는 로드 시점에 main()을 실행하므로 가져오지 않고 같은 규칙을 재현한다:
-// agents/ 는 이 플러그인의 패키징이라 지문에서 빠진다.
-test("public skill lock fingerprint matches the synced skill directory", async () => {
-  const lock = await readJson("contracts", "public-skill.lock.json");
-  const skillRoot = resolve(
-    pluginRoot,
-    "skills",
-    "generate-development-country-report",
-  );
-  const digest = (value) => createHash("sha256").update(value).digest("hex");
-  const files = (await listFiles(skillRoot)).filter(
-    (file) => !file.startsWith("agents/"),
-  );
-  const entries = {};
-  for (const file of files.toSorted()) {
-    entries[file] = digest(await readFile(resolve(skillRoot, file), "utf8"));
-  }
-  assert.equal(lock.schema_version, 1);
-  assert.equal(lock.files, Object.keys(entries).length);
-  assert.equal(lock.fingerprint, digest(JSON.stringify(entries)));
 });

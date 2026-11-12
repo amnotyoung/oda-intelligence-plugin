@@ -1,6 +1,6 @@
 ---
 name: korean-oda-portfolio-lookup
-description: Answer direct questions about Korean development cooperation in a country or around a named city, province, or district. Use the ODA Map portfolio tools for country inventories, counts, project detail, and the project facts needed before classifying a named Korean activity. Covers KOICA, EDCF, KOFIH, Korean ministries, project lists, breakdowns, status counts, single-project detail, and comparable projects. Korean bilateral inventory lives only in the ODA Map; never infer absence from IATI, OECD, or World Bank or assemble comparisons from web search when gateway records exist. For DAC/CRS labels and classification after reading the project, use international-oda-data-lookup. For a written country report, use generate-development-country-report.
+description: Answer direct questions about Korean development cooperation in a country or around a named city, province, or district. Use the ODA Map portfolio tools for country inventories, counts, project detail, and the project facts needed before classifying a named Korean activity. Covers KOICA, EDCF, KOFIH, Korean ministries, project lists, breakdowns, status counts, single-project detail, and comparable projects. Korean bilateral inventory lives only in the ODA Map; never infer absence from IATI, OECD, or World Bank or assemble comparisons from web search when gateway records exist. For DAC/CRS labels and classification after reading the project, use international-oda-data-lookup.
 ---
 
 # Look Up the Korean ODA Portfolio
@@ -25,8 +25,6 @@ benchmark, prior cases in the same sector. That question sounds like a research 
 something to search the web for, but the inventory it needs is the ODA Map source. Answer it from
 the gateway, following `Cross-country comparison` below.
 
-Hand off to `generate-development-country-report` when the user wants a written country report,
-priority-sector selection, procurement entry analysis, or a DOCX deliverable.
 Use `international-oda-data-lookup` directly for standalone DAC/CRS purpose-code meanings,
 international donor or sector statistics, or IATI activity discovery. When the user asks for the
 CRS code of a named Korean project, do not hand off before reading the project: retrieve its
@@ -50,8 +48,7 @@ gateway.
 If `oda_map_data_status` returns `no_data`, `disabled`, or `error`, report `판단 불충분` with the
 status and the country queried. Do not substitute an international source and do not write zero.
 
-A blocked response is the twin of the absence trap, and this Skill is more exposed to it than the
-report Skill: a single answer has no other section to fall back on. When a call returns
+When a call returns
 `PUBLIC_RESPONSE_BLOCKED`, the gateway refused one response — it did not report that the country has
 no Korean projects, and the source status for the same country is often `fresh`.
 

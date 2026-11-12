@@ -178,7 +178,6 @@ name any external archive used; do not silently substitute OECD annual records f
   inventories.
 - Use the `koica-regulation-research` Skill only when the user asks for an internal KOICA rule or
   procedure governing how a classification is applied.
-- Use `generate-development-country-report` for a full written country report.
 
 ## Answer format
 
