@@ -2,8 +2,8 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "oda-intelligence",
   "displayName": "ODA Intelligence",
-  "version": "0.2.33",
-  "description": "Evidence-based development cooperation research across international aid, Korean projects, development documents, and KOICA regulations.",
+  "version": "0.2.34",
+  "description": "Evidence-based development cooperation research across international aid, Korean projects, procurement, and KOICA regulations.",
   "suggestedPrompts": [
     "List the Korean and KOICA projects running in Timor-Leste.",
     "Compare Korean ODA projects in Laos with international aid evidence.",

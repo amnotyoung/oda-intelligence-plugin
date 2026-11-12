@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -14,7 +13,6 @@ const expectedPublicFiles = [
   ".github/CODEOWNERS",
   ".github/workflows/ci.yml",
   ".github/workflows/update-gateway-contract.yml",
-  ".github/workflows/sync-public-skill.yml",
   ".gitignore",
   "LICENSE",
   "PRIVACY.md",
@@ -33,22 +31,6 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/.codex-plugin/plugin.json",
   "plugins/oda-intelligence/.mcp.json",
   "plugins/oda-intelligence/mcp_config.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/SKILL.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/agents/openai.yaml",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/country-report-template.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/koica-design-profile.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/assets/render-chart.py",
-  "plugins/oda-intelligence/skills/generate-development-country-report/build-manifest.json",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/chart-rendering.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/data-source-routing.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/docx-generation.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/koica-design-profile.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/procurement-model-integration.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/references/report-standard.md",
-  "plugins/oda-intelligence/skills/generate-development-country-report/requirements-chart.txt",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/koica_design_profile.py",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate-report.mjs",
-  "plugins/oda-intelligence/skills/generate-development-country-report/scripts/validate_koica_docx.py",
   "plugins/oda-intelligence/skills/international-oda-data-lookup/SKILL.md",
   "plugins/oda-intelligence/skills/international-oda-data-lookup/agents/openai.yaml",
   "plugins/oda-intelligence/skills/koica-regulation-research/SKILL.md",
@@ -57,10 +39,8 @@ const expectedPublicFiles = [
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/SKILL.md",
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/agents/openai.yaml",
   "plugins/oda-intelligence/skills/korean-oda-portfolio-lookup/references/portfolio-lookup-protocol.md",
-  "contracts/public-skill.lock.json",
   "scripts/bump-plugin-version.mjs",
   "scripts/check-gateway-contract.mjs",
-  "scripts/sync-public-skill.mjs",
   "scripts/check-plugin-version.mjs",
   "scripts/gateway-fetch.mjs",
   "test/gateway-contract.test.mjs",
@@ -70,21 +50,6 @@ const expectedPublicFiles = [
 
 async function readJson(...parts) {
   return JSON.parse(await readFile(resolve(root, ...parts), "utf8"));
-}
-
-async function listFiles(directory, prefix = "") {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    if (entry.name === "node_modules" || entry.name === ".git") continue;
-    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      files.push(...(await listFiles(resolve(directory, entry.name), relative)));
-    } else {
-      files.push(relative);
-    }
-  }
-  return files;
 }
 
 function listRepositoryFiles() {
@@ -210,7 +175,7 @@ test("Antigravity package shares the skills and the one gateway", async () => {
   )
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
-  assert.equal(skillNames.length, 4);
+  assert.equal(skillNames.length, 3);
   for (const skillName of skillNames) {
     const text = await readFile(
       resolve(pluginRoot, "skills", skillName, "SKILL.md"),
@@ -256,7 +221,6 @@ test("plugin and every Skill depend on one credential-free gateway", async () =>
   assert.doesNotMatch(JSON.stringify(mcp), /authorization|token/i);
 
   for (const relative of [
-    "skills/generate-development-country-report/agents/openai.yaml",
     "skills/international-oda-data-lookup/agents/openai.yaml",
     "skills/koica-regulation-research/agents/openai.yaml",
     "skills/korean-oda-portfolio-lookup/agents/openai.yaml",
@@ -347,30 +311,8 @@ test("named-geography project questions gather local evidence before DAC and CRS
 
   assert.ok(section, "applied classification needs an explicit geography-first route");
   assert.match(section, /피지에서 태양광 사업[\s\S]+CRS 코드/u);
-  assert.match(section, /country name is not a subnational place/u);
-  assert.match(section, /`search_offices_by_topic`/u);
-  assert.match(section, /`search_development_by_place`/u);
-  assert.match(section, /`oda_map_project_detail`/u);
-  assert.match(section, /`dac_purpose_code_lookup`/u);
-  assert.ok(
-    section.indexOf("`oda_map_project_detail`") <
-      section.indexOf("`search_development_by_place`"),
-    "named Korean project evidence must outrank the place route",
-  );
-  assert.ok(
-    section.indexOf("`search_development_by_place`") <
-      section.indexOf("`search_offices_by_topic`"),
-    "subnational-place evidence must outrank the country-topic route",
-  );
-  assert.ok(
-    section.indexOf("`search_offices_by_topic`") <
-      section.indexOf("`dac_purpose_code_lookup`"),
-    "every local-evidence route must precede the code-list lookup",
-  );
-  assert.match(section, /material\s+document[\s\S]+`get_trend_document`/u);
-  assert.match(section, /material\s+mapped project[\s\S]+`oda_map_project_detail`/u);
+  assert.ok(section.indexOf("`oda_map_project_detail`") < section.indexOf("`dac_purpose_code_lookup`"));
   assert.match(section, /neither a country nor an identifier[\s\S]+ask for the recipient country/u);
-  assert.match(section, /same original `country`[\s\S]+wrong\s+recipient/u);
   assert.match(section, /actually reported under in IATI[\s\S]+`activity_sectors`/u);
   assert.match(section, /literal leading `iati:`[\s\S]+never synthesize/u);
   assert.match(section, /`total_found: 1`[\s\S]+canonical `iati_identifier`/u);
@@ -381,20 +323,12 @@ test("named-geography project questions gather local evidence before DAC and CRS
     /publisher's public IATI XML or d-portal activity\s+HTML\/XML/u,
   );
   assert.match(section, /geography alone/u);
-  assert.match(section, /does not itself assign an official CRS code/u);
-  assert.match(section, /empty place or document search[\s\S]+does not prove/u);
   assert.match(internationalAgent, /Classify and trace projects with OECD, CRS, and IATI evidence/u);
   assert.match(portfolioSkill, /do not hand off before reading the project/u);
   assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
   assert.match(portfolioProtocol, /empty `transaction_sector_code`[\s\S]+no sector absence/u);
   assert.match(portfolioProtocol, /miss for `311`[\s\S]+`31120`/u);
 
-  const countryTopicTool = gatewayContract.tools.search_offices_by_topic;
-  assert.ok(countryTopicTool, "country-topic document discovery must be approved");
-  assert.deepEqual(countryTopicTool.allowed_required_inputs, ["query"]);
-  assert.equal(countryTopicTool.input_properties.country, "string");
-  assert.equal(countryTopicTool.input_properties.query, "string");
-  assert.ok(gatewayContract.tools.search_development_by_place);
   assert.ok(gatewayContract.tools.oda_map_project_detail);
   assert.ok(gatewayContract.tools.dac_purpose_code_lookup);
 });
@@ -490,72 +424,18 @@ test("historical reported-code questions use official OECD project microdata", a
   assert.match(internationalAgent, /annual official OECD CRS purpose-code assignments/u);
 });
 
-test("place-led questions resolve place evidence before country portfolio detail", async () => {
-  const portfolioSkill = await readFile(
-    resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),
-    "utf8",
-  );
-  const portfolioProtocol = await readFile(
-    resolve(
-      pluginRoot,
-      "skills",
-      "korean-oda-portfolio-lookup",
-      "references",
-      "portfolio-lookup-protocol.md",
-    ),
-    "utf8",
-  );
-  const portfolioAgent = await readFile(
-    resolve(
-      pluginRoot,
-      "skills",
-      "korean-oda-portfolio-lookup",
-      "agents",
-      "openai.yaml",
-    ),
-    "utf8",
-  );
-  const gatewayContract = await readJson("contracts", "gateway-contract.json");
-  const placeTool = gatewayContract.tools.search_development_by_place;
-
-  assert.ok(placeTool, "place search must be an approved gateway tool");
-  assert.deepEqual(placeTool.allowed_required_inputs, ["place"]);
-  assert.deepEqual(placeTool.input_properties, {
-    country: "string",
-    kinds: "array",
-    limit: "integer",
-    month_from: "string",
-    month_to: "string",
-    place: "string",
-    query: "string",
-    sector: "string",
-  });
-  assert.deepEqual(placeTool.output_required, [
-    "caveat",
-    "country",
-    "knowledge_graph",
-    "map",
-    "place",
-    "requires_disambiguation",
-    "resolved_places",
-    "result_count",
-  ]);
-  assert.deepEqual(placeTool.smoke_arguments, {
-    country: "라오스",
-    limit: 1,
-    place: "비엔티안",
-    query: "보건",
-  });
-  assert.equal(placeTool.read_only, true);
-
-  assert.match(portfolioSkill, /mentions, projects mapped there, or both/u);
-  assert.match(portfolioSkill, /call\s+`search_development_by_place` first/u);
-  assert.match(portfolioSkill, /requires_disambiguation[\s\S]+retry[\s\S]+`country`/u);
-  assert.match(portfolioSkill, /Keep the branches distinct[\s\S]+`knowledge_graph`[\s\S]+`map`/u);
-  assert.match(portfolioSkill, /`get_trend_document`[\s\S]+`oda_map_project_detail`/u);
-  assert.match(portfolioProtocol, /documentary linkage, not proof/u);
-  assert.match(portfolioProtocol, /map\s+branch is a dated, place-linked snapshot/u);
-  assert.match(portfolioAgent, /country or around a named place/u);
+test("the public skills only route place queries through the project map", async () => {
+  const removed = /search_development_by_place|search_development_trends|get_trend_document|get_corpus_overview|search_entity_relationships|search_offices_by_entity|search_offices_by_topic|list_available_corpora/u;
+  const contract = await readJson("contracts", "gateway-contract.json");
+  assert.doesNotMatch(Object.keys(contract.tools).join(" "), removed);
+  const skillsRoot = resolve(pluginRoot, "skills");
+  for (const file of await readdir(skillsRoot, { recursive: true })) {
+    if (/\.(md|yaml)$/u.test(file)) {
+      assert.doesNotMatch(await readFile(resolve(skillsRoot, file), "utf8"), removed, file);
+    }
+  }
+  const portfolio = await readFile(resolve(skillsRoot, "korean-oda-portfolio-lookup/SKILL.md"), "utf8");
+  assert.match(portfolio, /oda_map_projects` with `locations`/u);
 });
 
 test("ChatGPT compatibility maps the registered gateway app without a secret", async () => {
@@ -642,9 +522,7 @@ function withoutPublicSourceUrls(text) {
   );
 }
 
-// 상류에서 동기화되는 스킬 본문과 계약 파일이 대상이다. README는 네 백엔드
-// 식별자를 의도적으로 설명하고 있어 이 검사와 별개로 다룬다.
-test("synced skill text contains no non-public repository or internal path name", async () => {
+test("bundled plugin text contains no non-public repository or internal path name", async () => {
   const files = listRepositoryFiles().filter(
     (file) => file.startsWith("plugins/") || file.startsWith("contracts/"),
   );
@@ -715,26 +593,18 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 35 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 27 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 35);
+  assert.equal(Object.keys(contract.tools).length, 27);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
   // "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)으로 개방되어 있다.
-  // 전체 표면이 공개되었다. 규정은 "정관 및 내부규정", 동향은 "국별 개발협력동향"
-  // 개방 릴리스(공공데이터포털, 이용허락범위 제한 없음)가 재배포 근거다.
   for (const opened of [
     "compliance_radar",
     "get_article",
     "get_attachment",
     "list_attachments",
-    "get_trend_document",
-    "search_development_by_place",
-    "search_entity_relationships",
-    "get_corpus_overview",
-    "search_offices_by_topic",
-    "search_offices_by_entity",
     "dac_purpose_code_lookup",
   ]) {
     assert.ok(opened in contract.tools, `${opened} must be an approved tool`);
@@ -742,13 +612,13 @@ test("minimal accepted gateway contract contains 35 approved read-only tools", a
   assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
 });
 
-test("observed lock pins exactly the 35 approved tool definitions", async () => {
+test("observed lock pins exactly the 27 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 35);
+  assert.equal(lock.gateway.tool_count, 27);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),
@@ -759,32 +629,4 @@ test("observed lock pins exactly the 35 approved tool definitions", async () => 
       /^[a-f0-9]{64}$/u.test(hash),
     ),
   );
-});
-
-// 생성 스킬은 상류 canonical에서 받아 public-skill.lock.json이 지문으로 고정한다.
-// 스킬 사본을 이 저장소에서 직접 고치면 lock이 조용히 뒤처지고, 다음 동기화가
-// 그 수정을 상류 빌드로 되돌리거나 금지어 검사에서 멈출 때까지 아무도 모른다.
-// 지문을 실제 디렉터리 내용과 대조해 그 드리프트를 이쪽 CI에서 잡는다.
-//
-// 계산 규칙은 scripts/sync-public-skill.mjs의 fingerprint와 같아야 한다. 그
-// 스크립트는 로드 시점에 main()을 실행하므로 가져오지 않고 같은 규칙을 재현한다:
-// agents/ 는 이 플러그인의 패키징이라 지문에서 빠진다.
-test("public skill lock fingerprint matches the synced skill directory", async () => {
-  const lock = await readJson("contracts", "public-skill.lock.json");
-  const skillRoot = resolve(
-    pluginRoot,
-    "skills",
-    "generate-development-country-report",
-  );
-  const digest = (value) => createHash("sha256").update(value).digest("hex");
-  const files = (await listFiles(skillRoot)).filter(
-    (file) => !file.startsWith("agents/"),
-  );
-  const entries = {};
-  for (const file of files.toSorted()) {
-    entries[file] = digest(await readFile(resolve(skillRoot, file), "utf8"));
-  }
-  assert.equal(lock.schema_version, 1);
-  assert.equal(lock.files, Object.keys(entries).length);
-  assert.equal(lock.fingerprint, digest(JSON.stringify(entries)));
 });

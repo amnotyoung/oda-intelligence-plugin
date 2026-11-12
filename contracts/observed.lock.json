@@ -1,8 +1,8 @@
 {
   "gateway": {
-    "instructions_sha256": "2c02f866dc962fa27610ff3a2b1cbe6a386a13618c1e6b747dd15925f14d13b9",
+    "instructions_sha256": "a86d00e5d56f34ae4ae03ae704d38236c462f94fbcd71c2ea3f43d3ace280460",
     "server_name": "oda-intelligence",
-    "tool_count": 35,
+    "tool_count": 27,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
@@ -16,13 +16,10 @@
       "find_references": "abe7ec531aa1b9bd1e436964848b326c354495b92099cdce0c64b387ae0765bd",
       "get_article": "180be0e725246bc99456185c7f6b4d64eade085f5782054039ccdaaa4f50a9c9",
       "get_attachment": "4948e143c9b8cbe27fc8f47b5140bd4a3955ad1e6caf808381ec5f2665a8e5ee",
-      "get_corpus_overview": "b294acf23543d0e5f2f2ecfefe859c629854c44d4258a32c579146ce0de489e8",
-      "get_trend_document": "0e83423747e4dd8184efe211e692b24cdaf92aa56a847966d1f191b9680a51a4",
       "iati_query_country": "7f455b65afa584f8d46cd4317d536607d4dd91638332c1a1b852e27cc6cca5b9",
       "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
       "iati_test_connection": "8aa708a1fd1f8e53fa9713d35c95f7096b6c86742ed50f07d0b16fd9e1164027",
       "list_attachments": "9d8e56ce8a5cc55b2ef7d604a05f0ec7cfd1d0ea830bd2d4e9ecdfdfa1aeb267",
-      "list_available_corpora": "e7540d105680587b402d4a1e9e142ed38109d1e3ffda48a917ff5c7cf92bf5d8",
       "list_sources": "ff0afbed7f4288f16444883cd57b8eca75882a8cea307c107fe2f9dd93fbde52",
       "oda_map_country_context": "1888560230094110e23bb42bc2f6b1cf3f46567fe7b9a9f41d7064df1ee429ca",
       "oda_map_data_status": "e45dedff831e661c543ef9cad510cc8359cac835f6b220b73ed2003288ee17f1",
@@ -32,11 +29,6 @@
       "procurement_country_context": "75dbd248075263016de72629a0e1088fd8e6ba5ce8bfe330b8387863b65ea93e",
       "procurement_model_detail": "7c63760e34ce2e0844fba1cfb55b347052e9bc483b50ff010fb14a2849ed1e9a",
       "procurement_model_status": "05c19b7d709afc9bfa0ac85b0dbef0f9162c97366e122548e7b93b582c7cdf56",
-      "search_development_by_place": "b8b66e496b26216994982e8e3aee695a92a4a9295c96df3d08eb6e73c8c5be43",
-      "search_development_trends": "8dca2540b1d580ec9dfaea6dc47ecf3134f617063e22b7f675e472bf0e3a8c45",
-      "search_entity_relationships": "49d94e73774018a276e66802ed2525a28c3f3b976dd50b7607d9b278e12df5b4",
-      "search_offices_by_entity": "1644e97ee1b0bc448115f27d21061d456c565275d52dc538a18256a279da41c3",
-      "search_offices_by_topic": "93e3d44ad9886acf838f14198a9de14881acd6c3e0c41f7f8b9e964ffad93469",
       "search_regulation": "28c42340cf2725c6e305ba0e6779c0e5c1783722c06afe25cf82233f60f106f5",
       "verify_citation": "0fe87f9ee4bc2e15cd3abecfcb2e83d6f80d1df2aa13679b08b223bb7808e33e"
     },

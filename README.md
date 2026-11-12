@@ -5,24 +5,14 @@
 근거 기반 개발협력 조사를 위한 Claude, Codex, Antigravity 및 ChatGPT 공개
 패키지입니다.
 
-이 플러그인은 네 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
+이 플러그인은 세 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
 한 개에 연결합니다.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
 
-게이트웨이는 국제원조 및 국가 현황, 한국 ODA 사업, 개발협력 문서, KOICA 규정
-조사를 위한 통제된 도구를 제공합니다. 사용자는 OAuth 토큰이나 IATI 인증 정보를
-제공할 필요가 없습니다.
-
-다섯 개 출처 도메인은 각각 별도의 Claude 커넥터로 설치되지 않습니다.
-Claude에는 `oda-intelligence` 커넥터 한 개가 표시되며, 이 커넥터가 제공하는
-읽기 전용 도구가 국제데이터(`io-mcp`), 한국 ODA 사업, 개발협력 문서,
-KOICA 규정, 협력국 조달 출처로 요청을 전달합니다. `devcoop-trends`나
-`koica-reg-mcp` 같은 개별 커넥터를 직접 구성하는 방법도 그대로 유효합니다.
-한 도메인만 필요할 때 고르는 더 작은 설치 단위이며, 이 플러그인과 독립적으로
-작동합니다.
+게이트웨이 한 개에서 국제원조·국가 현황, 한국 ODA 사업 지도, KOICA 규정, 협력국 조달제도를 조회합니다. 사용자 인증은 필요하지 않습니다.
 
 이 저장소에는 서버 구현 소스, 배포 비밀 정보, 비공개 Git 기록 또는 로컬 인증
 정보 저장소가 포함되어 있지 않습니다. 유일한 런타임 의존성은 공개 MCP
@@ -37,11 +27,11 @@ KOICA 규정, 협력국 조달 출처로 요청을 전달합니다. `devcoop-tre
 시작하세요. 기존 대화에는 대화 생성 시점의 도구 스냅샷이 남아 있을 수 있습니다.
 플러그인 상세 화면에는 다음 구성 요소가 설치된 것으로 표시되어야 합니다.
 
-- Skill 네 개
+- Skill 세 개
 - `oda-intelligence`라는 이름의 커넥터 한 개
 - 해당 커넥터가 제공하는 읽기 전용 도구
 
-Skill 네 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
+Skill 세 개만 표시된다면 마켓플레이스를 동기화하고 플러그인을 업데이트하거나
 재설치한 뒤 새 대화를 시작하세요. Skill 자체는 숨겨진 백엔드를 호출하지 않으며,
 번들로 제공되는 커넥터가 필요합니다.
 
@@ -52,8 +42,7 @@ claude plugin marketplace add amnotyoung/oda-intelligence-plugin
 claude plugin install oda-intelligence@oda-intelligence-plugin
 ```
 
-아래는 데스크톱 앱에서의 설치 데모입니다. 마켓플레이스를 추가하고, Skill 네 개와
-커넥터 한 개가 설치된 것을 확인한 뒤, 실제 질문에 답하기까지를 담았습니다.
+이전 버전의 데스크톱 설치 영상입니다. 현재 버전은 Skill 세 개를 설치합니다.
 
 ![ODA Intelligence 설치 데모](docs/assets/install-demo.gif)
 
@@ -99,7 +88,7 @@ agy plugin install https://github.com/amnotyoung/oda-intelligence-plugin
 
 `agy`는 저장소의 `plugins/` 폴더에서 `oda-intelligence`를 찾아 Antigravity
 매니페스트(`.antigravity-plugin/plugin.json`)와 MCP 설정(`mcp_config.json`)으로
-설치합니다. Skill 네 개는 Claude·Codex 패키지와 같은 `skills/` 폴더를 씁니다.
+설치합니다. Skill 세 개는 Claude·Codex 패키지와 같은 `skills/` 폴더를 씁니다.
 게이트웨이는 Antigravity 원격 MCP 형식인 `serverUrl`로 연결되며, 에이전트에는
 `oda-intelligence_oda-intelligence`라는 서버 이름으로 표시됩니다.
 
@@ -110,7 +99,7 @@ agy plugin list
 ```
 
 `oda-intelligence (enabled, …)`, `Source: antigravity`,
-`4 skills, 1 MCP server`가 보여야 합니다. 처음 도구를 호출할 때 MCP 권한 승인
+`3 skills, 1 MCP server`가 보여야 합니다. 처음 도구를 호출할 때 MCP 권한 승인
 창이 뜨면 허용하세요. 업데이트할 때는 같은 `agy plugin install` 명령을 다시
 실행한 뒤 새 대화를 시작합니다.
 
@@ -136,7 +125,7 @@ CLI 없이 도구만 연결하려면 Antigravity MCP 설정(`mcp_config.json`)�
 
 ## ChatGPT
 
-전체 플러그인은 번들로 제공되는 네 개의 Skill과 등록된 `ODA Intelligence`
+전체 플러그인은 번들로 제공되는 세 개의 Skill과 등록된 `ODA Intelligence`
 MCP 앱을 결합합니다. 커밋된 `.app.json`에는 앱의 기술 식별자가 들어 있으며,
 인증 정보나 인증 토큰은 포함되어 있지 않습니다.
 
@@ -164,10 +153,10 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 도구
 
-커넥터는 다섯 개 출처 도메인에 걸쳐 검토된 읽기 전용 도구를 제공합니다. 출처에
+커넥터는 네 개 출처 도메인에 걸쳐 검토된 읽기 전용 도구를 제공합니다. 출처에
 쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
 
-번들로 제공되는 Skill 네 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
+번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
 질문에는 도구 이름을 댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이
 만든 호출을 읽을 때 쓰는 자료입니다.
 
@@ -183,14 +172,13 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ### 자연어로 묻기
 
-Skill은 도구 이름이 아니라 주제로 라우팅합니다. 네 Skill이 각각 다른 종류의
+Skill은 도구 이름이 아니라 주제로 라우팅합니다. 세 Skill이 각각 다른 종류의
 질문을 맡습니다.
 
 | Skill | 맡는 질문 | 사용하는 도메인 |
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS 코드·통계, IATI 활동 탐색, 국제 원조 근거의 구분과 검증 | `international-data` + 필요한 경우 OECD 공식 원문 |
-| `korean-oda-portfolio-lookup` | 한국 기관이 한 국가 또는 특정 도시·주·군에서 무엇을 하고 있는지 — 지명별 문서·지도 사업, 국가 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `development-documents` + `korean-oda-map` |
-| `generate-development-country-report` | 국가보고서·원조 지형 검토, 중점분야 선정, 참여 경로, 조달 진입, Go/No-Go 위험 | 다섯 개 전부 |
+| `korean-oda-portfolio-lookup` | 한국 기관이 한 국가 또는 특정 도시·주·군에서 무엇을 하고 있는지 — 사업별 지도 위치, 국가 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
 | `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
 
 프롬프트를 쓸 때 다음 네 가지가 결과를 좌우합니다.
@@ -273,13 +261,7 @@ OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 �
 `country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
 채널·활동 세부자료 전용 조회는 별도 범위입니다.
 
-`피지에서 태양광 사업을 하려는데 CRS 코드를 무엇으로 써야 하나`처럼 국가명과
-사업주제가 함께 있는 적용형 분류 질문은 코드표부터 보지 않습니다. 국가명은
-`search_offices_by_topic(country, query)`으로 국가별 개발협력 문서를 먼저 찾고,
-도시·주·군 같은 하위 지명은 `search_development_by_place`로 먼저 해소하며, 특정
-한국 사업은 ODA Map 상세를 먼저 읽습니다. 그 뒤 `dac_purpose_code_lookup`으로
-후보 코드의 공식 명칭을 확인합니다. 앞 단계의 지역·사업 근거는 후보를 판별하는
-자료이지, 그 사업에 공식 CRS 코드가 부여됐다는 증거는 아닙니다.
+국가와 주제가 주어진 CRS 분류 질문은 사업 설계자료를, 특정 한국 사업은 ODA Map 상세를 먼저 확인합니다. 그런 다음 `dac_purpose_code_lookup`으로 후보 코드의 공식 명칭을 확인합니다.
 
 > 지금 미얀마에 대해 국제 근거가 얼마나 확보되는지, IATI에는 무엇이 있는지
 > 알려줘.
@@ -327,60 +309,6 @@ verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
 전에 이 도구로 한 번 훑으세요. 색인은 동기화 주기만큼 공식 개정을 뒤따르므로,
 중대한 결론은 현행 공식 원문으로 확인하세요.
 
-### 개발협력 문서 — `development-documents`
-
-국가사무소 개발협력 문서와 거기서 추출한 관계를 다룹니다 — 동향 위키에 직접
-가지 않아도 그 내용을 조회할 수 있습니다. 코퍼스는 사무소 단위입니다. 도시·주·군
-같은 지명에서 시작하면 `search_development_by_place`가 장소를 먼저 해석해 관련 문서와
-그 위치에 배치된 지도 사업을 분리해 반환합니다. 어느 사무소를 볼지 모르는 주제
-질문은 `search_offices_by_topic`이 48개 사무소를 가로질러 관련 사무소부터 찾습니다.
-사용 순서는 지명 해석 또는 사무소 탐색 → 검색 → 문서·사업 상세 → 관계 근거입니다.
-
-| 도구 | 무엇을 반환하는가 | 입력 |
-|---|---|---|
-| `list_available_corpora` | 이용 가능한 공개 코퍼스와 사무소 관할. 문서 수, 문서 종류, 포함 국가를 함께 반환 | (없음) |
-| `search_development_by_place` | 도시·주·군 등 지명을 정확한 별칭으로 해석하고, 관련 문서(`knowledge_graph`)와 그 장소에 배치된 지도 사업(`map`)을 별도 분기로 반환합니다. 동명이의 장소는 후보와 `requires_disambiguation`을 반환합니다 | **`place`**, `country`, `query`, `month_from`, `month_to`, `sector`, `kinds`, `limit` |
-| `search_offices_by_topic` | 48개 사무소를 가로지른 사무소 랭킹 — 사무소별 히트 수와 대표 문서 최대 2건. `total_matches`가 전체 일치 수, `truncated_office_count`가 상한에서 잘린 사무소 수를 보고합니다 | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
-| `search_development_trends` | 문서 탐색 메타데이터와 요약, 문서별 공식 원문 링크. `total_matches`가 전체 일치 수를 보고하고 `offset`으로 다음 페이지를 조회합니다 | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
-| `get_trend_document` | 검색이 반환한 `article_id`로 문서 하나의 컨텍스트를 조회합니다 — 메타데이터, 공식 링크, 그 문서에서 추출된 관계들, 그리고 관련 동향·사업 각 10건(위키 문서 페이지의 그 목록) | **`office`**, **`document_id`** |
-| `get_corpus_overview` | 사무소 코퍼스의 분야·월·문서종류·기관별 문서 수 — 위키 목차 페이지와 같은 레코드에서 센 집계입니다. 기관 카운트는 문서당 1회 기준 | **`office`** |
-| `search_offices_by_entity` | 48개 사무소를 가로지른 기관 랭킹 — 사무소별 관계 수, 주요 관계 유형, 대표 관계 최대 2건(근거 문장 없음). 근거 본문 검색(`query`)은 사무소별 도구만 지원합니다 | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
-| `search_entity_relationships` | 특정 기관이 source 또는 target인 관계 검색. 관계마다 근거 문장과 근거 문서를 동봉하며, `total_matches`가 전체 일치 수를 항상 보고합니다 | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
-
-> 비엔티안과 관련된 최근 보건 문서와 그 장소에 배치된 한국 ODA 사업을 함께 보여줘.
-
-```text
-search_development_by_place { "place": "비엔티안", "country": "라오스", "query": "보건", "limit": 5 }
-get_trend_document          { "office": "<문서가 준 office>", "document_id": "<문서가 준 article_id>" }
-oda_map_project_detail      { "project_id": "<지도 사업이 준 project_id>" }
-```
-
-`requires_disambiguation`이 `true`면 후보를 임의로 합치거나 하나를 고르지 말고, 사용자가
-뜻한 국가를 `country`에 넣어 같은 지명을 다시 검색합니다. `knowledge_graph`는 지명
-언급 또는 지도 사업명과의 문서 연결이고, `map`은 사업의 지도상 위치입니다. 문서 언급을
-사업 위치로, 지도 위치를 문서 언급으로 바꾸어 읽지 마세요. 중요한 문서는 반환된
-`office`와 `article_id`로 `get_trend_document`를, 중요한 지도 사업은 `project_id`로
-`oda_map_project_detail`을 이어서 호출합니다. 국가 전체의 최신 사업 수·상태·예산이
-필요하면 지명 검색 건수를 쓰지 말고 `oda_map_data_status`와 국가별 사업 도구로
-확인합니다.
-
-> 캄보디아에서 KOICA가 어떤 기관들과 협력하는지, 무슨 근거로 그런지 보여줘.
-
-```text
-list_available_corpora      {}
-search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
-get_trend_document          { "office": "캄보디아", "document_id": "<검색이 준 article_id>" }
-search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
-get_corpus_overview         { "office": "캄보디아" }
-```
-
-`office`는 국가명 또는 slug(`캄보디아`, `cambodia`)를 받고, `kinds`는 `trend`와
-`project` 중에서 고르며, `office_role`은 주재국과 겸임국을 구분합니다. 관계
-추출은 검증된 사실이 아니라 신호입니다 — 모든 관계에 근거 문서가 동봉되므로,
-주장을 옮기기 전에 그 문서를 확인하세요. 문서 식별자는 도구를 잇는 조회
-키입니다. 독자용 산문에서는 원시 식별자가 아니라 제목·날짜·출처·공식 링크로
-문서를 인용하세요.
-
 ### 협력국 조달 — `partner-country-procurement`
 
 국가별로 세 개 축을 모델링합니다. `bidding`(입찰제도), `governance`(조달
@@ -411,7 +339,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 
 | 파라미터 | 제한 |
 |---|---|
-| `limit` | `search_regulation` 10, `find_references`·`search_development_trends` 20, `search_development_by_place`는 `knowledge_graph`·`map` 각 20, `search_offices_by_topic`·`search_offices_by_entity` 사무소 20, `search_entity_relationships` 50, `oda_map_projects` 100 |
+| `limit` | `search_regulation` 10, `find_references` 20, `oda_map_projects` 100 |
 | `rows` | `iati_query_country` 20 |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -431,8 +359,6 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 - 일일 워크플로는 도구 계약 hash가 완전히 동일할 때만 잠금 메타데이터 변경의
   patch 버전을 올리고 자동 생성 PR을 squash 병합합니다. 도구 schema·세부
   제약 hash가 바뀌면 PR을 열어 둔 채 사람 검토를 기다립니다.
-- canonical 공개 Skill 변경도 생성 결과와 잠금 파일을 검증하고 같은 방식으로
-  patch 버전을 올려 자동 병합합니다.
 - 호환성을 깨뜨리는 계약 변경이 감지되면 승인된 계약을 다시 작성하지 않고
   검사에 실패합니다.
 - Skill 라우팅 또는 승인된 계약을 변경하려면 버전이 지정된 플러그인
@@ -454,7 +380,6 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_development_by_place`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 
 `korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
@@ -481,15 +406,14 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | `mofa_travel_alert` | https://www.0404.go.kr |
 
 `international-data`에 속하지만 출처 키가 없는 도구가 둘 있습니다.
-`country_list`는 개발협력 문서 인덱스에서 가져온 사무소 관할 정보를 반환하므로,
-그 인덱스(https://devcoop-trends-wiki.pages.dev)를 출처로 제시합니다.
+`country_list`는 게이트웨이에 포함된 국가·사무소 목록과 기준일을 반환합니다.
 `country_map_outline`은 자신의 출처를 응답에 직접 싣습니다. 매 응답의 `source` 필드가 공개
 `datasets/geo-countries` GeoJSON 주소 —
 https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
 — 를 담으므로, 조달의 `model_url`처럼 그 필드를 인용합니다.
 
 색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 위 표의 주소로 답합니다. KOICA
-규정 색인은 단독 배포판 저장소가, 개발협력 문서 코퍼스는 공개 위키가 그 자리입니다.
+규정 색인은 단독 배포판 저장소에서 확인할 수 있습니다.
 다만 이름이 비슷한 다른 공개 포털은 다른 자료를 담고 있으므로, 표에 적힌 주소가
 아닌 곳으로 안내하면 독자가 하려던 확인을 오히려 막습니다. 조달은 도메인 하나로
 답하기 어렵습니다. 모델 응답마다 `model_url`이 실리므로, 사이트 주소보다 그 필드를
@@ -506,11 +430,6 @@ https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geo
   "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)입니다. 대량 일괄
   추출은 여전히 제공하지 않으며, 목록은 응답 예산에 맞춰 잘리되 실제 총계를
   함께 보고합니다.
-- 개발협력 문서 도구는 코퍼스 탐색, 요약, 공개 원문 URL, 문서별 컨텍스트,
-  그리고 근거 문서가 동봉된 추출 관계를 제공합니다. 재배포 근거는
-  공공데이터포털의 개방 릴리스 "한국국제협력단_국별 개발협력동향"(이용허락범위
-  제한 없음)입니다. 문서 전문은 공식 원문 링크에 있으며, 위키 내부 경로와
-  플래그는 공개 응답에서 제거됩니다.
 - IATI 및 기타 국제 출처의 인증 정보는 서버에서 관리하며 플러그인에 포함하거나
   사용자에게 반환하지 않습니다.
 - 한국 ODA 통합누리집 지도 도구는 공개 지도에 이미 표시된 최종 유효 좌표를
