@@ -2,7 +2,8 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-근거 기반 개발협력 조사를 위한 Claude, Codex 및 ChatGPT 공개 패키지입니다.
+근거 기반 개발협력 조사를 위한 Claude, Codex, Antigravity 및 ChatGPT 공개
+패키지입니다.
 
 이 플러그인은 세 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
 한 개에 연결합니다.
@@ -75,6 +76,52 @@ codex plugin add oda-intelligence@oda-intelligence-plugin
 로컬 소스를 수정한 경우에는 플러그인 버전 또는 Codex 캐시버스터를 갱신한 뒤
 `codex plugin add`를 다시 실행하세요. 설치 또는 재설치 후 새 작업을 시작해야
 Codex가 갱신된 Skill과 MCP 구성을 불러옵니다.
+
+## Antigravity
+
+Google Antigravity에서는 `agy` CLI(1.3.3 이상)로 GitHub 저장소를 바로
+설치합니다.
+
+```bash
+agy plugin install https://github.com/amnotyoung/oda-intelligence-plugin
+```
+
+`agy`는 저장소의 `plugins/` 폴더에서 `oda-intelligence`를 찾아 Antigravity
+매니페스트(`.antigravity-plugin/plugin.json`)와 MCP 설정(`mcp_config.json`)으로
+설치합니다. Skill 세 개는 Claude·Codex 패키지와 같은 `skills/` 폴더를 씁니다.
+게이트웨이는 Antigravity 원격 MCP 형식인 `serverUrl`로 연결되며, 에이전트에는
+`oda-intelligence_oda-intelligence`라는 서버 이름으로 표시됩니다.
+
+설치 결과는 다음 명령으로 확인합니다.
+
+```bash
+agy plugin list
+```
+
+`oda-intelligence (enabled, …)`, `Source: antigravity`,
+`3 skills, 1 MCP server`가 보여야 합니다. 처음 도구를 호출할 때 MCP 권한 승인
+창이 뜨면 허용하세요. 업데이트할 때는 같은 `agy plugin install` 명령을 다시
+실행한 뒤 새 대화를 시작합니다.
+
+로컬 사본에서는 저장소 루트에서 플러그인 폴더를 지정합니다.
+
+```bash
+agy plugin install ./plugins/oda-intelligence
+```
+
+CLI 없이 도구만 연결하려면 Antigravity MCP 설정(`mcp_config.json`)의
+`mcpServers`에 다음 항목을 추가합니다. 이 방법은 Skill을 설치하지 않습니다.
+원격 서버 주소는 `serverUrl`에 적어야 하며, `httpUrl`은 지원되지 않습니다.
+
+```json
+{
+  "mcpServers": {
+    "oda-intelligence": {
+      "serverUrl": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
+    }
+  }
+}
+```
 
 ## ChatGPT
 
@@ -413,6 +460,11 @@ npm ci
 npm test
 npm run contracts:check
 ```
+
+Antigravity 패키지는 `agy plugin validate plugins/oda-intelligence`로 검사합니다.
+`--strict`를 붙이면 Claude Code용 `.mcp.json`이 같은 폴더에 있어 경고 한 건으로
+실패합니다. Antigravity는 이 파일을 읽지 않으며, Claude 패키지에는 필요한
+파일이므로 이 경고는 예상된 결과입니다.
 
 소스 코드는 [Apache License 2.0](LICENSE)에 따라 제공됩니다. MCP 도구가
 반환하는 데이터에 이 저장소의 라이선스가 새로 적용되는 것은 아닙니다.

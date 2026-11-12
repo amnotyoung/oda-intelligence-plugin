@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "oda-intelligence": {
+      "serverUrl": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "oda-intelligence",
+  "displayName": "ODA Intelligence",
+  "version": "0.2.36",
+  "description": "Evidence-based development cooperation research across international aid, Korean projects, procurement, and KOICA regulations.",
+  "suggestedPrompts": [
+    "List the Korean and KOICA projects running in Timor-Leste.",
+    "Compare Korean ODA projects in Laos with international aid evidence.",
+    "Find and verify the KOICA regulation governing a procedure."
+  ],
+  "author": {
+    "name": "amnotyoung",
+    "url": "https://github.com/amnotyoung"
+  },
+  "homepage": "https://github.com/amnotyoung/oda-intelligence-plugin/tree/main/plugins/oda-intelligence",
+  "repository": "https://github.com/amnotyoung/oda-intelligence-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "oda",
+    "development-cooperation",
+    "iati",
+    "koica",
+    "mcp"
+  ]
+}
