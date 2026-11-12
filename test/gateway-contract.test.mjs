@@ -7,6 +7,7 @@ import {
   buildObservedLock,
   canAutoMergeObservedLock,
   evaluateSmokeResults,
+  smokeTools,
   validateGatewayCompatibility,
   validatePluginConfiguration,
   validateSmokeCoverage,
@@ -323,4 +324,38 @@ test("the shipped contract covers every tool with smoke arguments", async () => 
     await readFile(resolve(ROOT, "contracts", "gateway-contract.json"), "utf8"),
   );
   assert.deepEqual(validateSmokeCoverage(contractFile), []);
+});
+
+test("map detail uses the live list ID once and checks the returned ID", async () => {
+  const spec = JSON.parse(await readFile(resolve(ROOT, "contracts/gateway-contract.json"), "utf8"));
+  const list = spec.tools.oda_map_projects;
+  const detail = spec.tools.oda_map_project_detail;
+  const map = { tools: { oda_map_project_detail: detail, oda_map_projects: list } };
+  assert.deepEqual(validateSmokeCoverage(map), []);
+
+  for (const [listedId, returnedId] of [["live:42", "live:42"], ["live:42", "wrong"], [null, null]]) {
+    const calls = [];
+    const client = { async callTool(request) {
+      calls.push(request);
+      if (request.name === "oda_map_projects") {
+        const data = { as_of: "2026-11-12", items: listedId ? [{ project_id: listedId }] : [] };
+        return { content: [{ type: "text", text: JSON.stringify({ data }) }] };
+      }
+      return { structuredContent: { data: { item: { project_id: returnedId } } } };
+    } };
+    const failures = evaluateSmokeResults(await smokeTools(client, map));
+    assert.deepEqual(calls[0], { name: "oda_map_projects", arguments: list.smoke_arguments });
+    if (!listedId) {
+      assert.equal(calls.length, 1);
+      assert.match(failures.join("\n"), /oda_map_project_detail:.*usable project_id/u);
+      continue;
+    }
+    assert.equal(calls.length, 2);
+    assert.deepEqual(calls[1], {
+      name: "oda_map_project_detail",
+      arguments: { project_id: listedId, country: list.smoke_arguments.country, as_of: "2026-11-12" },
+    });
+    if (returnedId === listedId) assert.deepEqual(failures, []);
+    else assert.match(failures.join("\n"), /oda_map_project_detail:.*data\.item\.project_id/u);
+  }
 });
