@@ -496,7 +496,7 @@
       ],
       "requires_coordinate_output": true,
       "read_only": true,
-      "smoke_exempt_reason": "project_id는 지도 빌드마다 달라 고정할 수 없다"
+      "smoke_project_from": "oda_map_projects"
     },
     "oda_map_projects": {
       "allowed_required_inputs": [
@@ -525,7 +525,12 @@
       "requires_coordinate_output": true,
       "read_only": true,
       "smoke_arguments": {
-        "country": "베트남"
+        "country": "베트남",
+        "limit": 1,
+        "fields": [
+          "id",
+          "name"
+        ]
       }
     },
     "oecd_crs_query_country": {
