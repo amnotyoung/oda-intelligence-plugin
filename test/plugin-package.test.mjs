@@ -255,30 +255,8 @@ test("named-geography project questions gather local evidence before DAC and CRS
 
   assert.ok(section, "applied classification needs an explicit geography-first route");
   assert.match(section, /피지에서 태양광 사업[\s\S]+CRS 코드/u);
-  assert.match(section, /country name is not a subnational place/u);
-  assert.match(section, /`search_offices_by_topic`/u);
-  assert.match(section, /`search_development_by_place`/u);
-  assert.match(section, /`oda_map_project_detail`/u);
-  assert.match(section, /`dac_purpose_code_lookup`/u);
-  assert.ok(
-    section.indexOf("`oda_map_project_detail`") <
-      section.indexOf("`search_development_by_place`"),
-    "named Korean project evidence must outrank the place route",
-  );
-  assert.ok(
-    section.indexOf("`search_development_by_place`") <
-      section.indexOf("`search_offices_by_topic`"),
-    "subnational-place evidence must outrank the country-topic route",
-  );
-  assert.ok(
-    section.indexOf("`search_offices_by_topic`") <
-      section.indexOf("`dac_purpose_code_lookup`"),
-    "every local-evidence route must precede the code-list lookup",
-  );
-  assert.match(section, /material\s+document[\s\S]+`get_trend_document`/u);
-  assert.match(section, /material\s+mapped project[\s\S]+`oda_map_project_detail`/u);
+  assert.ok(section.indexOf("`oda_map_project_detail`") < section.indexOf("`dac_purpose_code_lookup`"));
   assert.match(section, /neither a country nor an identifier[\s\S]+ask for the recipient country/u);
-  assert.match(section, /same original `country`[\s\S]+wrong\s+recipient/u);
   assert.match(section, /actually reported under in IATI[\s\S]+`activity_sectors`/u);
   assert.match(section, /literal leading `iati:`[\s\S]+never synthesize/u);
   assert.match(section, /`total_found: 1`[\s\S]+canonical `iati_identifier`/u);
@@ -289,20 +267,12 @@ test("named-geography project questions gather local evidence before DAC and CRS
     /publisher's public IATI XML or d-portal activity\s+HTML\/XML/u,
   );
   assert.match(section, /geography alone/u);
-  assert.match(section, /does not itself assign an official CRS code/u);
-  assert.match(section, /empty place or document search[\s\S]+does not prove/u);
   assert.match(internationalAgent, /Classify and trace projects with OECD, CRS, and IATI evidence/u);
   assert.match(portfolioSkill, /do not hand off before reading the project/u);
   assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
   assert.match(portfolioProtocol, /empty `transaction_sector_code`[\s\S]+no sector absence/u);
   assert.match(portfolioProtocol, /miss for `311`[\s\S]+`31120`/u);
 
-  const countryTopicTool = gatewayContract.tools.search_offices_by_topic;
-  assert.ok(countryTopicTool, "country-topic document discovery must be approved");
-  assert.deepEqual(countryTopicTool.allowed_required_inputs, ["query"]);
-  assert.equal(countryTopicTool.input_properties.country, "string");
-  assert.equal(countryTopicTool.input_properties.query, "string");
-  assert.ok(gatewayContract.tools.search_development_by_place);
   assert.ok(gatewayContract.tools.oda_map_project_detail);
   assert.ok(gatewayContract.tools.dac_purpose_code_lookup);
 });
@@ -398,72 +368,18 @@ test("historical reported-code questions use official OECD project microdata", a
   assert.match(internationalAgent, /annual official OECD CRS purpose-code assignments/u);
 });
 
-test("place-led questions resolve place evidence before country portfolio detail", async () => {
-  const portfolioSkill = await readFile(
-    resolve(pluginRoot, "skills", "korean-oda-portfolio-lookup", "SKILL.md"),
-    "utf8",
-  );
-  const portfolioProtocol = await readFile(
-    resolve(
-      pluginRoot,
-      "skills",
-      "korean-oda-portfolio-lookup",
-      "references",
-      "portfolio-lookup-protocol.md",
-    ),
-    "utf8",
-  );
-  const portfolioAgent = await readFile(
-    resolve(
-      pluginRoot,
-      "skills",
-      "korean-oda-portfolio-lookup",
-      "agents",
-      "openai.yaml",
-    ),
-    "utf8",
-  );
-  const gatewayContract = await readJson("contracts", "gateway-contract.json");
-  const placeTool = gatewayContract.tools.search_development_by_place;
-
-  assert.ok(placeTool, "place search must be an approved gateway tool");
-  assert.deepEqual(placeTool.allowed_required_inputs, ["place"]);
-  assert.deepEqual(placeTool.input_properties, {
-    country: "string",
-    kinds: "array",
-    limit: "integer",
-    month_from: "string",
-    month_to: "string",
-    place: "string",
-    query: "string",
-    sector: "string",
-  });
-  assert.deepEqual(placeTool.output_required, [
-    "caveat",
-    "country",
-    "knowledge_graph",
-    "map",
-    "place",
-    "requires_disambiguation",
-    "resolved_places",
-    "result_count",
-  ]);
-  assert.deepEqual(placeTool.smoke_arguments, {
-    country: "라오스",
-    limit: 1,
-    place: "비엔티안",
-    query: "보건",
-  });
-  assert.equal(placeTool.read_only, true);
-
-  assert.match(portfolioSkill, /mentions, projects mapped there, or both/u);
-  assert.match(portfolioSkill, /call\s+`search_development_by_place` first/u);
-  assert.match(portfolioSkill, /requires_disambiguation[\s\S]+retry[\s\S]+`country`/u);
-  assert.match(portfolioSkill, /Keep the branches distinct[\s\S]+`knowledge_graph`[\s\S]+`map`/u);
-  assert.match(portfolioSkill, /`get_trend_document`[\s\S]+`oda_map_project_detail`/u);
-  assert.match(portfolioProtocol, /documentary linkage, not proof/u);
-  assert.match(portfolioProtocol, /map\s+branch is a dated, place-linked snapshot/u);
-  assert.match(portfolioAgent, /country or around a named place/u);
+test("the public skills only route place queries through the project map", async () => {
+  const removed = /search_development_by_place|search_development_trends|get_trend_document|get_corpus_overview|search_entity_relationships|search_offices_by_entity|search_offices_by_topic|list_available_corpora/u;
+  const contract = await readJson("contracts", "gateway-contract.json");
+  assert.doesNotMatch(Object.keys(contract.tools).join(" "), removed);
+  const skillsRoot = resolve(pluginRoot, "skills");
+  for (const file of await readdir(skillsRoot, { recursive: true })) {
+    if (/\.(md|yaml)$/u.test(file)) {
+      assert.doesNotMatch(await readFile(resolve(skillsRoot, file), "utf8"), removed, file);
+    }
+  }
+  const portfolio = await readFile(resolve(skillsRoot, "korean-oda-portfolio-lookup/SKILL.md"), "utf8");
+  assert.match(portfolio, /oda_map_projects` with `locations`/u);
 });
 
 test("ChatGPT compatibility maps the registered gateway app without a secret", async () => {
@@ -623,26 +539,18 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 35 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 27 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 35);
+  assert.equal(Object.keys(contract.tools).length, 27);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
   // "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)으로 개방되어 있다.
-  // 전체 표면이 공개되었다. 규정은 "정관 및 내부규정", 동향은 "국별 개발협력동향"
-  // 개방 릴리스(공공데이터포털, 이용허락범위 제한 없음)가 재배포 근거다.
   for (const opened of [
     "compliance_radar",
     "get_article",
     "get_attachment",
     "list_attachments",
-    "get_trend_document",
-    "search_development_by_place",
-    "search_entity_relationships",
-    "get_corpus_overview",
-    "search_offices_by_topic",
-    "search_offices_by_entity",
     "dac_purpose_code_lookup",
   ]) {
     assert.ok(opened in contract.tools, `${opened} must be an approved tool`);
@@ -650,13 +558,13 @@ test("minimal accepted gateway contract contains 35 approved read-only tools", a
   assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
 });
 
-test("observed lock pins exactly the 35 approved tool definitions", async () => {
+test("observed lock pins exactly the 27 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 35);
+  assert.equal(lock.gateway.tool_count, 27);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

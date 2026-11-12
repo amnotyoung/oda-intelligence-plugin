@@ -6,7 +6,7 @@ dependencies:
   tools:
     - type: "mcp"
       value: "oda-intelligence"
-      description: "Read-only gateway for development-document and project context, official OECD DAC/CRS codes, country-level international aid evidence, and IATI discovery"
+      description: "Read-only gateway for project design and location evidence, official OECD DAC/CRS codes, country-level international aid evidence, and IATI discovery"
       transport: "streamable_http"
       url: "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
 policy:

@@ -111,7 +111,7 @@ A blocked call is not an absent portfolio. When `oda_map_country_context` return
 
 If `oda_map_data_status` reports `fresh` while a context section stays blocked, say so: the evidence exists and the public gateway withheld this response. That is a gateway limitation, not a data gap, and the distinction changes what a reader should do next.
 
-Use development-cooperation document search for project and institutional evidence. For every adopted document, cite:
+Consult official project documents for project and institutional evidence. For every adopted document, cite:
 
 - exact title
 - direct original URL when available

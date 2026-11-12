@@ -12,18 +12,7 @@ gateway:
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
 
-The gateway provides controlled tools for international aid and country
-context, Korean ODA projects, development-cooperation documents, and KOICA
-regulation research. Users do not provide an OAuth token or IATI credential.
-
-The five source domains are not installed as five separate Claude connectors.
-Claude should show one `oda-intelligence` connector whose read-only tools
-route to international data (`io-mcp`), Korean ODA projects,
-development-cooperation documents, KOICA regulations, and partner-country
-procurement sources. Configuring an individual connector such as
-`devcoop-trends` or `koica-reg-mcp` directly remains equally valid. Those are
-smaller install units for anyone who needs a single domain, and they work
-independently of this plugin.
+One gateway provides international aid and country data, Korean ODA project locations, KOICA regulations, and partner-country procurement information. Users do not need credentials.
 
 This repository contains no source-server implementation, deployment secret,
 private Git history, or local credential store. Its only runtime dependency is
@@ -121,7 +110,7 @@ If you don't see a tool call, check that the `oda-intelligence` connector is ena
 
 ## Tools
 
-The connector supplies reviewed read-only tools across five source domains. No tool
+The connector supplies reviewed read-only tools across four source domains. No tool
 writes to a source, and no tool takes a credential from the user.
 
 The four bundled Skills route most questions to the right tools on their own,
@@ -147,8 +136,8 @@ kind of question:
 | Skill | The questions it takes | Domains it draws on |
 |---|---|---|
 | `international-oda-data-lookup` | OECD DAC/DAC2A/CRS codes and statistics, IATI discovery, and correct separation of international-aid evidence | `international-data` plus the official OECD source when needed |
-| `korean-oda-portfolio-lookup` | What Korean agencies are doing in a country or around a named city, province, or district: place-linked documents and mapped projects, country project lists, agency and sector breakdowns, active or completed counts, project detail, and comparable projects | `development-documents` + `korean-oda-map` |
-| `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All five |
+| `korean-oda-portfolio-lookup` | What Korean agencies are doing in a country or around a named city, province, or district: mapped project locations, country project lists, agency and sector breakdowns, active or completed counts, project detail, and comparable projects | `korean-oda-map` |
+| `generate-development-country-report` | A written country report or aid-landscape review, priority-sector selection, participation routes, procurement entry, Go/No-Go risk | All four |
 | `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
 
 Four things make a prompt land:
@@ -235,14 +224,7 @@ value. The OECD observations in
 `country_report_context` are country-level DAC2A totals; donor, sector,
 channel, and activity-level CRS detail remains a separate query surface.
 
-An applied classification question that combines a country and project topic,
-such as "Which CRS code fits a solar project in Fiji?", does not start with the
-codelist. A country routes first through `search_offices_by_topic(country,
-query)`, a city, province, or district through `search_development_by_place`,
-and a named Korean project through its ODA Map detail. Only then does
-`dac_purpose_code_lookup` verify the candidate labels. The geographic and
-project evidence distinguishes candidates; it does not prove that an official
-CRS code was assigned to that activity.
+For an applied CRS classification, consult the project design or the ODA Map record of a named Korean project before checking candidate labels with `dac_purpose_code_lookup`.
 
 > How much international evidence is available for Myanmar right now, and what
 > does IATI hold for it?
@@ -293,65 +275,6 @@ drafted passage that cites regulations before the passage is circulated. The
 index follows official revisions on a sync cadence, so confirm a consequential
 conclusion against the current official source.
 
-### Development documents — `development-documents`
-
-Country-office development-cooperation documents and the relationships
-extracted from them — the content of the trend wiki, queryable without
-visiting the site. Corpora are per office. For a city, province, or district,
-`search_development_by_place` resolves the place first and returns related
-documents separately from projects placed there on the map. When you do not
-know which office carries a topic, `search_offices_by_topic` searches all 48
-corpora. The working order is place resolution or office discovery → search →
-document or project detail → relationship evidence.
-
-| Tool | What it returns | Inputs |
-|---|---|---|
-| `list_available_corpora` | Available public corpora and office jurisdictions, with article counts, document kinds, and covered countries | (none) |
-| `search_development_by_place` | Resolves an exact verified alias for a city, province, or district, then returns related documents (`knowledge_graph`) separately from projects placed there on the map (`map`). Same-named places return candidates and `requires_disambiguation` | **`place`**, `country`, `query`, `month_from`, `month_to`, `sector`, `kinds`, `limit` |
-| `search_offices_by_topic` | An office ranking across all 48 corpora — hit count and up to two evidence documents per office. `total_matches` states the corpus-wide count and `truncated_office_count` how many offices the cap dropped | **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit` |
-| `search_development_trends` | Discovery metadata and bounded summaries with the official original link per document. `total_matches` states the full count and `offset` pages past the first results | **`office`**, **`query`**, `country`, `sector`, `kinds`, `office_role`, `month_from`, `month_to`, `limit`, `offset` |
-| `get_trend_document` | One document's context by the `article_id` a search returned: metadata, official link, the relationships extracted from that document, and ten related trends and ten related projects — the lists its wiki page shows | **`office`**, **`document_id`** |
-| `get_corpus_overview` | Sector, month, kind, and organization document counts for an office corpus — the same aggregates the wiki catalog page shows. Organization counts are once per document | **`office`** |
-| `search_offices_by_entity` | An office ranking across all 48 corpora for one organisation — per-office relationship counts, leading relation types, and up to two sample relationships (no evidence sentences). Evidence-text search (`query`) stays office-level | **`entity`**, `relation_type`, `kinds`, `month_from`, `month_to`, `limit` |
-| `search_entity_relationships` | Who-works-with-whom: relations where the named organisation is source or target, each carrying its evidence sentence and source document. `total_matches` always states the full count | **`office`**, **`entity`**, `relation_type`, `month_from`, `month_to`, `kinds`, `query`, `limit` |
-
-> Show recent health documents connected to Vientiane and Korean ODA projects
-> placed at that location.
-
-```text
-search_development_by_place { "place": "Vientiane", "country": "Laos", "query": "health", "limit": 5 }
-get_trend_document          { "office": "<office from the document>", "document_id": "<article_id from the document>" }
-oda_map_project_detail      { "project_id": "<project_id from the mapped project>" }
-```
-
-When `requires_disambiguation` is `true`, do not merge the candidates or choose
-one silently. Retry the same place with the intended `country`.
-`knowledge_graph` is a document mention or a link through a mapped project
-name; `map` is project placement at the map location. Neither relation proves
-the other. Follow a material document with `get_trend_document`, using its
-returned `office` and `article_id`, and a material mapped project with
-`oda_map_project_detail`, using its `project_id`. For a current country total,
-status, budget, or exhaustive list, ignore the place-result count and use
-`oda_map_data_status` plus the country portfolio tools.
-
-> Which organisations does KOICA work with in Cambodia, and on what evidence?
-
-```text
-list_available_corpora      {}
-search_development_trends   { "office": "캄보디아", "query": "보건 분야 동향", "limit": 3 }
-get_trend_document          { "office": "캄보디아", "document_id": "<article_id from the search>" }
-search_entity_relationships { "office": "캄보디아", "entity": "KOICA", "limit": 10 }
-get_corpus_overview         { "office": "캄보디아" }
-```
-
-`office` takes a country name or slug (`캄보디아`, `cambodia`), `kinds` takes
-`trend` or `project`, and `office_role` distinguishes a host country from a
-concurrently accredited one. Relationship extraction is a signal, not a
-verified fact: every relation ships with its evidence document, so check the
-document before repeating the claim. Document identifiers are join keys for
-chaining these tools — cite a document in prose by its title, date, outlet,
-and official link, not by its raw identifier.
-
 ### Partner-country procurement — `partner-country-procurement`
 
 Three modelled axes per country: `bidding` (bidding rules), `governance`
@@ -383,7 +306,7 @@ enforced by the gateway, not by the client:
 
 | Parameter | Limit |
 |---|---|
-| `limit` | 10 for `search_regulation`; 20 for `find_references` and `search_development_trends`; 20 in each `knowledge_graph` and `map` branch of `search_development_by_place`; 20 offices for `search_offices_by_topic` and `search_offices_by_entity`; 50 for `search_entity_relationships`; 100 for `oda_map_projects` |
+| `limit` | `search_regulation` 10, `find_references` 20, `oda_map_projects` 100 |
 | `rows` | 20 for `iati_query_country` |
 | `sampleSize`, `sample_limit` | 10 |
 | `offset`, `start` | 10000 |
@@ -426,7 +349,6 @@ when this document falls behind.
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
 | `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `development-documents` | `list_available_corpora`, `search_development_by_place`, `search_offices_by_topic`, `search_offices_by_entity`, `search_development_trends`, `get_trend_document`, `get_corpus_overview`, `search_entity_relationships` | https://devcoop-trends-wiki.pages.dev |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
 `korean-oda-map` is an independent, unofficial compilation of Korean
@@ -453,22 +375,13 @@ unofficial map and name no agency as its publisher.
 | `acled` | https://acleddata.com |
 | `mofa_travel_alert` | https://www.0404.go.kr |
 
-Two tools sit in `international-data` without a source key. `country_list`
-returns office jurisdiction drawn from the development-document index, so
-attribute it to that index at https://devcoop-trends-wiki.pages.dev.
+`country_list` returns the bundled office registry and its reference date.
 `country_map_outline` names its own source: each response carries the public
 `datasets/geo-countries` GeoJSON address in its `source` field — currently
 https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
 — so cite that field, the way a procurement answer cites `model_url`.
 
-When a reader asks where the indexed text can be seen, answer with the address
-in the table above: the standalone distribution repository for the KOICA
-regulation index, the public wiki for the development-document corpus. A
-different public portal that resembles the source holds something else, so
-sending a reader anywhere other than the listed address costs them the check
-they were trying to make. Procurement is different:
-each model response carries its own `model_url`, so quote that field rather than
-a domain.
+For indexed KOICA regulations, cite the standalone regulation index. For procurement models, cite the returned `model_url`.
 
 `country_travel_alert` is approved on the contract, but the MOFA travel-alert
 service key is not configured on the public deployment, so `mofa_travel_alert`
@@ -483,12 +396,6 @@ source, not an absence of travel risk.
   한국국제협력단_정관 및 내부규정 on the Korean public data portal (no usage
   restrictions). Bulk export is still not offered: listings truncate to the
   response budget and state the true total.
-- Development-document tools expose corpus discovery, bounded summaries,
-  public original URLs, per-document context, and extracted relationships with
-  their evidence documents. The redistribution basis is the open-data release
-  한국국제협력단_국별 개발협력동향 on the Korean public data portal (no usage
-  restrictions). Complete document text lives at the official original link,
-  and wiki-internal paths and flags are stripped from public responses.
 - IATI and other international-source credentials are managed by the server
   and are never included in the plugin or returned to users.
 - Korean ODA Map tools can return the effective final coordinates already

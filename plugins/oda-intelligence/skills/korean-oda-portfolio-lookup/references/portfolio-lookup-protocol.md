@@ -6,15 +6,12 @@
 |---|---|---|
 | What Korean agencies fund and implement in a country | ODA Map | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` |
 | Project facts needed before classifying a named Korean activity | ODA Map, then the OECD codelist | `oda_map_data_status`, `oda_map_projects`, `oda_map_project_detail`, then `dac_purpose_code_lookup` |
-| Which documents mention a named place and which projects are mapped there | Development documents plus a dated map snapshot | `search_development_by_place` |
 | Comparable country-level ODA totals across donors | OECD DAC2A behind international data | `country_report_context` |
 | Multi-donor activity discovery | IATI | `iati_query_country` |
-| Responsible KOICA office and jurisdiction role | Development documents | `country_list` |
+| Responsible KOICA office and jurisdiction role | Country registry | `country_list` |
 | KOICA internal rules governing a procedure | Regulation index | `koica-regulation-research` Skill |
 
-The ODA Map row is the only row that answers a Korean project-inventory question. The place row is
-bounded discovery across two evidence branches, not an inventory, and the other rows cannot confirm
-or deny a Korean project.
+Use the ODA Map for Korean project inventory.
 
 For a CRS question about one named Korean project, preserve that same source order. Read the
 project's `description` and detail before looking up candidate codes. The map's sector label can
@@ -60,12 +57,8 @@ addresses for those domains:
 |---|---|---|
 | `korean-oda-map` | An independent, unofficial map of Korean development cooperation locations and its reviewed-correction layer. No agency published it | https://oda-map-lab.pages.dev |
 | `international-data` | IATI, World Bank, OECD, hazard, and humanitarian feeds, keyed per source below | Per source below |
-| `development-documents` | Indexed development cooperation documents | https://devcoop-trends-wiki.pages.dev |
 | `koica-regulations` | Indexed KOICA regulation text | https://github.com/amnotyoung/koica-reg-mcp |
 | `partner-country-procurement` | Partner-country procurement models | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
-
-`country_list` is tagged `international-data` but returns office jurisdiction drawn from the
-development-document index. Attribute it to that index at https://devcoop-trends-wiki.pages.dev.
 
 `country_data_status` and `country_report_context` return `sources[].source` keys inside the
 `international-data` domain. Attribute the key, not the domain:
@@ -103,36 +96,6 @@ Rules:
   compiler unnamed. It rests on Korean ODA project data, but it is an independent compilation that
   no agency published, and writing an agency name in front of it — `KOICA ...` — turns a private
   project into an official record the reader may go on to cite as one.
-
-## Place-first routing
-
-Use `search_development_by_place` before choosing an office corpus when the question starts from a
-city, province, state, county, or district. Pass the user's exact wording as `place`, plus any
-country, query, sector, month range, document kinds, and limit they supplied.
-
-1. Read `resolved_places` first. Resolution uses verified exact aliases, so an empty result is not
-   evidence that no document or project exists and is not permission to guess from a substring.
-2. If `requires_disambiguation` is true, preserve the candidate list. Use the country already given
-   by the user or ask which candidate is intended, then retry the same place search with `country`.
-   Never merge evidence from same-named places in different countries.
-3. Interpret `knowledge_graph` and `map` independently. A `knowledge_graph` document may mention the
-   place or be connected through a mapped project name; that is documentary linkage, not proof that
-   the activity occurred at the place. A `map` item is placed at the resolved map location; that is
-   location evidence, not proof that its document mentions the place.
-4. Follow a material `knowledge_graph.documents[]` result with `get_trend_document`, passing its
-   `office` and using its `article_id` as `document_id`. Follow a material `map.projects[]` result
-   with `oda_map_project_detail`, passing its `project_id`.
-5. The place tool applies `limit` separately to the document and map branches. Preserve each
-   branch's `total_matches`, filters, and caveat; never add the totals or present either as a unique
-   project count.
-6. For a current status, budget, country total, or exhaustive project list, move from place
-   discovery to `oda_map_data_status`, `oda_map_country_context`, and `oda_map_projects`. The map
-   branch is a dated, place-linked snapshot and cannot replace the country portfolio.
-
-Attribute the document branch to the development-document index and the map branch to `한국 ODA 사업
-위치 지도(비공식)`. Keep each document's public original URL separate from the map's public address.
-Report an observation date only when a follow-up source-status response actually provides one, and
-attribute that date to its source.
 
 ## The absence trap
 
@@ -212,7 +175,7 @@ Seven of the fourteen the schema allows are therefore absent by default — `des
 ## Filtering and paging
 
 - `country` is required on `oda_map_data_status`, `oda_map_country_context`, and
-  `oda_map_projects`. The place-discovery map branch is not a cross-country inventory, so a
+  `oda_map_projects`. A
   comparison, precedent, or benchmark question is answered by repeated per-country calls over a
   country set you chose — and the answer has to name that set. A bounded search reported without its
   boundary reads as an exhaustive one.
