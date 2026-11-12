@@ -291,7 +291,19 @@ export function validateSmokeCoverage(contract) {
     const hasExemption =
       typeof spec.smoke_exempt_reason === "string" &&
       spec.smoke_exempt_reason.length > 0;
-    if (hasArguments && hasExemption) {
+    const hasProjectSource = spec.smoke_project_from !== undefined;
+    if (hasProjectSource) {
+      if (
+        toolName !== "oda_map_project_detail" ||
+        spec.smoke_project_from !== "oda_map_projects" ||
+        typeof contract.tools.oda_map_projects?.smoke_arguments?.country !== "string"
+      ) {
+        failures.push(`${toolName}: smoke_project_from requires a country-scoped oda_map_projects smoke call`);
+      }
+      if (hasArguments || hasExemption) {
+        failures.push(`${toolName}: smoke_project_from must be the only smoke input mode`);
+      }
+    } else if (hasArguments && hasExemption) {
       failures.push(
         `${toolName}: smoke_arguments and smoke_exempt_reason are both set`,
       );
@@ -301,7 +313,7 @@ export function validateSmokeCoverage(contract) {
       );
     }
     if (spec.smoke_output_assertions !== undefined) {
-      if (!hasArguments) {
+      if (!hasArguments && !hasProjectSource) {
         failures.push(
           `${toolName}: smoke_output_assertions require smoke_arguments`,
         );
@@ -429,15 +441,37 @@ export function evaluateSmokeResults(results) {
 
 const SMOKE_CALL_TIMEOUT_MS = 240_000;
 
-async function smokeTools(client, contract) {
+export async function smokeTools(client, contract) {
   const results = [];
   // Sequential: the public gateway rate-limits per minute, and a burst of
   // parallel calls would report a limit breach as a broken tool.
-  for (const [toolName, spec] of Object.entries(contract.tools ?? {})) {
+  const entries = Object.entries(contract.tools ?? {});
+  // A list result must exist before a detail call, regardless of JSON key order.
+  const ordered = [
+    ...entries.filter(([, spec]) => !spec.smoke_project_from),
+    ...entries.filter(([, spec]) => spec.smoke_project_from),
+  ];
+  for (const [toolName, spec] of ordered) {
     if (spec.smoke_exempt_reason) continue;
     try {
+      let args = spec.smoke_arguments;
+      const assertions = [...(spec.smoke_output_assertions ?? [])];
+      if (spec.smoke_project_from) {
+        const source = results.find(({ tool }) => tool === spec.smoke_project_from);
+        const list = smokePayload(source?.result)?.data;
+        const projectId = list?.items?.[0]?.project_id;
+        if (source?.result?.isError || typeof projectId !== "string" || !projectId.trim()) {
+          throw new Error("oda_map_projects did not return a usable project_id");
+        }
+        args = {
+          country: contract.tools[spec.smoke_project_from].smoke_arguments.country,
+          project_id: projectId,
+        };
+        if (list.as_of) args.as_of = list.as_of;
+        assertions.push({ path: ["data", "item", "project_id"], equals: projectId });
+      }
       const result = await client.callTool(
-        { name: toolName, arguments: spec.smoke_arguments },
+        { name: toolName, arguments: args },
         undefined,
         // The country tools fan out to external APIs and answer in minutes on a
         // cold cache. The default 60s would report that as a broken tool.
@@ -446,7 +480,7 @@ async function smokeTools(client, contract) {
       results.push({
         tool: toolName,
         result,
-        assertions: spec.smoke_output_assertions ?? [],
+        assertions,
       });
     } catch (error) {
       results.push({
@@ -519,8 +553,9 @@ async function main() {
     const exempt = Object.entries(contract.tools).filter(
       ([, spec]) => spec.smoke_exempt_reason,
     );
+    const exemptNames = exempt.map(([name]) => name).join(", ");
     console.log(
-      `Smoke-called ${observed.smokeResults.length} tools; ${exempt.length} exempt (${exempt.map(([name]) => name).join(", ")}).`,
+      `Smoke-called ${observed.smokeResults.length} tools; ${exempt.length} exempt${exemptNames ? ` (${exemptNames})` : ""}.`,
     );
   }
 
