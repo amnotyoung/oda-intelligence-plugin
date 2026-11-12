@@ -309,6 +309,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 - 버전이 지정된 `v2` 엔드포인트는 승인된 도구 표면을 고정합니다. 도구 이름,
   필수 입력, 필수 출력, 읽기 전용 보장 및 노출 위험이 높아 금지된 도구는
   `contracts/gateway-contract.json`을 기준으로 검사합니다.
+- 일일 점검과 갱신 PR은 GitHub Actions 기본 토큰을 사용합니다. 점검 작업 안에서 게이트웨이를 조회하고 변경 패키지의 테스트·의존성 감사·버전 검사를 실행합니다.
 - 일일 워크플로는 도구 계약 hash가 완전히 동일할 때만 잠금 메타데이터 변경의
   patch 버전을 올리고 자동 생성 PR을 squash 병합합니다. 도구 schema·세부
   제약 hash가 바뀌면 PR을 열어 둔 채 사람 검토를 기다립니다.

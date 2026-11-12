@@ -320,6 +320,7 @@ enforced by the gateway, not by the client:
 - The versioned `v2` endpoint fixes the approved tool surface. Tool names,
   required inputs, required outputs, read-only guarantees, and forbidden
   high-exposure tools are checked against `contracts/gateway-contract.json`.
+- The daily check and its update PR use the built-in GitHub Actions token. The job checks the live gateway and runs package tests, a dependency audit, and a version check on changes.
 - A daily workflow auto-merges generated lock metadata updates only when the
   exact tool contract hashes stay unchanged. Tool schema/detail hash drift is
   left as an open pull request for human review.
