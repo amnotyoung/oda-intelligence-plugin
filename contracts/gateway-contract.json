@@ -105,6 +105,54 @@
         "countryCode": "VN"
       }
     },
+    "country_indicator_data_status": {
+      "allowed_required_inputs": [
+        "countryCode"
+      ],
+      "input_properties": {
+        "countryCode": "string",
+        "refresh": "boolean"
+      },
+      "output_required": [
+        "available_observation_count",
+        "catalog",
+        "caveats",
+        "country",
+        "data_status",
+        "error_indicator_count",
+        "generated_at",
+        "methodology_version",
+        "missing_is_zero",
+        "missing_observation_count",
+        "source_statuses",
+        "supported_indicator_count"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "NPL"
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "country",
+            "iso3"
+          ],
+          "equals": "NPL"
+        },
+        {
+          "path": [
+            "supported_indicator_count"
+          ],
+          "equals": 43
+        },
+        {
+          "path": [
+            "missing_is_zero"
+          ],
+          "equals": false
+        }
+      ]
+    },
     "country_list": {
       "allowed_required_inputs": [],
       "input_properties": {},
@@ -286,6 +334,63 @@
         "source": "인사규정",
         "label": "[별지 제1호 서식]"
       }
+    },
+    "get_country_indicator_snapshot": {
+      "allowed_required_inputs": [
+        "countryCode",
+        "indicatorIds"
+      ],
+      "input_properties": {
+        "countryCode": "string",
+        "indicatorIds": "array",
+        "refresh": "boolean"
+      },
+      "output_required": [
+        "catalog",
+        "caveats",
+        "country",
+        "data_status",
+        "error_count",
+        "generated_at",
+        "methodology_version",
+        "missing_count",
+        "missing_is_zero",
+        "observations",
+        "reported_count",
+        "requested_count",
+        "requested_indicator_ids",
+        "source_statuses"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "countryCode": "NPL",
+        "indicatorIds": [
+          "world_bank:EG.ELC.ACCS.ZS",
+          "who_gho:SDGHPVRECEIVED"
+        ]
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "requested_count"
+          ],
+          "equals": 2
+        },
+        {
+          "path": [
+            "observations"
+          ],
+          "array_contains": {
+            "indicator_id": "world_bank:EG.ELC.ACCS.ZS"
+          }
+        },
+        {
+          "path": [
+            "missing_is_zero"
+          ],
+          "equals": false
+        }
+      ]
     },
     "iati_query_country": {
       "allowed_required_inputs": [
@@ -641,6 +746,47 @@
       ],
       "read_only": true,
       "smoke_arguments": {}
+    },
+    "search_development_indicator_catalog": {
+      "allowed_required_inputs": [],
+      "input_properties": {
+        "query": "string",
+        "source": "string",
+        "limit": "integer"
+      },
+      "output_required": [
+        "catalog",
+        "caveats",
+        "has_more",
+        "indicators",
+        "missing_is_zero",
+        "query",
+        "returned",
+        "source",
+        "total_matches"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "query": "전력 접근",
+        "source": "world_bank",
+        "limit": 5
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "indicators"
+          ],
+          "array_contains": {
+            "indicator_id": "world_bank:EG.ELC.ACCS.ZS"
+          }
+        },
+        {
+          "path": [
+            "missing_is_zero"
+          ],
+          "equals": false
+        }
+      ]
     },
     "search_regulation": {
       "allowed_required_inputs": [
