@@ -185,6 +185,9 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 |---|---|---|
 | `dac_purpose_code_lookup` | OECD 공식 SDMX `CL_DAC_SECTOR`에서 3자리 DAC 분야와 5자리 CRS 목적코드, 부모관계, 코드목록 버전을 조회 | `code`, `query`, `includeChildren`, `limit`, `refresh` |
 | `country_data_status` | IATI·World Bank·OECD·재난·HAPI·UNHCR·WHO·ReliefWeb 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
+| `country_indicator_data_status` | 국가별 개발지표 가용성 및 출처별 조회 상태 | **`countryCode`** (ISO3) |
+| `search_development_indicator_catalog` | 세계은행 42개·WHO GHO 1개 지표에서 정의, 단위, 안정 ID 검색 | `query`, `source`, `limit` |
+| `get_country_indicator_snapshot` | 선택한 지표의 국가별 관측값·기준연도·단위·출처·결측 상태 | **`countryCode`** (ISO3), **`indicatorIds`** (최대 20개) |
 | `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_humanitarian_context` | HDX HAPI·UNHCR·WHO GHO의 정형 관측치와 ReliefWeb·World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_hazard_snapshot` | USGS·GDACS·NASA EONET 사건을 국가 경계로 거른 뒤 같은 유형·100㎞·48시간 기준으로 중복 제거한 결과 | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
@@ -332,7 +335,7 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 | 출처 도메인 | 도구 | 공개 주소 |
 |---|---|---|
 | `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
-| `international-data` | `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
+| `international-data` | `country_indicator_data_status`, `search_development_indicator_catalog`, `get_country_indicator_snapshot`, `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
 | `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
 | `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
 

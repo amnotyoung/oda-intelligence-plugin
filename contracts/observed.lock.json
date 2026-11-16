@@ -1,13 +1,14 @@
 {
   "gateway": {
-    "instructions_sha256": "a86d00e5d56f34ae4ae03ae704d38236c462f94fbcd71c2ea3f43d3ace280460",
+    "instructions_sha256": "ce51a817956b0d72c3626803558b275a7e20f2f9e3402fd0b8981379dae450f0",
     "server_name": "oda-intelligence",
-    "tool_count": 27,
+    "tool_count": 30,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
       "country_hazard_snapshot": "a2d5f4b9efce2bfe57125a8abedbb035a2da8cafb8e404efb289de82bafd71bc",
       "country_humanitarian_context": "431b43caf0126822d605cd8efd1a32a11000d00d9ac35cc13b1c622583a70ee1",
+      "country_indicator_data_status": "6be871a1b4b35666650056f748f1d9f7e5df5b33b12c583352749d866dfc8cce",
       "country_list": "08572a061dd3e66fa1e1b619bf7bca8a90f190777ed2289059c3e2c6d5e1bc5e",
       "country_map_outline": "d2524188225b838c8c4b489c5a9d0534fe09de80da00f17d4099968d641fd170",
       "country_report_context": "97f2d6591a21f7ca4fa8e67c004c3e5996993a51696bfe81e86b50f9a3dc0100",
@@ -16,6 +17,7 @@
       "find_references": "abe7ec531aa1b9bd1e436964848b326c354495b92099cdce0c64b387ae0765bd",
       "get_article": "180be0e725246bc99456185c7f6b4d64eade085f5782054039ccdaaa4f50a9c9",
       "get_attachment": "4948e143c9b8cbe27fc8f47b5140bd4a3955ad1e6caf808381ec5f2665a8e5ee",
+      "get_country_indicator_snapshot": "ba081413e0479d46ee4df489a051ecc18ffb18ac3e815f5d72b8f7337c037da9",
       "iati_query_country": "7f455b65afa584f8d46cd4317d536607d4dd91638332c1a1b852e27cc6cca5b9",
       "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
       "iati_test_connection": "8aa708a1fd1f8e53fa9713d35c95f7096b6c86742ed50f07d0b16fd9e1164027",
@@ -29,6 +31,7 @@
       "procurement_country_context": "75dbd248075263016de72629a0e1088fd8e6ba5ce8bfe330b8387863b65ea93e",
       "procurement_model_detail": "7c63760e34ce2e0844fba1cfb55b347052e9bc483b50ff010fb14a2849ed1e9a",
       "procurement_model_status": "05c19b7d709afc9bfa0ac85b0dbef0f9162c97366e122548e7b93b582c7cdf56",
+      "search_development_indicator_catalog": "bf341433d9e53b5e227008f143e089658ae2e3b7a4db466d159f08b975e9ff17",
       "search_regulation": "28c42340cf2725c6e305ba0e6779c0e5c1783722c06afe25cf82233f60f106f5",
       "verify_citation": "0fe87f9ee4bc2e15cd3abecfcb2e83d6f80d1df2aa13679b08b223bb7808e33e"
     },

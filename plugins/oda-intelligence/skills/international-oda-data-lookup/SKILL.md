@@ -1,6 +1,6 @@
 ---
 name: international-oda-data-lookup
-description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and project design and location evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, historical annual OECD CRS purpose-code assignments, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, and IATI discovery or filtering. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
+description: Answer targeted international ODA and development-finance questions using OECD DAC/DAC2A/CRS, IATI, World Bank, and project design and location evidence. Use for DAC or CRS purpose/sector code meanings and lists, applied code selection for a proposed or named project, a publisher's current IATI-reported sector, historical annual OECD CRS purpose-code assignments, evidence of an official OECD CRS submission for an existing project, recipient-country ODA totals, donor/sector/channel/activity detail, IATI discovery or filtering, and country development indicators from the World Bank and WHO GHO. When an applied classification question names a recipient country, subnational place, or project, gather that geography and project evidence before recommending a code. Do not use for standalone Korean agency project inventories, KOICA internal regulations, or a full country-report deliverable.
 ---
 
 # Look Up International ODA Data
@@ -34,6 +34,11 @@ design facts before the official code list can be interpreted.
    project/programme microdata (`MD_DIM=DD`), not an aggregate sector series. The gateway has no
    dedicated CRS detail query. An IATI sector does not by itself prove what was submitted to the OECD
    CRS database; do not substitute an IATI count or record for OECD CRS evidence.
+
+6. **Country development indicators** — call `country_indicator_data_status` for the country's ISO3
+   code, then `search_development_indicator_catalog` to resolve the requested measure. Pass the returned
+   stable IDs (up to 20) to `get_country_indicator_snapshot`. Report the source, unit and reference
+   year for each observation. Distinguish a reported zero from missing data or a provider error.
 
 If `dac_purpose_code_lookup` is absent from the current tool snapshot, explain that the gateway
 upgrade is not active in this conversation and use the official OECD API through an available web
