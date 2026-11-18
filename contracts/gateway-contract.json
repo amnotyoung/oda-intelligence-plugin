@@ -6,7 +6,17 @@
     "allow_additional_optional_inputs": true,
     "reject_new_required_inputs": true,
     "require_read_only": true,
-    "forbidden_tools": []
+    "forbidden_tools": [
+      "country_travel_alert",
+      "get_article",
+      "get_attachment",
+      "iati_query_country",
+      "iati_status",
+      "iati_test_connection",
+      "procurement_country_context",
+      "procurement_model_detail",
+      "procurement_model_status"
+    ]
   },
   "gateway": {
     "id": "oda-intelligence",
@@ -211,35 +221,6 @@
         "countryCode": "VN"
       }
     },
-    "country_travel_alert": {
-      "allowed_required_inputs": [
-        "countryCode"
-      ],
-      "input_properties": {
-        "countryCode": "string",
-        "refresh": "boolean"
-      },
-      "output_required": [
-        "alert_signal",
-        "alerts",
-        "caveats",
-        "country",
-        "data_status",
-        "generated_at",
-        "highest_alarm_label",
-        "highest_alarm_level",
-        "methodology_version",
-        "missing_is_zero",
-        "record_count",
-        "risk_judgement",
-        "risk_score",
-        "source_status"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "countryCode": "VN"
-      }
-    },
     "dac_purpose_code_lookup": {
       "allowed_required_inputs": [],
       "input_properties": {
@@ -299,42 +280,6 @@
         "article": "제30조"
       }
     },
-    "get_article": {
-      "allowed_required_inputs": [
-        "article",
-        "source"
-      ],
-      "input_properties": {
-        "article": "string",
-        "source": "string"
-      },
-      "output_required": [
-        "result"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "source": "대외무상협력사업에 관한 조달 및 계약규정",
-        "article": "제30조"
-      }
-    },
-    "get_attachment": {
-      "allowed_required_inputs": [
-        "label",
-        "source"
-      ],
-      "input_properties": {
-        "label": "string",
-        "source": "string"
-      },
-      "output_required": [
-        "result"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "source": "인사규정",
-        "label": "[별지 제1호 서식]"
-      }
-    },
     "get_country_indicator_snapshot": {
       "allowed_required_inputs": [
         "countryCode",
@@ -391,130 +336,6 @@
           "equals": false
         }
       ]
-    },
-    "iati_query_country": {
-      "allowed_required_inputs": [
-        "countryCode"
-      ],
-      "input_properties": {
-        "activityStatusCode": "string",
-        "collection": "string",
-        "countryCode": "string",
-        "fields": "array",
-        "iatiIdentifier": "string",
-        "lastUpdatedAfter": "string",
-        "reportingOrganisation": "string",
-        "rows": "integer",
-        "sectorCode": "string",
-        "start": "integer",
-        "startDate": "string",
-        "summary": "boolean"
-      },
-      "output_required": [
-        "caveats",
-        "collection",
-        "country_code",
-        "coverage",
-        "data",
-        "methodology_version",
-        "ok",
-        "returned",
-        "source",
-        "stale",
-        "start",
-        "status",
-        "summary",
-        "total_found"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "countryCode": "FJ",
-        "collection": "activity",
-        "iatiIdentifier": "KR-GOV-051-2021010100097",
-        "summary": false,
-        "rows": 1,
-        "fields": [
-          "iati_identifier",
-          "title_narrative",
-          "recipient_country_code",
-          "activity_sectors",
-          "activity_sectors_truncated",
-          "last_updated_datetime"
-        ]
-      },
-      "smoke_output_assertions": [
-        {
-          "path": [
-            "data",
-            0,
-            "title_narrative"
-          ],
-          "equals": "Fiji Agrophotovoltaic Program (GCF)"
-        },
-        {
-          "path": [
-            "data",
-            0,
-            "recipient_country_code"
-          ],
-          "equals": "FJ"
-        },
-        {
-          "path": [
-            "data",
-            0,
-            "iati_identifier"
-          ],
-          "equals": "KR-GOV-010-KR-GOV-051-2021010100097"
-        },
-        {
-          "path": [
-            "data",
-            0,
-            "activity_sectors"
-          ],
-          "array_contains": {
-            "code": "31120",
-            "vocabulary": "1",
-            "vocabulary_inferred": false
-          }
-        },
-        {
-          "path": [
-            "data",
-            0,
-            "activity_sectors_truncated"
-          ],
-          "equals": false
-        }
-      ]
-    },
-    "iati_status": {
-      "allowed_required_inputs": [],
-      "input_properties": {},
-      "output_required": [
-        "configured",
-        "credentialMode",
-        "nextStep",
-        "ok"
-      ],
-      "read_only": true,
-      "smoke_arguments": {}
-    },
-    "iati_test_connection": {
-      "allowed_required_inputs": [],
-      "input_properties": {},
-      "output_required": [
-        "countryCode",
-        "credentialMode",
-        "ok",
-        "returned",
-        "sampleIdentifier",
-        "testedAt",
-        "totalFound"
-      ],
-      "read_only": true,
-      "smoke_arguments": {}
     },
     "list_attachments": {
       "allowed_required_inputs": [],
@@ -692,61 +513,6 @@
         "breakdown": "sector"
       }
     },
-    "procurement_country_context": {
-      "allowed_required_inputs": [
-        "country"
-      ],
-      "input_properties": {
-        "country": "string"
-      },
-      "output_required": [
-        "caveats",
-        "country",
-        "dataset",
-        "models",
-        "status"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "country": "베트남"
-      }
-    },
-    "procurement_model_detail": {
-      "allowed_required_inputs": [
-        "axis",
-        "country"
-      ],
-      "input_properties": {
-        "axis": "string",
-        "country": "string"
-      },
-      "output_required": [
-        "axis",
-        "caveats",
-        "country",
-        "dataset",
-        "status"
-      ],
-      "read_only": true,
-      "smoke_arguments": {
-        "country": "베트남",
-        "axis": "bidding"
-      }
-    },
-    "procurement_model_status": {
-      "allowed_required_inputs": [],
-      "input_properties": {
-        "country": "string"
-      },
-      "output_required": [
-        "axes",
-        "caveats",
-        "dataset",
-        "status"
-      ],
-      "read_only": true,
-      "smoke_arguments": {}
-    },
     "search_development_indicator_catalog": {
       "allowed_required_inputs": [],
       "input_properties": {
@@ -823,6 +589,38 @@
       "smoke_arguments": {
         "text": "인사규정 제1조"
       }
+    },
+    "get_health_observation_by_year": {
+      "read_only": true,
+      "allowed_required_inputs": [
+        "country",
+        "indicator",
+        "year"
+      ],
+      "input_properties": {
+        "country": "string",
+        "indicator": "string",
+        "year": "integer"
+      },
+      "smoke_arguments": {
+        "country": "TLS",
+        "indicator": "WB:SH.DYN.NMRT",
+        "year": 2019
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "country"
+          ],
+          "equals": "TLS"
+        },
+        {
+          "path": [
+            "year"
+          ],
+          "equals": 2019
+        }
+      ]
     }
   }
 }
