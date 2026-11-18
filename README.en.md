@@ -12,7 +12,7 @@ gateway:
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
 
-One gateway provides international aid and country data, Korean ODA project locations, KOICA regulations, and partner-country procurement information. Users do not need credentials.
+One gateway provides international aid and country data, Korean ODA project locations, KOICA regulations, and development indicators. Users do not need credentials.
 
 This repository contains no source-server implementation, deployment secret,
 private Git history, or local credential store. Its only runtime dependency is
@@ -153,53 +153,15 @@ Open the `country_report_context` or `country_humanitarian_context` call from th
 
 If you don't see a tool call, check that the `oda-intelligence` connector is enabled in the plugin details, then try the question in a new conversation.
 
-## Tools
+## Public catalog of 22 tools
 
-The connector supplies reviewed read-only tools across four source domains. No tool
-writes to a source, and no tool takes a credential from the user.
+For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark credential-dependent feeds as disabled.
 
-The three bundled Skills route most questions to the right tools on their own,
-so a plain question usually needs no tool name. The tables below are for
-choosing a call deliberately, or for reading a call someone else made.
-
-Two habits decide whether an answer built on these tools holds up:
-
-- **Ask the status tool first.** `oda_map_data_status`,
-  `procurement_model_status`, `country_data_status`, and `iati_status` report
-  what each backend currently holds. An evidence tool called before them can
-  return a thin answer that looks complete.
-- **A missing source is not a zero.** `stale`, `no_data`, `disabled`, and
-  `error` each mean the evidence was not observed. None of them means the
-  quantity is zero or the risk is absent. Responses carry `missing_is_zero:
-  false` to say so.
-
-### Asking in plain language
-
-The Skills route on subject, not on tool name. Each one claims a different
-kind of question:
-
-| Skill | The questions it takes | Domains it draws on |
-|---|---|---|
-| `international-oda-data-lookup` | OECD DAC/DAC2A/CRS codes and statistics, IATI discovery, and correct separation of international-aid evidence | `international-data` plus the official OECD source when needed |
-| `korean-oda-portfolio-lookup` | What Korean agencies are doing in a country or around a named city, province, or district: mapped project locations, country project lists, agency and sector breakdowns, active or completed counts, project detail, and comparable projects | `korean-oda-map` |
-| `koica-regulation-research` | KOICA internal rules: personnel, leave, pay, promotion, discipline, organisation, accounting, contracts, procurement, audits, welfare, training | `koica-regulations` |
-
-Four things make a prompt land:
-
-- **Name the country or place.** Korean and English both resolve — `미얀마`,
-  `Myanmar`, `비엔티안`, or `Vientiane`. Add the country for an ambiguous place;
-  procurement also accepts `nepal` or `NPL`.
-- **Give the as-of date** when a count has to be reproducible. Project status
-  is recomputed per call, so "as of 2026-03-31" pins it.
-- **Say what the answer is for** — a report, a slide, a decision memo. It
-  decides how much evidence is worth pulling.
-- **Ask for the citation check by name** when a passage cites regulations.
-  "인용한 조문을 검증해줘" runs `verify_citation` over the draft, which is what
-  catches an article that does not exist.
-
-Each domain below pairs a prompt with the calls it usually resolves to. The
-model chooses the calls, so read the sequences as the typical resolution
-rather than a guarantee.
+- **Development and health indicators** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
+- **Korean project map** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
+- **OECD development finance** · `dac_purpose_code_lookup`, `oecd_crs_query_country`
+- **Country, hazard and humanitarian context** · `country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_list`, `country_map_outline`, `country_report_context`
+- **KOICA regulations** · `compliance_radar`, `find_references`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
 
 ### Korean ODA projects — `korean-oda-map`
 
@@ -228,9 +190,6 @@ to the date it was computed for.
 
 ### International context — `international-data`
 
-Country context assembled from international sources. `country_data_status`
-reports freshness per source key, so read it before quoting any figure.
-
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `dac_purpose_code_lookup` | Official OECD SDMX `CL_DAC_SECTOR` entries: 3-digit DAC sectors, 5-digit CRS purpose codes, parent relationships, and codelist version | `code`, `query`, `includeChildren`, `limit`, `refresh` |
@@ -241,127 +200,19 @@ reports freshness per source key, so read it before quoting any figure.
 | `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_humanitarian_context` | Structured HDX HAPI, UNHCR, and WHO GHO observations, plus recent ReliefWeb and World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_hazard_snapshot` | USGS, GDACS, and NASA EONET events clipped to the country boundary, de-duplicated by same type within 100 km and 48 hours | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
-| `country_travel_alert` | MOFA travel-alert levels for Korean nationals — safety information, not a feasibility judgement. Disabled on the public deployment; see below | **`countryCode`**, `refresh` |
 | `country_list` | KOICA overseas-office host and concurrent countries with ISO codes, responsible office, and jurisdiction role | (none) |
 | `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** |
-| `iati_query_country` | IATI activities, transactions, or budgets. An identifier-scoped single-activity match returns `activity_sectors` with code, vocabulary, percentage, and label associations preserved plus `activity_sectors_truncated`; `summary: false` returns detailed records | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
-| `iati_status` | Whether the server's IATI lookup is configured. Returns no credential value or storage location | (none) |
-| `iati_test_connection` | Fetches one Myanmar activity with the server-held credential to test the connection. Prints no credential | (none) |
-
-`dac_purpose_code_lookup` reads the official OECD API codelist. If an older
-conversation's tool snapshot does not show it yet, start a new conversation;
-the Skill checks the official OECD API directly in the meantime.
-`iati_query_country.sectorCode` only applies an already verified three- to
-five-digit code to country-level IATI records. It is an exact filter, so `311`
-does not match `31120`. To verify a publisher's current IATI value, pass a
-verified project identifier, require one match, verify the returned canonical
-`iati_identifier`, and read `activity_sectors` plus `activity_sectors_truncated`. Remove only a literal ODA Map
-`iati:` namespace; never synthesize another prefix. A true truncation flag means the list is partial. An empty `activity_sectors`
-array requires a transaction-level check because IATI permits sector reporting
-at either level. This current IATI value does not by itself prove an OECD CRS
-submission or the first historical submission. For earlier reported codes, the
-Skill does not infer history from an IATI update
-timestamp. It narrows official OECD `DSD_CRS@DF_CRS` project/programme microdata
-(`MD_DIM=DD`) by provider, recipient, and year; verifies `DONOR_PROJECT_ID` against
-the title and agency; and compares distinct `SECTOR` values by `TIME_PERIOD`.
-Commitment/disbursement and current/constant-price rows are collapsed instead of
-being counted as code changes. This is official annual OECD CRS evidence, not an
-IATI XML revision log, and `NATURE_OF_SUBMISSION=2` does not reveal the superseded
-value. The OECD observations in
-`country_report_context` are country-level DAC2A totals; donor, sector,
-channel, and activity-level CRS detail remains a separate query surface.
-
-For an applied CRS classification, consult the project design or the ODA Map record of a named Korean project before checking candidate labels with `dac_purpose_code_lookup`.
-
-> How much international evidence is available for Myanmar right now, and what
-> does IATI hold for it?
-
-```text
-country_data_status    { "countryCode": "MM" }
-country_report_context { "countryCode": "MM", "sampleSize": 3 }
-iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 3 }
-```
-
-`countryCode` is ISO alpha-2 (Myanmar is `MM`), and `collection` is
-`activity`, `transaction`, or `budget`.
 
 ### KOICA regulations — `koica-regulations`
-
-Search, full text, cross-references, and citation checking over the KOICA
-regulation index — the same tool surface as the standalone `koica-reg-mcp`
-public deployment. The regulation text is openly released on the Korean
-public data portal (한국국제협력단_정관 및 내부규정, no usage restrictions),
-which is the redistribution basis for serving it here in full. The working
-order is discovery → full text → citation check.
 
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `search_regulation` | Regulation metadata and article snippets with a relevance score. `include_attachments: true` searches annex tables and forms (별표·별지) too, and `mode` picks hybrid (default), keyword, or semantic retrieval | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
-| `get_article` | The complete text of one article, selected by regulation name and article number. Main-body articles win over supplementary (부칙) duplicates | **`source`**, **`article`** |
 | `list_sources` | The indexed current regulations with category, revision date, and article count | `category` |
 | `list_attachments` | The annex/form index (별표·별지) with titles and excerpts, filterable by regulation, category, and kind. Truncates to the response budget; `total` always states the true count | `source`, `category`, `kind`, `include_deleted` |
-| `get_attachment` | The complete text of one annex table or form, selected by regulation name and label (`"별표 1"`, `"별지 제3호 서식"` — free form) | **`source`**, **`label`** |
 | `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. `include_mermaid: true` adds a flowchart of the graph. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | Revision-lag radar: flags implementation rules and guidelines whose parent regulation was revised more recently (`review_needed` / `ok` / `unknown` / `no_parent`) | `source` |
 | `verify_citation` | Cross-checks every `{regulation} 제N조` citation in a text against the index and marks each `ok`, `not_found`, or `unknown_source` | **`text`** |
-
-> How many days of annual leave can staff take, and which article says so —
-> quote the full article.
-
-```text
-search_regulation { "query": "연차휴가", "limit": 3 }
-get_article       { "source": "복무규정", "article": "제24조" }
-get_attachment    { "source": "복무규정", "label": "별표 1" }
-find_references   { "source": "직제규정", "article": "제9조" }
-verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
-```
-
-`verify_citation` is the guard against invented articles: the citation above
-comes back `not_found`, because 인사규정 has no 제9999조. Run it over any
-drafted passage that cites regulations before the passage is circulated. The
-index follows official revisions on a sync cadence, so confirm a consequential
-conclusion against the current official source.
-
-### Partner-country procurement — `partner-country-procurement`
-
-Three modelled axes per country: `bidding` (bidding rules), `governance`
-(procurement governance), and `pipeline` (ODA project formation). Check which
-axes exist before citing procurement.
-
-| Tool | What it returns | Inputs |
-|---|---|---|
-| `procurement_model_status` | Which axes are modelled for a country and their verification state | `country` |
-| `procurement_country_context` | Report-ready summary of the axes: authorities, procedural stages, bottlenecks, entry barriers. No full process graph | **`country`** |
-| `procurement_model_detail` | One country and one axis in full: canvas, process graph (lanes, stages, nodes, edges), and verification sources | **`country`**, **`axis`** |
-
-> Walk me through how an ODA project is formed in Nepal and where it
-> bottlenecks.
-
-```text
-procurement_model_status { "country": "네팔" }
-procurement_model_detail { "country": "네팔", "axis": "pipeline" }
-```
-
-`country` accepts a slug, ISO3 code, Korean name, or English name (`nepal`,
-`NPL`, `네팔`, `Nepal`). An absent model means the axis has not been modelled,
-not that the partner country lacks a formal procedure.
-
-### Public profile limits
-
-The public profile caps result size and withholds some fields. These are
-enforced by the gateway, not by the client:
-
-| Parameter | Limit |
-|---|---|
-| `limit` | `search_regulation` 10, `find_references` 20, `oda_map_projects` 100 |
-| `rows` | 20 for `iati_query_country` |
-| `sampleSize`, `sample_limit` | 10 |
-| `offset`, `start` | 10000 |
-| `fields` | Only the values listed in each tool's schema |
-| `refresh` | Ignored — the profile serves server-managed caches |
-| `includeEvents` | At most 200 events; `record_count` still states the true total |
-| `list_attachments` result | Truncated to the response budget; `total` always states the true count and a caveat names the narrower filters |
-| `oda_map_projects` items | Heavy field combinations (all fields + coordinates) truncate to the response budget; `returned` and `has_more` stay coherent for paging and a caveat states the drop. Compact default pages return in full |
 
 ## Controlled updates
 
@@ -378,75 +229,6 @@ enforced by the gateway, not by the client:
 - Skill routing and accepted contract changes require a versioned plugin
   update; installed caches still need a marketplace upgrade and a new
   conversation.
-
-## Data sources and attribution
-
-Each gateway tool declares its source domain in its description as
-`[Source: ...]`. An answer names the source it rests on and gives that source's
-public address, so a reader can open the evidence instead of taking the answer
-on trust.
-
-Source status entries carry a `public_url` field. Prefer it over the tables
-below: it is what the gateway declares for that source, and it stays correct
-when this document falls behind.
-
-| Source domain | Tools | Public address |
-|---|---|---|
-| `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
-| `international-data` | `country_indicator_data_status`, `search_development_indicator_catalog`, `get_country_indicator_snapshot`, `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | Per source key below |
-| `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
-
-`korean-oda-map` is an independent, unofficial compilation of Korean
-development cooperation locations. It rests on Korean ODA project data, but no
-agency published it and it carries no agency's endorsement. Cite it as an
-unofficial map and name no agency as its publisher.
-
-`country_data_status` reports freshness per source key within
-`international-data`. Attribute the key rather than the domain:
-
-| Source key | Public address |
-|---|---|
-| `iati` | https://d-portal.org |
-| `oecd` | https://data-explorer.oecd.org |
-| `world_bank` | https://data.worldbank.org |
-| `world_bank_documents` | https://documents.worldbank.org |
-| `unhcr` | https://www.unhcr.org/refugee-statistics/ |
-| `who_gho` | https://www.who.int/data/gho |
-| `reliefweb` | https://reliefweb.int |
-| `hdx_hapi` | https://hapi.humdata.org |
-| `usgs` | https://earthquake.usgs.gov |
-| `gdacs` | https://www.gdacs.org |
-| `eonet` | https://eonet.gsfc.nasa.gov |
-| `acled` | https://acleddata.com |
-| `mofa_travel_alert` | https://www.0404.go.kr |
-
-`country_list` returns the bundled office registry and its reference date.
-`country_map_outline` names its own source: each response carries the public
-`datasets/geo-countries` GeoJSON address in its `source` field — currently
-https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
-— so cite that field, the way a procurement answer cites `model_url`.
-
-For indexed KOICA regulations, cite the standalone regulation index. For procurement models, cite the returned `model_url`.
-
-`country_travel_alert` is approved on the contract, but the MOFA travel-alert
-service key is not configured on the public deployment, so `mofa_travel_alert`
-reports `disabled` and the tool returns no alert level. That is a disabled
-source, not an absence of travel risk.
-
-## Public content boundary
-
-- KOICA regulation tools expose search, complete article text, complete
-  annex/form text (별표·별지), cross-references, a revision-lag radar, and
-  citation verification. The redistribution basis is the open-data release
-  한국국제협력단_정관 및 내부규정 on the Korean public data portal (no usage
-  restrictions). Bulk export is still not offered: listings truncate to the
-  response budget and state the true total.
-- IATI and other international-source credentials are managed by the server
-  and are never included in the plugin or returned to users.
-- Korean ODA Map tools can return the effective final coordinates already
-  shown on the public map. Coordinate provenance and scope must be retained;
-  pre-correction coordinates, review history, and submitter data are excluded.
 
 ## Data-use notice
 

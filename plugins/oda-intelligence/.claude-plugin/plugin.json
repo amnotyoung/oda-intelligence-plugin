@@ -3,7 +3,7 @@
   "name": "oda-intelligence",
   "displayName": "ODA Intelligence",
   "version": "0.2.37",
-  "description": "Evidence-based development cooperation research across international aid, Korean projects, procurement, and KOICA regulations.",
+  "description": "Evidence-based development cooperation research across international aid, Korean projects, health indicators, and KOICA regulations.",
   "author": {
     "name": "amnotyoung",
     "url": "https://github.com/amnotyoung"
@@ -14,7 +14,7 @@
   "keywords": [
     "ODA",
     "development-cooperation",
-    "IATI",
+    "WHO",
     "KOICA",
     "MCP"
   ]
