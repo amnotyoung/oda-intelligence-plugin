@@ -1,8 +1,10 @@
 {
+  "schema_version": 1,
   "gateway": {
-    "instructions_sha256": "ce51a817956b0d72c3626803558b275a7e20f2f9e3402fd0b8981379dae450f0",
+    "url": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp",
     "server_name": "oda-intelligence",
-    "tool_count": 30,
+    "instructions_sha256": "959489f56ea802ddfc7d4ac80e96b7d1322425e7f110ce623444d90da0c06d57",
+    "tool_count": 22,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
       "country_data_status": "65c2a87982b16efb20def1858d12313063834957f8d0db2630eded5803990552",
@@ -12,15 +14,10 @@
       "country_list": "08572a061dd3e66fa1e1b619bf7bca8a90f190777ed2289059c3e2c6d5e1bc5e",
       "country_map_outline": "d2524188225b838c8c4b489c5a9d0534fe09de80da00f17d4099968d641fd170",
       "country_report_context": "97f2d6591a21f7ca4fa8e67c004c3e5996993a51696bfe81e86b50f9a3dc0100",
-      "country_travel_alert": "a9503e88d9b57bbe6220181fc1e628091c0f4e06359d9ab4864ccc1f11d7bcad",
       "dac_purpose_code_lookup": "429bbc904fb4674b82bd7d987268ebae4cc3e99cacad5baa4e71d4ab67f2aef2",
       "find_references": "abe7ec531aa1b9bd1e436964848b326c354495b92099cdce0c64b387ae0765bd",
-      "get_article": "180be0e725246bc99456185c7f6b4d64eade085f5782054039ccdaaa4f50a9c9",
-      "get_attachment": "4948e143c9b8cbe27fc8f47b5140bd4a3955ad1e6caf808381ec5f2665a8e5ee",
       "get_country_indicator_snapshot": "ba081413e0479d46ee4df489a051ecc18ffb18ac3e815f5d72b8f7337c037da9",
-      "iati_query_country": "7f455b65afa584f8d46cd4317d536607d4dd91638332c1a1b852e27cc6cca5b9",
-      "iati_status": "b4405f1b10c04d75023baba25f55c5de268ffef8db6848337ab9c00f5224af9d",
-      "iati_test_connection": "8aa708a1fd1f8e53fa9713d35c95f7096b6c86742ed50f07d0b16fd9e1164027",
+      "get_health_observation_by_year": "db665671334b814ae494414d2477ec2544a5751ba2a7e46afb5616ffb3e5a939",
       "list_attachments": "9d8e56ce8a5cc55b2ef7d604a05f0ec7cfd1d0ea830bd2d4e9ecdfdfa1aeb267",
       "list_sources": "ff0afbed7f4288f16444883cd57b8eca75882a8cea307c107fe2f9dd93fbde52",
       "oda_map_country_context": "1888560230094110e23bb42bc2f6b1cf3f46567fe7b9a9f41d7064df1ee429ca",
@@ -28,14 +25,9 @@
       "oda_map_project_detail": "8599e3b9c4875e447743b8514f7e51c6fa96244b3c4c520730f060ffcb3770f9",
       "oda_map_projects": "46869df16ee7d724eeb826cad5f28f6b2a89bf8a1701321836cd9b0c5a0a6f76",
       "oecd_crs_query_country": "d67bd0db5b773046d4d69cc4366116a8e58bd9b7f6fb3bcccc8e4289827beb4e",
-      "procurement_country_context": "75dbd248075263016de72629a0e1088fd8e6ba5ce8bfe330b8387863b65ea93e",
-      "procurement_model_detail": "7c63760e34ce2e0844fba1cfb55b347052e9bc483b50ff010fb14a2849ed1e9a",
-      "procurement_model_status": "05c19b7d709afc9bfa0ac85b0dbef0f9162c97366e122548e7b93b582c7cdf56",
       "search_development_indicator_catalog": "bf341433d9e53b5e227008f143e089658ae2e3b7a4db466d159f08b975e9ff17",
       "search_regulation": "28c42340cf2725c6e305ba0e6779c0e5c1783722c06afe25cf82233f60f106f5",
       "verify_citation": "0fe87f9ee4bc2e15cd3abecfcb2e83d6f80d1df2aa13679b08b223bb7808e33e"
-    },
-    "url": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
-  },
-  "schema_version": 1
+    }
+  }
 }

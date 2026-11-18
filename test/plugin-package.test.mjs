@@ -172,10 +172,7 @@ test("standalone DAC and CRS questions route away from KOICA regulations", async
     gatewayContract.tools.dac_purpose_code_lookup.smoke_arguments,
     { code: "311" },
   );
-  assert.deepEqual(
-    gatewayContract.tools.iati_query_country.allowed_required_inputs,
-    ["countryCode"],
-  );
+  assert.ok(!gatewayContract.tools.iati_query_country);
 });
 
 test("named-geography project questions gather local evidence before DAC and CRS classification", async () => {
@@ -221,11 +218,9 @@ test("named-geography project questions gather local evidence before DAC and CRS
   assert.match(section, /피지에서 태양광 사업[\s\S]+CRS 코드/u);
   assert.ok(section.indexOf("`oda_map_project_detail`") < section.indexOf("`dac_purpose_code_lookup`"));
   assert.match(section, /neither a country nor an identifier[\s\S]+ask for the recipient country/u);
-  assert.match(section, /actually reported under in IATI[\s\S]+`activity_sectors`/u);
   assert.match(section, /literal leading `iati:`[\s\S]+never synthesize/u);
-  assert.match(section, /`total_found: 1`[\s\S]+canonical `iati_identifier`/u);
   assert.match(section, /named non-Korean activity[\s\S]+publisher's public IATI record/u);
-  assert.match(section, /`activity_sectors`/u);
+  assert.match(section, /transaction-level sector elements/u);
   assert.match(
     section,
     /publisher's public IATI XML or d-portal activity\s+HTML\/XML/u,
@@ -263,31 +258,9 @@ test("reported sectors distinguish current IATI evidence from OECD CRS submissio
   );
 
   assert.match(internationalSkill, /publisher's current IATI-reported sector/u);
-  assert.match(internationalSkill, /`311` does not match `31120`/u);
-  assert.match(
-    internationalSkill,
-    /present empty\s+array[\s\S]+structured current activity record was read/u,
-  );
-  assert.match(
-    internationalSkill,
-    /empty\s+`activity_sectors`[\s\S]+transaction-level check/u,
-  );
-  assert.match(
-    internationalSkill,
-    /current IATI-reported activity or transaction sector[\s\S]+official OECD/u,
-  );
-  assert.match(
-    internationalSkill,
-    /every vocabulary `1` sector and its percentage[\s\S]+`vocabulary_inferred`/u,
-  );
-  assert.match(
-    internationalSkill,
-    /`activity_sectors_truncated` is true[\s\S]+partial/u,
-  );
-  assert.match(
-    internationalSkill,
-    /`transaction_sector_code` alone[\s\S]+must never be labelled CRS/u,
-  );
+  assert.match(internationalSkill, /publisher's public IATI XML/u);
+  assert.match(internationalSkill, /transaction-level sector elements/u);
+  assert.doesNotMatch(internationalSkill, /`iati_query_country`|`iati_status`/u);
   assert.match(internationalAgent, /current IATI-reported sector[\s\S]+official OECD CRS/u);
 });
 
@@ -501,9 +474,9 @@ test("public text contains no local path or unrelated owner repository URL", asy
   }
 });
 
-test("minimal accepted gateway contract contains 30 approved read-only tools", async () => {
+test("minimal accepted gateway contract contains 22 approved read-only tools", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
-  assert.equal(Object.keys(contract.tools).length, 30);
+  assert.equal(Object.keys(contract.tools).length, 22);
   assert.ok(Object.values(contract.tools).every((tool) => tool.read_only));
   assert.equal(contract.gateway.url, gatewayUrl);
   // KOICA 규정 도구 4종은 v2 표면에 공개되었다. 규정 텍스트는 공공데이터포털
@@ -513,23 +486,22 @@ test("minimal accepted gateway contract contains 30 approved read-only tools", a
     "search_development_indicator_catalog",
     "get_country_indicator_snapshot",
     "compliance_radar",
-    "get_article",
-    "get_attachment",
+    "get_health_observation_by_year",
     "list_attachments",
     "dac_purpose_code_lookup",
   ]) {
     assert.ok(opened in contract.tools, `${opened} must be an approved tool`);
   }
-  assert.deepEqual(contract.compatibility_policy.forbidden_tools, []);
+  for (const removed of contract.compatibility_policy.forbidden_tools) assert.ok(!contract.tools[removed]);
 });
 
-test("observed lock pins exactly the 30 approved tool definitions", async () => {
+test("observed lock pins exactly the 22 approved tool definitions", async () => {
   const contract = await readJson("contracts", "gateway-contract.json");
   const lock = await readJson("contracts", "observed.lock.json");
   assert.equal(lock.schema_version, 1);
   assert.equal(lock.gateway.url, gatewayUrl);
   assert.equal(lock.gateway.server_name, "oda-intelligence");
-  assert.equal(lock.gateway.tool_count, 30);
+  assert.equal(lock.gateway.tool_count, 22);
   assert.deepEqual(
     Object.keys(lock.gateway.tools).toSorted(),
     Object.keys(contract.tools).toSorted(),

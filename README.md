@@ -11,7 +11,7 @@
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
 
-게이트웨이 한 개에서 국제원조·국가 현황, 한국 ODA 사업 지도, KOICA 규정, 협력국 조달제도를 조회합니다. 사용자 인증은 필요하지 않습니다.
+게이트웨이 한 개에서 국제원조·국가 현황, 한국 ODA 사업 지도, KOICA 규정 및 개발지표를 조회합니다. 사용자 인증은 필요하지 않습니다.
 
 이 저장소에는 서버 구현 소스, 배포 비밀 정보, 비공개 Git 기록 또는 로컬 인증
 정보 저장소가 포함되어 있지 않습니다. 유일한 런타임 의존성은 공개 MCP
@@ -104,52 +104,15 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 호출 내역이 보이지 않으면 플러그인 상세에서 `oda-intelligence` 커넥터가 활성화되어 있는지 확인한 뒤 새 대화에서 다시 질문하세요.
 
-## 도구
+## 공개 도구 22개
 
-커넥터는 네 개 출처 도메인에 걸쳐 검토된 읽기 전용 도구를 제공합니다. 출처에
-쓰기를 수행하는 도구는 없으며, 사용자에게 인증 정보를 요구하는 도구도 없습니다.
+특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회는 개인 키가 필요한 자료원을 비활성으로 표시합니다.
 
-번들로 제공되는 Skill 세 개가 대부분의 질문을 알맞은 도구로 연결하므로, 평범한
-질문에는 도구 이름을 댈 필요가 없습니다. 아래 표는 호출을 직접 고르거나, 남이
-만든 호출을 읽을 때 쓰는 자료입니다.
-
-이 도구들로 만든 답변이 버티려면 두 가지 습관이 필요합니다.
-
-- **상태 도구를 먼저 호출합니다.** `oda_map_data_status`,
-  `procurement_model_status`, `country_data_status`, `iati_status`는 각 백엔드가
-  지금 무엇을 보유하고 있는지 보고합니다. 이를 건너뛰고 근거 도구를 부르면
-  빈약한 응답을 완결된 답으로 오해하기 쉽습니다.
-- **결측은 0이 아닙니다.** `stale`, `no_data`, `disabled`, `error`는 모두 근거를
-  관측하지 못했다는 뜻입니다. 수치가 0이라거나 위험이 없다는 뜻이 아닙니다.
-  응답에 실리는 `missing_is_zero: false`가 그것을 명시합니다.
-
-### 자연어로 묻기
-
-Skill은 도구 이름이 아니라 주제로 라우팅합니다. 세 Skill이 각각 다른 종류의
-질문을 맡습니다.
-
-| Skill | 맡는 질문 | 사용하는 도메인 |
-|---|---|---|
-| `international-oda-data-lookup` | OECD DAC/DAC2A/CRS 코드·통계, IATI 활동 탐색, 국제 원조 근거의 구분과 검증 | `international-data` + 필요한 경우 OECD 공식 원문 |
-| `korean-oda-portfolio-lookup` | 한국 기관이 한 국가 또는 특정 도시·주·군에서 무엇을 하고 있는지 — 사업별 지도 위치, 국가 사업 목록, 기관·분야별 분포, 진행·종료 건수, 개별 사업 상세, 특정 사업과 비슷한 사업 찾기 | `korean-oda-map` |
-| `koica-regulation-research` | KOICA 내부 규정 — 인사, 휴가, 보수, 승진, 징계, 조직, 회계, 계약, 조달, 감사, 복리후생, 연수 | `koica-regulations` |
-
-프롬프트를 쓸 때 다음 네 가지가 결과를 좌우합니다.
-
-- **국가명이나 지명을 밝힙니다.** 한국어와 영문이 모두 해석됩니다(`미얀마`,
-  `Myanmar`, `비엔티안`, `Vientiane`). 동명이의 지명은 국가를 함께 적어야 하며,
-  조달은 `nepal`, `NPL` 같은 slug·ISO3 코드도 받습니다.
-- **기준일을 지정합니다.** 건수를 재현해야 할 때 필요합니다. 사업 상태는 호출할
-  때마다 다시 계산되므로 "2026-03-31 기준으로"라고 못 박아야 고정됩니다.
-- **무엇에 쓸 답인지 말합니다.** 보고서인지, 슬라이드인지, 의사결정 메모인지에
-  따라 끌어올 근거의 양이 달라집니다.
-- **인용 검증을 직접 요청합니다.** 규정을 인용한 문단이라면 "인용한 조문을
-  검증해줘"라고 덧붙이면 `verify_citation`이 초안을 훑어 존재하지 않는 조문을
-  잡아냅니다.
-
-아래 각 도메인에는 프롬프트와, 그 프롬프트가 대체로 풀려 나가는 호출을 함께
-싣습니다. 호출을 고르는 것은 모델이므로 보장된 순서가 아니라 통상적인 해석으로
-읽으세요.
+- **개발지표와 보건통계** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
+- **한국 ODA 지도** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
+- **OECD 개발재원** · `dac_purpose_code_lookup`, `oecd_crs_query_country`
+- **국가·재난·인도지원** · `country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_list`, `country_map_outline`, `country_report_context`
+- **KOICA 규정** · `compliance_radar`, `find_references`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
 
 ### 한국 ODA 사업 — `korean-oda-map`
 
@@ -178,132 +141,29 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 
 ### 국제 현황 — `international-data`
 
-국제 출처에서 모은 국가 현황입니다. `country_data_status`가 출처 키별로 최신성을
-보고하므로, 어떤 수치든 인용하기 전에 먼저 확인하세요.
-
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `dac_purpose_code_lookup` | OECD 공식 SDMX `CL_DAC_SECTOR`에서 3자리 DAC 분야와 5자리 CRS 목적코드, 부모관계, 코드목록 버전을 조회 | `code`, `query`, `includeChildren`, `limit`, `refresh` |
-| `country_data_status` | IATI·World Bank·OECD·재난·HAPI·UNHCR·WHO·ReliefWeb 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
+| `country_data_status` | World Bank·OECD·재난·UNHCR·WHO 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
 | `country_indicator_data_status` | 국가별 개발지표 가용성 및 출처별 조회 상태 | **`countryCode`** (ISO3) |
 | `search_development_indicator_catalog` | 세계은행 42개·WHO GHO 1개 지표에서 정의, 단위, 안정 ID 검색 | `query`, `source`, `limit` |
 | `get_country_indicator_snapshot` | 선택한 지표의 국가별 관측값·기준연도·단위·출처·결측 상태 | **`countryCode`** (ISO3), **`indicatorIds`** (최대 20개) |
 | `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_humanitarian_context` | HDX HAPI·UNHCR·WHO GHO의 정형 관측치와 ReliefWeb·World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | UNHCR·WHO GHO의 관측치와 World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_hazard_snapshot` | USGS·GDACS·NASA EONET 사건을 국가 경계로 거른 뒤 같은 유형·100㎞·48시간 기준으로 중복 제거한 결과 | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
-| `country_travel_alert` | 외교부 여행경보 단계. 대한민국 국민 대상 안전 정보이며 사업 타당성 평가가 아닙니다. 공개 배포에서는 비활성 상태입니다(아래 참조) | **`countryCode`**, `refresh` |
 | `country_list` | KOICA 해외사무소 소재국·겸임국을 ISO 코드, 담당 사무소, 관할 역할과 함께 반환 | (없음) |
 | `country_map_outline` | 보고서 배경용 단순화 국가 윤곽선. 사업 위치를 얹을 지리 맥락일 뿐 경계 확정이 아닙니다 | **`countryCode`** |
-| `iati_query_country` | IATI 활동·거래·예산 조회. 식별자로 좁혀 단일 활동을 확인하면 코드·어휘·비율·명칭의 대응관계를 보존한 `activity_sectors`와 `activity_sectors_truncated`를 반환하며, `summary: false`일 때 상세 레코드를 반환합니다 | **`countryCode`**, `collection`, `rows`, `start`, `summary`, `fields`, `sectorCode`, `reportingOrganisation`, `iatiIdentifier`, `activityStatusCode`, `startDate`, `lastUpdatedAfter` |
-| `iati_status` | 서버의 IATI 조회 기능이 준비됐는지만 확인합니다. 자격 증명 값이나 저장 위치는 반환하지 않습니다 | (없음) |
-| `iati_test_connection` | 서버가 관리하는 자격 증명으로 미얀마 활동 1건을 조회해 연결을 시험합니다. 자격 증명은 출력하지 않습니다 | (없음) |
-
-`dac_purpose_code_lookup`은 OECD 공식 API의 코드표를 조회합니다. 이전 대화의
-도구 스냅샷에 이 도구가 아직 없다면 새 대화를 시작해야 하며, Skill은 그동안
-OECD 공식 API를 직접 확인합니다. `iati_query_country.sectorCode`는 이렇게 확인한
-3~5자리 코드를 국가별 IATI 기록에 적용하는 필터일 뿐 코드 뜻을 검증하지 않습니다.
-`sectorCode`는 정확 일치 필터이므로 `311`은 `31120`을 찾지 않습니다. 기존 사업의
-현재 IATI 보고값은 검증된 사업 식별자를 `iatiIdentifier`에 넣고 단일 매칭된 canonical
-`iati_identifier`의 `activity_sectors`와 `activity_sectors_truncated`에서 확인합니다. ODA Map의 `iati:` 접두사만 제거할
-수 있으며 다른 접두사를 만들면 안 됩니다. 잘림 표지가 참이면 목록은 부분 결과입니다. 빈 `activity_sectors`는 거래 수준 보고를
-확인해야 한다는 뜻이지 sector 부재가 아닙니다. 이 값은 OECD CRS 제출자료나 최초 제출
-이력을 자동으로 증명하지 않습니다.
-기존 코드 이력은 IATI 최신본의 갱신일로 추정하지 않습니다. Skill은 OECD 공식
-`DSD_CRS@DF_CRS`의 프로젝트/프로그램 마이크로데이터(`MD_DIM=DD`)를 공여국·수원국·
-연도로 좁힌 뒤, `DONOR_PROJECT_ID`와 사업명·기관을 교차검증하고 `TIME_PERIOD`별
-고유 `SECTOR`를 비교합니다. 약정/지출 및 경상/불변가격 행은 코드 변경으로 중복
-계산하지 않습니다. 이는 OECD의 연도별 공식 CRS 기록이며 IATI XML 개정 이력은
-아닙니다. `NATURE_OF_SUBMISSION=2`가 있어도 바뀌기 전 값 자체는 복원되지 않습니다.
-`country_report_context`의 OECD 수치는 국가별 DAC2A 총액이며, CRS 공여국·분야·
-채널·활동 세부자료 전용 조회는 별도 범위입니다.
-
-국가와 주제가 주어진 CRS 분류 질문은 사업 설계자료를, 특정 한국 사업은 ODA Map 상세를 먼저 확인합니다. 그런 다음 `dac_purpose_code_lookup`으로 후보 코드의 공식 명칭을 확인합니다.
-
-> 지금 미얀마에 대해 국제 근거가 얼마나 확보되는지, IATI에는 무엇이 있는지
-> 알려줘.
-
-```text
-country_data_status    { "countryCode": "MM" }
-country_report_context { "countryCode": "MM", "sampleSize": 3 }
-iati_query_country     { "countryCode": "MM", "collection": "activity", "rows": 3 }
-```
-
-`countryCode`는 ISO alpha-2 코드이며(미얀마는 `MM`), `collection`은 `activity`,
-`transaction`, `budget` 중 하나입니다.
 
 ### KOICA 규정 — `koica-regulations`
-
-KOICA 규정 색인에 대한 검색·전문 조회·상호참조·인용 검증입니다. 단독 배포판
-`koica-reg-mcp` 공개 서버와 같은 도구 표면입니다. 규정 텍스트는 공공데이터포털의
-"한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)으로 개방되어 있으며,
-그것이 전문을 여기서 그대로 제공하는 재배포 근거입니다. 사용 순서는 탐색 →
-전문 조회 → 인용 검증입니다.
 
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `search_regulation` | 규정 메타데이터와 조문 스니펫, 적합도 점수. `include_attachments: true`면 별표·별지도 함께 검색하고, `mode`로 hybrid(기본)·keyword·semantic 검색을 고릅니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
-| `get_article` | 규정명·조문 번호로 조문 본문 전체를 반환합니다. 본칙 조문이 같은 번호의 부칙 조문보다 우선합니다 | **`source`**, **`article`** |
 | `list_sources` | 색인된 현행 규정 목록. 규정 유형, 개정일, 조문 수 포함 | `category` |
 | `list_attachments` | 별표·별지 목록을 제목·발췌와 함께 반환하며 규정·유형·종류로 필터링합니다. 응답 예산에 맞춰 잘리지만 `total`이 언제나 실제 총계를 담습니다 | `source`, `category`, `kind`, `include_deleted` |
-| `get_attachment` | 규정명과 라벨로 별표·별지 본문 전체를 반환합니다. 라벨은 `"별표 1"`, `"별지 제3호 서식"` 등 자유 형식입니다 | **`source`**, **`label`** |
 | `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. `include_mermaid: true`면 인용망 flowchart 코드가 함께 실립니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | 정비 레이더 — 모규정이 더 최근에 개정된 시행세칙·지침을 `review_needed` / `ok` / `unknown` / `no_parent`로 플래그합니다 | `source` |
 | `verify_citation` | 텍스트 안의 모든 `{규정명} 제N조` 인용을 색인과 대조해 `ok`, `not_found`, `unknown_source`로 분류합니다 | **`text`** |
-
-> 연차휴가를 며칠 쓸 수 있는지 근거 조문 전문과 함께 알려줘.
-
-```text
-search_regulation { "query": "연차휴가", "limit": 3 }
-get_article       { "source": "복무규정", "article": "제24조" }
-get_attachment    { "source": "복무규정", "label": "별표 1" }
-find_references   { "source": "직제규정", "article": "제9조" }
-verify_citation   { "text": "인사규정 제9999조에 따라 처리한다." }
-```
-
-`verify_citation`은 지어낸 조문을 막는 장치입니다. 위 인용은 `not_found`로
-돌아옵니다. 인사규정에 제9999조가 없기 때문입니다. 규정을 인용한 문단은 회람하기
-전에 이 도구로 한 번 훑으세요. 색인은 동기화 주기만큼 공식 개정을 뒤따르므로,
-중대한 결론은 현행 공식 원문으로 확인하세요.
-
-### 협력국 조달 — `partner-country-procurement`
-
-국가별로 세 개 축을 모델링합니다. `bidding`(입찰제도), `governance`(조달
-거버넌스), `pipeline`(ODA 사업형성 절차)입니다. 조달 근거를 쓰기 전에 어떤 축이
-있는지 먼저 확인하세요.
-
-| 도구 | 무엇을 반환하는가 | 입력 |
-|---|---|---|
-| `procurement_model_status` | 국가별로 어떤 축이 모델링되어 있는지와 그 검증 상태 | `country` |
-| `procurement_country_context` | 축별 요약: 권한기관, 절차 단계, 병목, 진입장벽. 전체 공정 그래프는 포함하지 않습니다 | **`country`** |
-| `procurement_model_detail` | 한 국가·한 축의 모델 전체. canvas, 공정 그래프(lanes·stages·nodes·edges), 검증 원출처 포함 | **`country`**, **`axis`** |
-
-> 네팔에서 ODA 사업이 어떤 절차로 형성되는지, 병목이 어디인지 설명해줘.
-
-```text
-procurement_model_status { "country": "네팔" }
-procurement_model_detail { "country": "네팔", "axis": "pipeline" }
-```
-
-`country`는 slug, ISO3 코드, 한국어명, 영문명을 모두 받습니다(`nepal`, `NPL`,
-`네팔`, `Nepal`). 모델이 없다는 것은 그 축이 아직 모델링되지 않았다는 뜻이지,
-협력국에 공식 절차가 없다는 뜻이 아닙니다.
-
-### 공개 프로필 제한
-
-공개 프로필은 결과 크기를 제한하고 일부 필드를 제공하지 않습니다. 클라이언트가
-아니라 게이트웨이가 강제합니다.
-
-| 파라미터 | 제한 |
-|---|---|
-| `limit` | `search_regulation` 10, `find_references` 20, `oda_map_projects` 100 |
-| `rows` | `iati_query_country` 20 |
-| `sampleSize`, `sample_limit` | 10 |
-| `offset`, `start` | 10000 |
-| `fields` | 각 도구 스키마에 열거된 값만 |
-| `refresh` | 무시 — 서버가 관리하는 캐시를 제공합니다 |
-| `includeEvents` | 최대 200건 — 실제 총계는 `record_count`가 그대로 보고합니다 |
-| `list_attachments` 결과 | 응답 예산에 맞춰 잘림 — `total`이 언제나 실제 총계를 담고, caveat가 좁힐 필터를 안내합니다 |
-| `oda_map_projects` 항목 | 무거운 필드 조합(전체 필드+좌표)은 응답 예산에 맞춰 잘립니다 — `returned`·`has_more`가 페이징에 맞게 보정되고 caveat가 잘린 건수를 알립니다. 기본 압축 필드는 100건이 그대로 반환됩니다 |
 
 ## 통제된 업데이트
 
@@ -321,77 +181,6 @@ procurement_model_detail { "country": "네팔", "axis": "pipeline" }
 - Skill 라우팅 또는 승인된 계약을 변경하려면 버전이 지정된 플러그인
   업데이트가 필요하며, 설치된 캐시를 갱신하려면 marketplace upgrade 후 새
   대화를 시작해야 합니다.
-
-## 데이터 출처와 출처 제시
-
-각 게이트웨이 도구는 자신의 출처 도메인을 도구 설명에 `[Source: ...]` 형태로
-선언합니다. 답변은 근거로 삼은 출처의 이름과 공개 주소를 함께 제시합니다.
-독자가 원본을 직접 열어 확인할 수 있어야 하기 때문입니다.
-
-출처 상태 항목에는 `public_url` 필드가 실립니다. 아래 표보다 이 필드를 우선
-사용하세요. 게이트웨이가 그 출처에 대해 직접 선언하는 값이며, 이 문서가 뒤처져도
-정확합니다.
-
-| 출처 도메인 | 도구 | 공개 주소 |
-|---|---|---|
-| `korean-oda-map` | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` | https://oda-map-lab.pages.dev |
-| `international-data` | `country_indicator_data_status`, `search_development_indicator_catalog`, `get_country_indicator_snapshot`, `country_data_status`, `country_report_context`, `country_list`, `country_map_outline`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_travel_alert`, `iati_query_country`, `iati_status`, `iati_test_connection` | 아래 출처 키별 주소 |
-| `koica-regulations` | `search_regulation`, `get_article`, `get_attachment`, `list_attachments`, `find_references`, `list_sources`, `verify_citation`, `compliance_radar` | https://github.com/amnotyoung/koica-reg-mcp |
-| `partner-country-procurement` | `procurement_country_context`, `procurement_model_detail`, `procurement_model_status` | https://amnotyoung.github.io/overseas-procurement-100/ (모델별 주소는 응답의 `model_url`) |
-
-`korean-oda-map`은 한국 개발협력 사업 위치를 독립적으로 취합한 비공식 지도입니다.
-한국 ODA 사업 데이터에 기반하지만 어느 기관도 발행하지 않았고 어느 기관의 보증도
-받지 않았습니다. 비공식 지도로 인용하고, 발행 기관을 지어내지 마세요.
-
-`country_data_status`는 `international-data` 안에서 출처 키별로 최신성을
-보고합니다. 도메인이 아니라 그 키를 출처로 제시합니다.
-
-| 출처 키 | 공개 주소 |
-|---|---|
-| `iati` | https://d-portal.org |
-| `oecd` | https://data-explorer.oecd.org |
-| `world_bank` | https://data.worldbank.org |
-| `world_bank_documents` | https://documents.worldbank.org |
-| `unhcr` | https://www.unhcr.org/refugee-statistics/ |
-| `who_gho` | https://www.who.int/data/gho |
-| `reliefweb` | https://reliefweb.int |
-| `hdx_hapi` | https://hapi.humdata.org |
-| `usgs` | https://earthquake.usgs.gov |
-| `gdacs` | https://www.gdacs.org |
-| `eonet` | https://eonet.gsfc.nasa.gov |
-| `acled` | https://acleddata.com |
-| `mofa_travel_alert` | https://www.0404.go.kr |
-
-`international-data`에 속하지만 출처 키가 없는 도구가 둘 있습니다.
-`country_list`는 게이트웨이에 포함된 국가·사무소 목록과 기준일을 반환합니다.
-`country_map_outline`은 자신의 출처를 응답에 직접 싣습니다. 매 응답의 `source` 필드가 공개
-`datasets/geo-countries` GeoJSON 주소 —
-https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson
-— 를 담으므로, 조달의 `model_url`처럼 그 필드를 인용합니다.
-
-색인된 텍스트를 어디서 볼 수 있느냐는 질문에는 위 표의 주소로 답합니다. KOICA
-규정 색인은 단독 배포판 저장소에서 확인할 수 있습니다.
-다만 이름이 비슷한 다른 공개 포털은 다른 자료를 담고 있으므로, 표에 적힌 주소가
-아닌 곳으로 안내하면 독자가 하려던 확인을 오히려 막습니다. 조달은 도메인 하나로
-답하기 어렵습니다. 모델 응답마다 `model_url`이 실리므로, 사이트 주소보다 그 필드를
-우선 인용합니다.
-
-`country_travel_alert`는 계약에 승인되어 있지만, 공개 배포에 외교부 여행경보
-서비스키가 설정되어 있지 않아 `mofa_travel_alert`가 `disabled`로 보고되고 도구는
-경보 등급을 반환하지 않습니다. 이는 비활성 출처이지 여행 위험의 부재가 아닙니다.
-
-## 공개 콘텐츠 범위
-
-- KOICA 규정 도구는 검색, 조문 전문, 별표·별지 전문, 상호 참조, 정비 레이더 및
-  인용 검증을 제공합니다. 재배포 근거는 공공데이터포털의 개방 릴리스
-  "한국국제협력단_정관 및 내부규정"(이용허락범위 제한 없음)입니다. 대량 일괄
-  추출은 여전히 제공하지 않으며, 목록은 응답 예산에 맞춰 잘리되 실제 총계를
-  함께 보고합니다.
-- IATI 및 기타 국제 출처의 인증 정보는 서버에서 관리하며 플러그인에 포함하거나
-  사용자에게 반환하지 않습니다.
-- 한국 ODA 통합누리집 지도 도구는 공개 지도에 이미 표시된 최종 유효 좌표를
-  반환할 수 있습니다. 좌표의 출처와 범위는 유지해야 하며, 보정 전 좌표,
-  검토 이력 및 제출자 정보는 제외됩니다.
 
 ## 데이터 이용 안내
 

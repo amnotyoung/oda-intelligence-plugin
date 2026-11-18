@@ -7,7 +7,7 @@
 | What Korean agencies fund and implement in a country | ODA Map | `oda_map_data_status`, `oda_map_country_context`, `oda_map_projects`, `oda_map_project_detail` |
 | Project facts needed before classifying a named Korean activity | ODA Map, then the OECD codelist | `oda_map_data_status`, `oda_map_projects`, `oda_map_project_detail`, then `dac_purpose_code_lookup` |
 | Comparable country-level ODA totals across donors | OECD DAC2A behind international data | `country_report_context` |
-| Multi-donor activity discovery | IATI | `iati_query_country` |
+| Multi-donor activity discovery | IATI | public IATI publisher XML |
 | Responsible KOICA office and jurisdiction role | Country registry | `country_list` |
 | KOICA internal rules governing a procedure | Regulation index | `koica-regulation-research` Skill |
 

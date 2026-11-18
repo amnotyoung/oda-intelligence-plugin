@@ -35,10 +35,10 @@ description here, then use the international-data Skill to interpret the officia
 Korean bilateral project inventory is carried by the **ODA Map** source and nothing else on this
 gateway.
 
-- `country_report_context`, `iati_query_country`, and the OECD and World Bank evidence behind them
+- `country_report_context`, public IATI publisher XML, and the OECD and World Bank evidence behind them
   are international-data sources. They carry country-level aid aggregates and multi-donor activity
   discovery, not a Korean agency project inventory.
-- Korea is a limited IATI publisher. An empty `iati_query_country` result is a statement about IATI
+- Korea is a limited IATI publisher. An empty public IATI publisher XML result is a statement about IATI
   coverage, not about Korean activity in the country.
 - **Never answer that Korean or KOICA project information is unavailable without first calling
   `oda_map_data_status` for that country.** An absent record in an international source is not
@@ -86,7 +86,7 @@ the pages searched and location coverage. A national fallback point does not est
    comes back empty-handed unless you ask for those fields by name. State that a returned page is a
    page when `has_more` is true.
 5. Call `oda_map_project_detail` only for the projects the answer actually turns on.
-6. Add international context from `country_report_context` or `iati_query_country` only when the
+6. Add international context from `country_report_context` or public IATI publisher XML only when the
    user asked to compare Korea against other donors. Keep the two evidence bases labelled
    separately; do not merge an ODA Map count with an IATI count.
 
