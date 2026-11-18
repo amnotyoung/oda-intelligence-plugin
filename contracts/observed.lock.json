@@ -1,9 +1,7 @@
 {
-  "schema_version": 1,
   "gateway": {
-    "url": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp",
-    "server_name": "oda-intelligence",
     "instructions_sha256": "959489f56ea802ddfc7d4ac80e96b7d1322425e7f110ce623444d90da0c06d57",
+    "server_name": "oda-intelligence",
     "tool_count": 22,
     "tools": {
       "compliance_radar": "91611452210620eedd1153d0fb56b359b052663c31125e04d7f7fb35ae8a1034",
@@ -28,6 +26,8 @@
       "search_development_indicator_catalog": "bf341433d9e53b5e227008f143e089658ae2e3b7a4db466d159f08b975e9ff17",
       "search_regulation": "28c42340cf2725c6e305ba0e6779c0e5c1783722c06afe25cf82233f60f106f5",
       "verify_citation": "0fe87f9ee4bc2e15cd3abecfcb2e83d6f80d1df2aa13679b08b223bb7808e33e"
-    }
-  }
+    },
+    "url": "https://oda-mcp.fly.dev/oda-intelligence/v2/mcp"
+  },
+  "schema_version": 1
 }
