@@ -20,20 +20,15 @@ design facts before the official code list can be interpreted.
 3. **Comparable recipient-country ODA total** — resolve the ISO2 country code, call
    `country_data_status`, then call `country_report_context`. Label the OECD observations as DAC2A,
    not CRS.
-4. **IATI activity, transaction, or budget discovery** — call `iati_status`, then
-   `iati_query_country`. Pass the recipient ISO2 code and request only the fields needed. For an
-   existing activity's current IATI-reported sector, use an identifier-scoped
-   `collection: "activity"` query and request `activity_sectors` plus
-   `activity_sectors_truncated`. Require one verified match and read its returned canonical
-   `iati_identifier`; never invent an identifier prefix. If
-   `activity_sectors` is empty, check transaction-level sector evidence because IATI permits sector
-   reporting at either activity level or for every transaction.
+4. For a publisher's current IATI-reported sector, open the publisher's public IATI XML or d-portal activity record. Verify the activity identifier, recipient, sector vocabulary and percentages at activity and transaction level. Label unavailable fields as unverified.
 5. **OECD CRS donor, sector, channel, activity detail, or annual project history** — use the current
    official OECD Data Explorer or OECD API through an available web or browser tool. For a named
    project's reported-code history, follow `Historical reported-code verification` below and use
    project/programme microdata (`MD_DIM=DD`), not an aggregate sector series. The gateway has no
    dedicated CRS detail query. An IATI sector does not by itself prove what was submitted to the OECD
    CRS database; do not substitute an IATI count or record for OECD CRS evidence.
+
+For a specified year of maternal, neonatal or under-five mortality call `get_health_observation_by_year`, retain the source row and cite the API URL and retrieval time.
 
 6. **Country development indicators** — call `country_indicator_data_status` for the country's ISO3
    code, then `search_development_indicator_catalog` to resolve the requested measure. Pass the returned
@@ -55,7 +50,7 @@ before a subnational place, and a subnational place before a country-and-topic s
 routes only when the less-specific search can supply a design fact the more-specific record lacks.
 
 1. **User-supplied IATI identifier or named non-Korean activity** — if the request already contains a
-   verified IATI identifier, query it directly with the known recipient ISO2 code. For a named
+   verified IATI identifier, look it up in the publisher XML and confirm the recipient. For a named
    non-Korean activity without an identifier, resolve one from the publisher's public IATI record,
    d-portal, or official OECD activity evidence before making an assignment claim. Do not route it
    through the Korean ODA Map and do not manufacture an identifier from the title.
@@ -75,27 +70,7 @@ routes only when the less-specific search can supply a design fact the more-spec
    depends on a still-unknown fact — for example centralised-grid versus isolated or standalone
    solar — give conditional candidates and name the fact required to choose. If the user asks which
    code an existing activity was actually reported under in IATI, a recommendation is not enough.
-   After the map identifies a Korean activity, remove only a literal leading `iati:` namespace from
-   its verified `project_id` and pass the remainder as `iatiIdentifier`; never synthesize a reporting-
-   organisation prefix. Call `iati_status`, then query `iati_query_country` with
-   `collection: "activity"`, the recipient ISO2 code, `summary: false`, and fields including
-   `iati_identifier`, `title_narrative`, `recipient_country_code`, `activity_sectors`,
-   `activity_sectors_truncated`, and `last_updated_datetime`. Require
-   `total_found: 1`, then verify the returned canonical `iati_identifier`, title, and recipient before
-   using the record. Report every vocabulary `1` sector and its percentage; vocabulary `1` may be
-   explicit or the IATI default indicated by `vocabulary_inferred`. Verify every returned code's
-   official label with `dac_purpose_code_lookup`. If `activity_sectors_truncated` is true, say the
-   result is partial and inspect the publisher XML before claiming a complete assignment list.
-6. If the current tool snapshot does not expose `activity_sectors`, or the matched activity record
-   omits that field even though it was requested, do not probe guessed parent codes. Open the matched
-   activity in the publisher's public IATI XML or d-portal activity HTML/XML instead. A present empty
-   array means the structured current activity record was read but has no activity-level sector; it
-   does **not** prove that IATI has no sector because the standard permits sector reporting for every
-   transaction instead. Query `collection: "transaction"` with the returned canonical identifier only
-   for discovery; `transaction_sector_code` alone does not preserve its vocabulary association and
-   must never be labelled CRS. Verify the structured transaction sector and vocabulary together in
-   the publisher XML or d-portal before calling it a CRS code. If neither level can be read, report that the assignment
-   field is unavailable; do not report that the publisher omitted a code.
+   After the map identifies the activity, remove only a literal leading `iati:` namespace from the verified identifier; never synthesize a publisher prefix. Open the publisher's public IATI XML or d-portal activity HTML/XML and verify the identifier, title and recipient. Report every vocabulary 1 sector and percentage. Inspect transaction-level sector elements when activity-level sectors are missing. Confirm the official label with `dac_purpose_code_lookup`.
 
 For example, `피지에서 태양광 사업 하려는데 CRS 코드 뭐 써야 하냐` requires the project design:
 if grid connection is unknown, present conditional code candidates. Geography does not establish purpose.
@@ -147,8 +122,6 @@ name any external archive used; do not silently substitute OECD annual records f
 ## DAC and CRS code rules
 
 - Distinguish a three-digit DAC sector category from a five-digit CRS purpose code.
-- Treat `sectorCode` on `iati_query_country` as a filter for a code already known. It neither lists
-  valid codes nor verifies their meanings. It is an exact filter: `311` does not match `31120`.
 - Treat `dac_purpose_code_lookup` as proof that a code and label are valid, not proof that a donor
   reported that code for a particular activity. Label a reasoned selection as recommended or
   likely unless an activity-level official source records the actual assignment.
