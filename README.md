@@ -2,20 +2,17 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-근거 기반 개발협력 조사를 위한 Claude, Codex 및 ChatGPT 공개 패키지입니다.
+**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.37에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
 
-이 플러그인은 세 개의 Skill을 설치하고, 다음의 공개 읽기 전용 MCP 게이트웨이
-한 개에 연결합니다.
+수강생도 이 저장소에서 같은 플러그인을 설치합니다. 아래에서 사용하는 앱의 설치 방법을 선택하고, 설치 후 **동티모르 조회 실습**으로 연결을 확인하세요.
+
+[Claude 설치](#claude) · [Codex 설치](#codex) · [ChatGPT 이용 조건](#chatgpt) · [동티모르 조회 실습](#설치-확인-실습)
+
+원격 MCP를 직접 등록하는 앱에서는 서버 이름을 `oda-intelligence`로 지정하고 다음 주소를 입력합니다. 이전에 수강생 전용 주소를 직접 등록했다면 이 주소로 교체하세요.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
-
-게이트웨이 한 개에서 국제원조·국가 현황, 한국 ODA 사업 지도, KOICA 규정 및 개발지표를 조회합니다. 사용자 인증은 필요하지 않습니다.
-
-이 저장소에는 서버 구현 소스, 배포 비밀 정보, 비공개 Git 기록 또는 로컬 인증
-정보 저장소가 포함되어 있지 않습니다. 유일한 런타임 의존성은 공개 MCP
-계약입니다.
 
 ## Claude
 
@@ -96,17 +93,19 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 설치 확인 실습
 
-설치를 마친 뒤 새 대화(Codex에서는 새 작업)를 열고 아래 질문을 그대로 입력하세요.
+설치한 뒤 새 대화에서 다음 질문을 보내세요.
 
-> ODA Intelligence로 동티모르의 모성사망비를 조회해 줘. WHO GHO가 제공하는 수치와 추정 구간, 단위, 기준연도를 알려 줘.
+> ODA Intelligence로 동티모르의 2019년 신생아 사망률을 조회해줘.
 
-도구 호출 내역에서 `oda-intelligence` 서버의 `country_report_context` 또는 `country_humanitarian_context`를 펼치세요. 동티모르(`TL`)의 WHO GHO 모성사망비가 도구 응답에 있으면 연결에 성공한 것입니다. 2026년 11월 9일 조회에서는 WHO GHO의 **2023년 출생아 10만 명당 192명(추정 구간 125~288명)**이 반환됐습니다. 출처가 갱신되면 수치나 기준연도도 달라질 수 있습니다.
+1. 실행 기록에서 `get_health_observation_by_year` 호출을 엽니다. 입력은 국가 `TLS`, 지표 `WB:SH.DYN.NMRT`, 연도 `2019`입니다.
+2. 응답의 `api_url`을 열고 World Bank 원본 행의 `date`와 `value`를 대조합니다. 2026년 11월 19일 조회값은 **출생아 1,000명당 23.5명**이었습니다. [World Bank 공식 응답](https://api.worldbank.org/v2/country/TLS/indicator/SH.DYN.NMRT?date=2019&format=json)
+3. 보고서에는 관측연도(`year`)와 조회 시각(`fetched_at`)을 함께 기록합니다. 같은 2019년 값도 자료가 개정되면 바뀔 수 있습니다.
 
-호출 내역이 보이지 않으면 플러그인 상세에서 `oda-intelligence` 커넥터가 활성화되어 있는지 확인한 뒤 새 대화에서 다시 질문하세요.
+호출 기록이 보이지 않으면 앱에서 `oda-intelligence` 연결을 확인한 뒤 새 대화에서 다시 실행하세요.
 
 ## 공개 도구 22개
 
-특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회는 개인 키가 필요한 자료원을 비활성으로 표시합니다.
+특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회에서 IATI Datastore, 외교부 여행경보, HDX HAPI, ReliefWeb은 `disabled`로 표시됩니다. 이 표시는 해당 자료원을 조회하지 않았다는 뜻입니다.
 
 - **개발지표와 보건통계** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **한국 ODA 지도** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
@@ -144,6 +143,8 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `dac_purpose_code_lookup` | OECD 공식 SDMX `CL_DAC_SECTOR`에서 3자리 DAC 분야와 5자리 CRS 목적코드, 부모관계, 코드목록 버전을 조회 | `code`, `query`, `includeChildren`, `limit`, `refresh` |
+| `oecd_crs_query_country` | 한국이 특정 수원국·연도에 보고한 OECD CRS 자료 | **`countryCode`**, **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
+| `get_health_observation_by_year` | 지정 연도의 WHO 모성사망비 또는 World Bank 신생아·5세 미만 사망률. 공식 응답 행, 단위, URL과 조회 시각 포함 | **`country`** (ISO3), **`indicator`**, **`year`** |
 | `country_data_status` | World Bank·OECD·재난·UNHCR·WHO 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
 | `country_indicator_data_status` | 국가별 개발지표 가용성 및 출처별 조회 상태 | **`countryCode`** (ISO3) |
 | `search_development_indicator_catalog` | 세계은행 42개·WHO GHO 1개 지표에서 정의, 단위, 안정 ID 검색 | `query`, `source`, `limit` |
