@@ -8,6 +8,7 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const manifestRelatives = [
   "plugins/oda-intelligence/.codex-plugin/plugin.json",
   "plugins/oda-intelligence/.claude-plugin/plugin.json",
+  "plugins/oda-intelligence/.antigravity-plugin/plugin.json",
 ];
 
 function numericVersion(version) {
@@ -34,6 +35,8 @@ export function requiresVersionBump(paths) {
       path === "plugins/oda-intelligence/.app.json" ||
       path === "plugins/oda-intelligence/.codex-plugin/plugin.json" ||
       path === "plugins/oda-intelligence/.claude-plugin/plugin.json" ||
+      path === "plugins/oda-intelligence/.antigravity-plugin/plugin.json" ||
+      path === "plugins/oda-intelligence/mcp_config.json" ||
       path === "contracts/gateway-contract.json" ||
       path === "contracts/observed.lock.json" ||
       path === ".claude-plugin/marketplace.json" ||
