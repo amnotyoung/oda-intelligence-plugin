@@ -4,11 +4,11 @@
 
 **ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.37 includes 22 read-only tools and three research skills. The gateway requires no personal API key.
 
-Class participants install this same plugin. Choose the instructions for your app, then run the Timor-Leste example to check the connection.
+Choose the instructions for your app, then run the Timor-Leste example to check the connection.
 
 [Claude installation](#claude) · [Codex installation](#codex) · [ChatGPT availability](#chatgpt) · [Timor-Leste example](#check-your-installation)
 
-If your app takes a remote MCP URL directly, name the server `oda-intelligence` and enter the address below. If you previously registered the classroom-only URL manually, replace it with this one.
+If your app takes a remote MCP URL directly, name the server `oda-intelligence` and enter the address below.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp

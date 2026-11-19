@@ -4,11 +4,11 @@
 
 **ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.37에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
 
-수강생도 이 저장소에서 같은 플러그인을 설치합니다. 아래에서 사용하는 앱의 설치 방법을 선택하고, 설치 후 **동티모르 조회 실습**으로 연결을 확인하세요.
+사용하는 앱에 플러그인을 설치한 뒤, 동티모르의 보건지표를 조회해 연결을 확인하세요.
 
-[Claude 설치](#claude) · [Codex 설치](#codex) · [ChatGPT 이용 조건](#chatgpt) · [동티모르 조회 실습](#설치-확인-실습)
+[Claude 설치](#claude) · [Codex 설치](#codex) · [ChatGPT 이용 조건](#chatgpt) · [첫 조회 예시](#첫-조회로-연결-확인)
 
-원격 MCP를 직접 등록하는 앱에서는 서버 이름을 `oda-intelligence`로 지정하고 다음 주소를 입력합니다. 이전에 수강생 전용 주소를 직접 등록했다면 이 주소로 교체하세요.
+원격 MCP를 직접 등록하는 앱에서는 서버 이름을 `oda-intelligence`로 지정하고 다음 주소를 입력합니다.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
@@ -52,7 +52,7 @@ codex plugin marketplace add amnotyoung/oda-intelligence-plugin
 codex plugin add oda-intelligence@oda-intelligence-plugin
 ```
 
-설치한 뒤 새 작업을 열고 [동티모르 실습](#설치-확인-실습)을 실행하세요. 플러그인이 공개 MCP 서버 `oda-intelligence`를 함께 등록합니다.
+설치한 뒤 새 작업을 열고 [첫 조회 예시](#첫-조회로-연결-확인)를 따라 해 보세요. 플러그인이 공개 MCP 서버 `oda-intelligence`를 함께 등록합니다.
 
 로컬 개발 시에는 저장소 루트에서 저장소 인자를 `.`으로 바꿉니다.
 
@@ -91,7 +91,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 변경은 같은 URL에서 사용할 수 있지만, 도구 계약의 새 버전은 워크스페이스
 관리자가 검토하고 갱신해야 합니다.
 
-## 설치 확인 실습
+## 첫 조회로 연결 확인
 
 설치한 뒤 새 대화에서 다음 질문을 보내세요.
 
