@@ -2,21 +2,17 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-Public Claude, Codex, and ChatGPT packaging for evidence-based development
-cooperation research.
+**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.37 includes 22 read-only tools and three research skills. The gateway requires no personal API key.
 
-The plugin installs three Skills and connects exactly one public, read-only MCP
-gateway:
+Class participants install this same plugin. Choose the instructions for your app, then run the Timor-Leste example to check the connection.
+
+[Claude installation](#claude) · [Codex installation](#codex) · [ChatGPT availability](#chatgpt) · [Timor-Leste example](#check-your-installation)
+
+If your app takes a remote MCP URL directly, name the server `oda-intelligence` and enter the address below. If you previously registered the classroom-only URL manually, replace it with this one.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
 ```
-
-One gateway provides international aid and country data, Korean ODA project locations, KOICA regulations, and development indicators. Users do not need credentials.
-
-This repository contains no source-server implementation, deployment secret,
-private Git history, or local credential store. Its only runtime dependency is
-the public MCP contract.
 
 ## Claude
 
@@ -98,17 +94,19 @@ version must be reviewed and refreshed by a workspace administrator.
 
 ## Check your installation
 
-After installing the plugin, open a new conversation (a new task in Codex) and paste this question:
+After installation, open a new conversation and ask:
 
-> Use ODA Intelligence to look up the maternal mortality ratio in Timor-Leste. Give the WHO GHO estimate, its uncertainty interval, the unit, and the reference year.
+> Use ODA Intelligence to look up the neonatal mortality rate in Timor-Leste in 2019.
 
-Open the `country_report_context` or `country_humanitarian_context` call from the `oda-intelligence` server. A WHO GHO maternal mortality ratio for Timor-Leste (`TL`) in the tool response confirms the connection. On 9 November 2026, WHO GHO returned a **2023 estimate of 192 maternal deaths per 100,000 live births (uncertainty interval 125–288)**. The estimate and reference year may change as the source is updated.
+1. Open the `get_health_observation_by_year` call in the activity history. The inputs are country `TLS`, indicator `WB:SH.DYN.NMRT`, and year `2019`.
+2. Open the returned `api_url` and compare the World Bank row’s `date` and `value`. On 19 November 2026, the API returned **23.5 deaths per 1,000 live births**. [World Bank response](https://api.worldbank.org/v2/country/TLS/indicator/SH.DYN.NMRT?date=2019&format=json)
+3. Record both the observation year (`year`) and the retrieval time (`fetched_at`). A later release can revise the estimate for 2019.
 
-If you don't see a tool call, check that the `oda-intelligence` connector is enabled in the plugin details, then try the question in a new conversation.
+If you cannot see the call, check the `oda-intelligence` connection in your app and try again in a new conversation.
 
 ## Public catalog of 22 tools
 
-For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark credential-dependent feeds as disabled.
+For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark IATI Datastore, Korean Ministry of Foreign Affairs travel advisories, HDX HAPI and ReliefWeb as `disabled`. This means the source was not queried.
 
 - **Development and health indicators** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **Korean project map** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
@@ -146,12 +144,14 @@ to the date it was computed for.
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `dac_purpose_code_lookup` | Official OECD SDMX `CL_DAC_SECTOR` entries: 3-digit DAC sectors, 5-digit CRS purpose codes, parent relationships, and codelist version | `code`, `query`, `includeChildren`, `limit`, `refresh` |
-| `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness across IATI, World Bank, OECD, hazard, HAPI, UNHCR, WHO, and ReliefWeb | **`countryCode`**, `refresh` |
+| `oecd_crs_query_country` | OECD CRS records reported by Korea for a recipient and year | **`countryCode`**, **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
+| `get_health_observation_by_year` | WHO maternal mortality or World Bank neonatal or under-five mortality for a specified year, with source row, unit, URL and retrieval time | **`country`** (ISO3), **`indicator`**, **`year`** |
+| `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness for World Bank, OECD, hazard, UNHCR and WHO sources; includes status for disabled feeds | **`countryCode`**, `refresh` |
 | `country_indicator_data_status` | Country indicator availability and provider status | **`countryCode`** (ISO3) |
 | `search_development_indicator_catalog` | Search definitions, units and stable IDs across 42 World Bank indicators and one WHO GHO indicator | `query`, `source`, `limit` |
 | `get_country_indicator_snapshot` | Country observations, reference years, units, sources and missing-data status for selected indicators | **`countryCode`** (ISO3), **`indicatorIds`** (up to 20) |
 | `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_humanitarian_context` | Structured HDX HAPI, UNHCR, and WHO GHO observations, plus recent ReliefWeb and World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | UNHCR and WHO GHO observations, plus World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
 | `country_hazard_snapshot` | USGS, GDACS, and NASA EONET events clipped to the country boundary, de-duplicated by same type within 100 km and 48 hours | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
 | `country_list` | KOICA overseas-office host and concurrent countries with ISO codes, responsible office, and jurisdiction role | (none) |
 | `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** |
