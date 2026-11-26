@@ -2,13 +2,13 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.37 includes 22 read-only tools and three research skills. The gateway requires no personal API key. It installs in Claude, Codex, Antigravity, and ChatGPT.
+**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.39 includes 22 read-only tools and three research skills. The gateway requires no personal API key. It installs in Claude, Codex, Antigravity, and ChatGPT.
 
-Class participants install this same plugin. Choose the instructions for your app, then run the Timor-Leste example to check the connection.
+Choose the instructions for your app, then run the Timor-Leste example to check the connection.
 
 [Claude installation](#claude) · [Codex installation](#codex) · [ChatGPT availability](#chatgpt) · [Timor-Leste example](#check-your-installation)
 
-If your app takes a remote MCP URL directly, name the server `oda-intelligence` and enter the address below. If you previously registered the classroom-only URL manually, replace it with this one.
+If your app takes a remote MCP URL directly, name the server `oda-intelligence` and enter the address below.
 
 ```text
 https://oda-mcp.fly.dev/oda-intelligence/v2/mcp
@@ -123,21 +123,24 @@ the Skills. Put the remote address in `serverUrl`; `httpUrl` is not supported.
 
 ## ChatGPT
 
-The complete plugin combines the three bundled Skills with the registered
-`ODA Intelligence` MCP app. The committed `.app.json` contains the app's
-technical identifier, not a credential or authentication token.
+**Connect the gateway tools.** In ChatGPT on the web, open
+`Plugins → + → Add custom MCP server` if your account has permission. Name the
+server `oda-intelligence`, enter the gateway URL above and select `None` for
+authentication. Create and install the connection, then try the first lookup in
+a new chat. [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)
 
-For maintainer testing, enable ChatGPT developer mode, add this repository as a
-personal marketplace source, and install `ODA Intelligence`. The registered app
-uses the gateway URL above with no authentication.
+**Install the package with all three research skills.** A workspace admin can
+open `Admin → Plugins → Add → Import marketplace`, enter this repository’s URL
+and leave `Path` empty. After import, check access to the registered MCP app.
+Members can then install `ODA Intelligence` from their workspace plugin list.
+[OpenAI marketplace import guide](https://learn.chatgpt.com/docs/enterprise/plugin-management)
 
-This developer-mode package is not yet a public directory release. Universal
-ChatGPT distribution requires a **With MCP** directory submission of the same
-gateway; a Skills-only submission would intentionally omit the app mapping.
+For a public directory submission, select **With MCP** to include the gateway.
+[OpenAI submission guide](https://developers.openai.com/plugins/deploy/submission)
 
-ChatGPT keeps an approved snapshot of tool definitions. Compatible data and
-server behavior changes are available at the same URL, while a new tool-contract
-version must be reviewed and refreshed by a workspace administrator.
+Workspace-approved custom MCP connections retain a snapshot of their tool
+definitions. When those definitions change, a workspace admin reviews the
+changes and refreshes the tool list.
 
 ## Check your installation
 
@@ -153,7 +156,7 @@ If you cannot see the call, check the `oda-intelligence` connection in your app 
 
 ## Public catalog of 22 tools
 
-For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark IATI Datastore, Korean Ministry of Foreign Affairs travel advisories, HDX HAPI and ReliefWeb as `disabled`. This means the source was not queried.
+For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark IATI Datastore, Korean Ministry of Foreign Affairs travel advisories, HDX HAPI, ReliefWeb and ACLED as `disabled`. This means the source was not queried.
 
 - **Development and health indicators** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **Korean project map** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
@@ -188,20 +191,22 @@ to the date it was computed for.
 
 ### International context — `international-data`
 
+The table specifies two-letter (ISO2) and three-letter (ISO3) country codes. For Timor-Leste, use `TL` for ISO2 and `TLS` for ISO3. The public gateway manages its own cache. Omit `refresh` or set it to `false`.
+
 | Tool | What it returns | Inputs |
 |---|---|---|
-| `dac_purpose_code_lookup` | Official OECD SDMX `CL_DAC_SECTOR` entries: 3-digit DAC sectors, 5-digit CRS purpose codes, parent relationships, and codelist version | `code`, `query`, `includeChildren`, `limit`, `refresh` |
-| `oecd_crs_query_country` | OECD CRS records reported by Korea for a recipient and year | **`countryCode`**, **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
+| `dac_purpose_code_lookup` |Query the gateway API for 3-digit DAC sectors, 5-digit CRS purpose codes, parent codes and the codelist version. Codes and labels come from the OECD workbook’s `Purpose codes` sheet. The response’s `cache_hit` field indicates whether the gateway used its cache. [DAC-CRS-CODES.xlsx](https://webfs.oecd.org/oda/DataCollection/Resources/DAC-CRS-CODES.xlsx) | `code`, `query`, `includeChildren`, `limit`, `refresh` |
+| `oecd_crs_query_country` | OECD CRS records reported by Korea for a recipient and year | **`countryCode`** (ISO2), **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
 | `get_health_observation_by_year` | WHO maternal mortality or World Bank neonatal or under-five mortality for a specified year, with source row, unit, URL and retrieval time | **`country`** (ISO3), **`indicator`**, **`year`** |
-| `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness for World Bank, OECD, hazard, UNHCR and WHO sources; includes status for disabled feeds | **`countryCode`**, `refresh` |
-| `country_indicator_data_status` | Country indicator availability and provider status | **`countryCode`** (ISO3) |
+| `country_data_status` | Observation, collection, and cache dates, record counts, errors, and freshness for World Bank, OECD, hazard, UNHCR and WHO sources; includes status for disabled feeds | **`countryCode`** (ISO2), `refresh` |
+| `country_indicator_data_status` | Country indicator availability and provider status | **`countryCode`** (ISO3), `refresh` |
 | `search_development_indicator_catalog` | Search definitions, units and stable IDs across 42 World Bank indicators and one WHO GHO indicator | `query`, `source`, `limit` |
-| `get_country_indicator_snapshot` | Country observations, reference years, units, sources and missing-data status for selected indicators | **`countryCode`** (ISO3), **`indicatorIds`** (up to 20) |
-| `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_humanitarian_context` | UNHCR and WHO GHO observations, plus World Bank document metadata | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_hazard_snapshot` | USGS, GDACS, and NASA EONET events clipped to the country boundary, de-duplicated by same type within 100 km and 48 hours | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
+| `get_country_indicator_snapshot` | Country observations, reference years, units, sources and missing-data status for selected indicators | **`countryCode`** (ISO3), **`indicatorIds`** (up to 20), `refresh` |
+| `country_report_context` | Report-ready context in one call: source status, counts, and three samples per source | **`countryCode`** (ISO2), `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | UNHCR and WHO GHO observations, plus World Bank document metadata | **`countryCode`** (ISO2), `sampleSize`, `fields`, `refresh` |
+| `country_hazard_snapshot` | USGS, GDACS, and NASA EONET events clipped to the country boundary, de-duplicated by same type within 100 km and 48 hours | **`countryCode`** (ISO2), `sampleSize`, `includeEvents`, `fields`, `refresh` |
 | `country_list` | KOICA overseas-office host and concurrent countries with ISO codes, responsible office, and jurisdiction role | (none) |
-| `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** |
+| `country_map_outline` | Simplified country outline for a report base map. Geographic context for placing project sites, not a boundary determination | **`countryCode`** (ISO2) |
 
 ### KOICA regulations — `koica-regulations`
 
@@ -222,9 +227,9 @@ to the date it was computed for.
   required inputs, required outputs, read-only guarantees, and forbidden
   high-exposure tools are checked against `contracts/gateway-contract.json`.
 - The daily check and its update PR use the built-in GitHub Actions token. The job checks the live gateway and runs package tests, a dependency audit, and a version check on changes.
-- A daily workflow auto-merges generated lock metadata updates only when the
-  exact tool contract hashes stay unchanged. Tool schema/detail hash drift is
-  left as an open pull request for human review.
+- When a compatible change updates `observed.lock.json`, the daily workflow bumps the patch version.
+  It squash-merges the PR when the tool contract hashes, gateway identity and other automatic merge
+  checks still match. A change to a tool schema or constraint hash leaves the PR open for review.
 - Breaking contract drift fails instead of rewriting the accepted contract.
 - Skill routing and accepted contract changes require a versioned plugin
   update; installed caches still need a marketplace upgrade and a new
@@ -236,16 +241,6 @@ The plugin routes requests to external data services. Source availability,
 licensing, confidentiality, and reuse conditions remain governed by the
 relevant source and operator. Do not treat a public MCP endpoint as proof that
 every returned document is cleared for unrestricted redistribution.
-
-## Related tooling
-
-[DevEval Agents](https://github.com/amnotyoung/dev-eval-agents) — a
-multi-agent OECD-DAC evaluation framework by the same maintainer — uses this
-gateway as an optional evidence source: country context for relevance and
-coherence ratings, the Korean ODA map for duplication checks, and
-`verify_citation` for regulation citations in evaluation reports. The
-integration is one-way and optional; this plugin does not depend on it, and
-its tool surface is unchanged by it.
 
 ## Development
 
