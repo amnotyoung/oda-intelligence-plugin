@@ -15,8 +15,11 @@ design facts before the official code list can be interpreted.
    `Geography-first applied classification` below before calling `dac_purpose_code_lookup`.
 2. **Standalone DAC/CRS code meaning or code list** — call `dac_purpose_code_lookup`. Use `code` for an exact
    three- or five-digit code, or `query` for an official-English-label search, but never both in
-   one call. For a three-digit branch, set `includeChildren=true`. The tool reads the official OECD
-   SDMX `CL_DAC_SECTOR` codelist. Never call `search_regulation` for this task.
+   one call. For a three-digit branch, set `includeChildren=true`.
+   Query the gateway API for codes and labels from the `Purpose codes` sheet of the OECD workbook
+   `DAC-CRS-CODES.xlsx`. The response retains `CL_DAC_SECTOR` as a
+   compatibility identifier. Check `caveats` for legacy SDMX aggregates and hierarchy details.
+   Never call `search_regulation` for this task.
 3. **Comparable recipient-country ODA total** — resolve the ISO2 country code, call
    `country_data_status`, then call `country_report_context`. Label the OECD observations as DAC2A,
    not CRS.
@@ -36,9 +39,9 @@ For a specified year of maternal, neonatal or under-five mortality call `get_hea
    year for each observation. Distinguish a reported zero from missing data or a provider error.
 
 If `dac_purpose_code_lookup` is absent from the current tool snapshot, explain that the gateway
-upgrade is not active in this conversation and use the official OECD API through an available web
-or browser tool. If the user explicitly requires gateway-only evidence for route 5, state the
-unsupported operation directly. Do not search an unrelated gateway source, invent a result, or
+upgrade is not active in this conversation and consult the `Purpose codes` sheet in the
+[official OECD workbook](https://webfs.oecd.org/oda/DataCollection/Resources/DAC-CRS-CODES.xlsx) for code definitions.
+If the user explicitly requires gateway-only evidence for route 5, state the unsupported operation directly. Do not search an unrelated gateway source, invent a result, or
 imply that an empty response proves the code or flow does not exist.
 
 ## Geography-first applied classification

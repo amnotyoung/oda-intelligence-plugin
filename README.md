@@ -2,7 +2,7 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.37에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
+**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.38에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
 
 사용하는 앱에 플러그인을 설치한 뒤, 동티모르의 보건지표를 조회해 연결을 확인하세요.
 
@@ -75,21 +75,22 @@ Codex가 갱신된 Skill과 MCP 구성을 불러옵니다.
 
 ## ChatGPT
 
-전체 플러그인은 번들로 제공되는 세 개의 Skill과 등록된 `ODA Intelligence`
-MCP 앱을 결합합니다. 커밋된 `.app.json`에는 앱의 기술 식별자가 들어 있으며,
-인증 정보나 인증 토큰은 포함되어 있지 않습니다.
+**게이트웨이 도구 연결.** ChatGPT 웹에서 사용자 지정 MCP 서버를 추가할 권한이 있으면
+`Plugins → + → Add custom MCP server`를 엽니다. 이름은 `oda-intelligence`로 지정하고,
+위의 게이트웨이 URL을 입력한 뒤 인증 방식으로 `None`을 선택합니다. 연결을 생성하고
+설치한 다음 새 대화에서 첫 조회를 실행하세요. [OpenAI 연결 안내](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)
 
-유지관리자 테스트 시 ChatGPT 개발자 모드를 활성화하고, 이 저장소를 개인
-마켓플레이스 소스로 추가한 다음 `ODA Intelligence`를 설치하세요. 등록된 앱은
-인증 없이 위 게이트웨이 URL을 사용합니다.
+**조사 스킬 3개를 포함한 패키지 설치.** 워크스페이스 관리자는
+`Admin → Plugins → Add → Import marketplace`에서 이 저장소의 URL을 입력하고
+`Path`를 비워 둡니다. 가져오기가 끝나면 등록된 MCP 앱의 접근 권한을 확인하세요.
+구성원은 워크스페이스의 플러그인 목록에서 `ODA Intelligence`를 설치할 수 있습니다.
+[OpenAI 마켓플레이스 가져오기 안내](https://learn.chatgpt.com/docs/enterprise/plugin-management)
 
-이 개발자 모드 패키지는 아직 공개 디렉터리에 출시되지 않았습니다. 모든
-ChatGPT 사용자에게 배포하려면 동일한 게이트웨이를 **With MCP** 유형으로
-디렉터리에 제출해야 합니다. Skill만 제출하면 앱 매핑은 의도적으로 제외됩니다.
+공개 디렉터리에 제출할 때는 게이트웨이를 포함하는 **With MCP** 유형을 사용합니다.
+[OpenAI 제출 안내](https://developers.openai.com/plugins/deploy/submission)
 
-ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는 데이터 및 서버 동작
-변경은 같은 URL에서 사용할 수 있지만, 도구 계약의 새 버전은 워크스페이스
-관리자가 검토하고 갱신해야 합니다.
+워크스페이스에서 승인한 사용자 지정 MCP 연결은 도구 정의의 스냅샷을 유지합니다.
+도구 정의가 바뀌면 관리자가 변경 사항을 검토하고 도구 목록을 갱신합니다.
 
 ## 첫 조회로 연결 확인
 
@@ -105,7 +106,7 @@ ChatGPT는 승인된 도구 정의의 스냅샷을 유지합니다. 호환되는
 
 ## 공개 도구 22개
 
-특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회에서 IATI Datastore, 외교부 여행경보, HDX HAPI, ReliefWeb은 `disabled`로 표시됩니다. 이 표시는 해당 자료원을 조회하지 않았다는 뜻입니다.
+특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회에서 IATI Datastore, 외교부 여행경보, HDX HAPI, ReliefWeb, ACLED는 `disabled`로 표시됩니다. 이 표시는 해당 자료원을 조회하지 않았다는 뜻입니다.
 
 - **개발지표와 보건통계** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **한국 ODA 지도** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
@@ -140,20 +141,22 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 
 ### 국제 현황 — `international-data`
 
+아래 표의 ISO2와 ISO3는 각각 두 자리와 세 자리 국가코드입니다. 동티모르는 ISO2가 `TL`, ISO3가 `TLS`입니다. 공개 게이트웨이는 서버에서 캐시를 관리하므로 `refresh`는 생략하거나 `false`로 지정합니다.
+
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
-| `dac_purpose_code_lookup` | OECD 공식 SDMX `CL_DAC_SECTOR`에서 3자리 DAC 분야와 5자리 CRS 목적코드, 부모관계, 코드목록 버전을 조회 | `code`, `query`, `includeChildren`, `limit`, `refresh` |
-| `oecd_crs_query_country` | 한국이 특정 수원국·연도에 보고한 OECD CRS 자료 | **`countryCode`**, **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
+| `dac_purpose_code_lookup` | 게이트웨이 API로 3자리 DAC 분야와 5자리 CRS 목적코드, 상위 코드, 코드표 판본을 조회합니다. 코드와 명칭의 원본은 OECD 통합문서의 `Purpose codes` 시트이며, 응답의 `cache_hit`은 캐시 사용 여부를 나타냅니다. [DAC-CRS-CODES.xlsx](https://webfs.oecd.org/oda/DataCollection/Resources/DAC-CRS-CODES.xlsx) | `code`, `query`, `includeChildren`, `limit`, `refresh` |
+| `oecd_crs_query_country` | 한국이 특정 수원국·연도에 보고한 OECD CRS 자료 | **`countryCode`** (ISO2), **`year`**, `sectorCode`, `flowType`, `breakdown`, `limit`, `refresh` |
 | `get_health_observation_by_year` | 지정 연도의 WHO 모성사망비 또는 World Bank 신생아·5세 미만 사망률. 공식 응답 행, 단위, URL과 조회 시각 포함 | **`country`** (ISO3), **`indicator`**, **`year`** |
-| `country_data_status` | World Bank·OECD·재난·UNHCR·WHO 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`**, `refresh` |
-| `country_indicator_data_status` | 국가별 개발지표 가용성 및 출처별 조회 상태 | **`countryCode`** (ISO3) |
+| `country_data_status` | World Bank·OECD·재난·UNHCR·WHO 문서의 관측일·수집일·캐시일·건수·오류·최신성 요약 | **`countryCode`** (ISO2), `refresh` |
+| `country_indicator_data_status` | 국가별 개발지표 가용성 및 출처별 조회 상태 | **`countryCode`** (ISO3), `refresh` |
 | `search_development_indicator_catalog` | 세계은행 42개·WHO GHO 1개 지표에서 정의, 단위, 안정 ID 검색 | `query`, `source`, `limit` |
-| `get_country_indicator_snapshot` | 선택한 지표의 국가별 관측값·기준연도·단위·출처·결측 상태 | **`countryCode`** (ISO3), **`indicatorIds`** (최대 20개) |
-| `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_humanitarian_context` | UNHCR·WHO GHO의 관측치와 World Bank 최신 문서 메타데이터 | **`countryCode`**, `sampleSize`, `fields`, `refresh` |
-| `country_hazard_snapshot` | USGS·GDACS·NASA EONET 사건을 국가 경계로 거른 뒤 같은 유형·100㎞·48시간 기준으로 중복 제거한 결과 | **`countryCode`**, `sampleSize`, `includeEvents`, `fields`, `refresh` |
+| `get_country_indicator_snapshot` | 선택한 지표의 국가별 관측값·기준연도·단위·출처·결측 상태 | **`countryCode`** (ISO3), **`indicatorIds`** (최대 20개), `refresh` |
+| `country_report_context` | 보고서용 정제 데이터를 한 번에 반환합니다. 기본은 출처 상태·건수·출처별 표본 3건입니다 | **`countryCode`** (ISO2), `sampleSize`, `fields`, `refresh` |
+| `country_humanitarian_context` | UNHCR·WHO GHO의 관측치와 World Bank 최신 문서 메타데이터 | **`countryCode`** (ISO2), `sampleSize`, `fields`, `refresh` |
+| `country_hazard_snapshot` | USGS·GDACS·NASA EONET 사건을 국가 경계로 거른 뒤 같은 유형·100㎞·48시간 기준으로 중복 제거한 결과 | **`countryCode`** (ISO2), `sampleSize`, `includeEvents`, `fields`, `refresh` |
 | `country_list` | KOICA 해외사무소 소재국·겸임국을 ISO 코드, 담당 사무소, 관할 역할과 함께 반환 | (없음) |
-| `country_map_outline` | 보고서 배경용 단순화 국가 윤곽선. 사업 위치를 얹을 지리 맥락일 뿐 경계 확정이 아닙니다 | **`countryCode`** |
+| `country_map_outline` | 보고서 배경용 단순화 국가 윤곽선. 사업 위치를 얹을 지리 맥락일 뿐 경계 확정이 아닙니다 | **`countryCode`** (ISO2) |
 
 ### KOICA 규정 — `koica-regulations`
 
@@ -174,9 +177,9 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
   필수 입력, 필수 출력, 읽기 전용 보장 및 노출 위험이 높아 금지된 도구는
   `contracts/gateway-contract.json`을 기준으로 검사합니다.
 - 일일 점검과 갱신 PR은 GitHub Actions 기본 토큰을 사용합니다. 점검 작업 안에서 게이트웨이를 조회하고 변경 패키지의 테스트·의존성 감사·버전 검사를 실행합니다.
-- 일일 워크플로는 도구 계약 hash가 완전히 동일할 때만 잠금 메타데이터 변경의
-  patch 버전을 올리고 자동 생성 PR을 squash 병합합니다. 도구 schema·세부
-  제약 hash가 바뀌면 PR을 열어 둔 채 사람 검토를 기다립니다.
+- 일일 점검에서 호환성 검사를 통과한 변경이 `observed.lock.json`에 생기면 패치 버전을 올립니다.
+  도구 계약 해시와 게이트웨이 식별 정보 등 자동 병합 조건이 유지되면 PR을 squash 병합하고,
+  도구 스키마나 세부 제약의 해시가 바뀌면 PR을 열어 두어 관리자가 검토합니다.
 - 호환성을 깨뜨리는 계약 변경이 감지되면 승인된 계약을 다시 작성하지 않고
   검사에 실패합니다.
 - Skill 라우팅 또는 승인된 계약을 변경하려면 버전이 지정된 플러그인
