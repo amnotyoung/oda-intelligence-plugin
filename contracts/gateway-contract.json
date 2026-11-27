@@ -8,8 +8,6 @@
     "require_read_only": true,
     "forbidden_tools": [
       "country_travel_alert",
-      "get_article",
-      "get_attachment",
       "iati_query_country",
       "iati_status",
       "iati_test_connection",
@@ -280,6 +278,82 @@
         "article": "제30조"
       }
     },
+    "get_article": {
+      "allowed_required_inputs": [
+        "source",
+        "article"
+      ],
+      "input_properties": {
+        "source": "string",
+        "article": "string",
+        "cursor": "string"
+      },
+      "output_required": [
+        "result",
+        "total",
+        "next_cursor"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "인사규정",
+        "article": "제1조"
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "result"
+          ],
+          "array_contains": {
+            "source": "인사규정",
+            "article": "제1조"
+          }
+        },
+        {
+          "path": [
+            "match_index"
+          ],
+          "equals": 0
+        }
+      ]
+    },
+    "get_attachment": {
+      "allowed_required_inputs": [
+        "source",
+        "label"
+      ],
+      "input_properties": {
+        "source": "string",
+        "label": "string",
+        "cursor": "string"
+      },
+      "output_required": [
+        "result",
+        "total",
+        "next_cursor"
+      ],
+      "read_only": true,
+      "smoke_arguments": {
+        "source": "인사규정",
+        "label": "[별표 1]"
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "result"
+          ],
+          "array_contains": {
+            "source": "인사규정",
+            "label": "[별표 1]"
+          }
+        },
+        {
+          "path": [
+            "match_index"
+          ],
+          "equals": 0
+        }
+      ]
+    },
     "get_country_indicator_snapshot": {
       "allowed_required_inputs": [
         "countryCode",
@@ -334,6 +408,38 @@
             "missing_is_zero"
           ],
           "equals": false
+        }
+      ]
+    },
+    "get_health_observation_by_year": {
+      "read_only": true,
+      "allowed_required_inputs": [
+        "country",
+        "indicator",
+        "year"
+      ],
+      "input_properties": {
+        "country": "string",
+        "indicator": "string",
+        "year": "integer"
+      },
+      "smoke_arguments": {
+        "country": "TLS",
+        "indicator": "WB:SH.DYN.NMRT",
+        "year": 2019
+      },
+      "smoke_output_assertions": [
+        {
+          "path": [
+            "country"
+          ],
+          "equals": "TLS"
+        },
+        {
+          "path": [
+            "year"
+          ],
+          "equals": 2019
         }
       ]
     },
@@ -589,38 +695,6 @@
       "smoke_arguments": {
         "text": "인사규정 제1조"
       }
-    },
-    "get_health_observation_by_year": {
-      "read_only": true,
-      "allowed_required_inputs": [
-        "country",
-        "indicator",
-        "year"
-      ],
-      "input_properties": {
-        "country": "string",
-        "indicator": "string",
-        "year": "integer"
-      },
-      "smoke_arguments": {
-        "country": "TLS",
-        "indicator": "WB:SH.DYN.NMRT",
-        "year": 2019
-      },
-      "smoke_output_assertions": [
-        {
-          "path": [
-            "country"
-          ],
-          "equals": "TLS"
-        },
-        {
-          "path": [
-            "year"
-          ],
-          "equals": 2019
-        }
-      ]
     }
   }
 }

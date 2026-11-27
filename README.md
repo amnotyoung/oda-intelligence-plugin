@@ -2,7 +2,7 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.39에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
+**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.40에는 읽기 전용 도구 24개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
 
 사용하는 앱에 플러그인을 설치한 뒤, 동티모르의 보건지표를 조회해 연결을 확인하세요.
 
@@ -104,15 +104,15 @@ Codex가 갱신된 Skill과 MCP 구성을 불러옵니다.
 
 호출 기록이 보이지 않으면 앱에서 `oda-intelligence` 연결을 확인한 뒤 새 대화에서 다시 실행하세요.
 
-## 공개 도구 22개
+## 공개 도구 24개
 
-특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 목록·검색·인용으로 찾고 전문은 공식 공시에서 확인합니다. 국가 종합조회에서 IATI Datastore, 외교부 여행경보, HDX HAPI, ReliefWeb, ACLED는 `disabled`로 표시됩니다. 이 표시는 해당 자료원을 조회하지 않았다는 뜻입니다.
+특정 연도의 모성·신생아·5세 미만 사망률은 국가·지표·연도를 지정해 요청합니다. 응답의 공식 URL, 수집 시각, 단위, 원본 행을 확인하세요. 규정은 게이트웨이에서 검색하고 조문·별표·별지의 추출 Markdown 전문과 색인 개정일을 조회합니다. 국가 종합조회에서 IATI Datastore, 외교부 여행경보, HDX HAPI, ReliefWeb, ACLED는 `disabled`로 표시됩니다. 이 표시는 해당 자료원을 조회하지 않았다는 뜻입니다.
 
 - **개발지표와 보건통계** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **한국 ODA 지도** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
 - **OECD 개발재원** · `dac_purpose_code_lookup`, `oecd_crs_query_country`
 - **국가·재난·인도지원** · `country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_list`, `country_map_outline`, `country_report_context`
-- **KOICA 규정** · `compliance_radar`, `find_references`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
+- **KOICA 규정** · `compliance_radar`, `find_references`, `get_article`, `get_attachment`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
 
 ### 한국 ODA 사업 — `korean-oda-map`
 
@@ -163,11 +163,15 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | 도구 | 무엇을 반환하는가 | 입력 |
 |---|---|---|
 | `search_regulation` | 규정 메타데이터와 조문 스니펫, 적합도 점수. `include_attachments: true`면 별표·별지도 함께 검색하고, `mode`로 hybrid(기본)·keyword·semantic 검색을 고릅니다 | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
+| `get_article` | 조문 번호로 추출 Markdown 본문과 조문 제목·개정일을 조회합니다 | **`source`** (정확한 규정명), **`article`**, `cursor` |
+| `get_attachment` | 별표·별지의 추출 Markdown 본문과 표제·개정일을 조회합니다 | **`source`** (정확한 규정명), **`label`**, `cursor` |
 | `list_sources` | 색인된 현행 규정 목록. 규정 유형, 개정일, 조문 수 포함 | `category` |
 | `list_attachments` | 별표·별지 목록을 제목·발췌와 함께 반환하며 규정·유형·종류로 필터링합니다. 응답 예산에 맞춰 잘리지만 `total`이 언제나 실제 총계를 담습니다 | `source`, `category`, `kind`, `include_deleted` |
 | `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. `include_mermaid: true`면 인용망 flowchart 코드가 함께 실립니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | 정비 레이더 — 모규정이 더 최근에 개정된 시행세칙·지침을 `review_needed` / `ok` / `unknown` / `no_parent`로 플래그합니다 | `source` |
-| `verify_citation` | 색인에서 규정명과 조문 번호를 확인합니다. 조문 제목을 인용하면 `title_verified`로 제목 검증 여부를 확인하고, `content_mismatch`이면 공식 원문과 대조합니다 | **`text`** |
+| `verify_citation` | 색인에서 규정명과 조문 번호를 확인합니다. 조문 제목을 인용하면 `title_verified`로 제목 검증 여부를 확인하고, `content_mismatch`이면 `get_article`의 조문 제목과 대조합니다 | **`text`** |
+
+예를 들어 `get_article({"source":"인사규정","article":"제1조"})`로 조문을, `get_attachment({"source":"인사규정","label":"[별표 1]"})`로 별표를 읽습니다. 긴 본문은 같은 호출의 `cursor`에 응답의 `next_cursor`를 넣어 이어 읽습니다. `match_index`별로 `result[0].body`를 순서대로 붙이고 `next_cursor`가 `null`이면 마칩니다.
 
 ## 통제된 업데이트
 
