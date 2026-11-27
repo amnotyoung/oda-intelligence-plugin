@@ -8,7 +8,7 @@ For consequential personnel, disciplinary, financial, procurement, audit, or pro
 4. Follow cross-regulation references with `find_references` when authority or procedure depends on another rule, and check `compliance_radar` when an implementation rule may lag its parent regulation.
 5. Separate the indexed KOICA rule from external statutes or factual applicability.
 6. For a consequential conclusion, confirm currency against the current official source: the index follows official revisions on a sync cadence, and the revision label states what the index holds.
-7. Verify the final citation-bearing text with `verify_citation`.
+7. Verify each final citation with `verify_citation`. Resolve any `content_mismatch` against the published article title and recheck the corrected citation.
 
 Use this answer shape:
 
@@ -23,24 +23,23 @@ If currency against the current official source was not checked, say so explicit
 
 ## Blocked responses
 
-`PUBLIC_RESPONSE_BLOCKED` reports that the gateway withheld one response. It carries no information about whether the regulation, article, or annex exists, and it does not describe the state of the index: the other regulation tools on the same source commonly answer normally while one is blocked. A blocked `search_regulation` in particular removes discovery, not access — `find_references`, `list_attachments`, `list_sources`, and `compliance_radar` each return regulation text or structure without it.
+`PUBLIC_RESPONSE_BLOCKED` applies to the individual response. Use the remaining index tools to identify the official publication.
 
 Recover in this order:
 
 1. `list_sources` for the governing regulation's exact title, revision label, and article count. Subject narrows it: procurement, contracting, delay, and sanction questions to 「대외무상협력사업에 관한 조달 및 계약규정」 and its 시행세칙; personnel, leave, and discipline questions to 「인사규정」 and its 시행세칙; accounting to 「회계규정」.
 2. Open the officially published regulation for the governing article. If unavailable, identify the missing text and leave its interpretation open.
 
-   A walk fails silently in a way search does not. Once the rate limit hits, the remaining articles return errors rather than text, and an article never fetched is indistinguishable from one fetched and found irrelevant — the walk simply ends with the governing provision missing and no sign that anything was skipped. Track which article numbers actually returned text, retry the ones that errored, and never state that a regulation lacks a provision on the strength of an incomplete walk.
 3. `find_references` from any located article, in both directions. Incoming references frequently carry the procedure, committee, or approval authority that governs how a substantive rule is applied.
 4. `list_attachments` and the official publication when an annex table or form governs.
 
-Then answer from the retrieved text and state that discovery search was unavailable. The failure this prevents is specific: an answer assembled from general public-procurement practice, from another institution's rules, or from recollection, presented as though the index had been read. That answer is unciteable and reads as authoritative. If the recovery path also fails, report that the index could not be read, name the regulation that would govern, and leave the conclusion open.
+State which indexed records and official provisions you read. If an official article or attachment remains unavailable, identify it and leave the interpretation open.
 
 ## Source attribution
 
-Every gateway tool declares its domain in its description as `[Source: ...]`. The regulation tools — `search_regulation`, `list_attachments`, `list_sources`, `find_references`, `compliance_radar`, and `verify_citation` — all carry `[Source: koica-regulations]`, an index of KOICA internal regulation text.
+The six regulation tools carry `[Source: koica-regulations]`. The gateway provides metadata, search snippets, annex excerpts, cross-references and citation checks.
 
-The underlying regulation text is openly released on the Korean public data portal as **한국국제협력단_정관 및 내부규정** (no usage restrictions). That release is the redistribution basis for the full text these tools return, and it is the address to give a reader who asks where the text is published. The gateway index is the compiled, searchable access path built on it; the two can differ by sync cadence, which is why a citation always carries the revision label.
+For the complete text, open the relevant filing and attachment in ALIO through [KOICA’s regulation guide](https://www.koica.go.kr/koica_kr/8085/subview.do). Cite the publication and revision you actually read.
 
 Attribute what the index returned:
 

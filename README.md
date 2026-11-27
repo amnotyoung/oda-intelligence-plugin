@@ -2,7 +2,7 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.38에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
+**ODA Intelligence**는 한국 ODA 사업 위치, OECD 개발재원, WHO·World Bank 지표, 재난·인도지원 현황과 KOICA 규정을 조회하는 플러그인입니다. 공개판 0.2.39에는 읽기 전용 도구 22개와 조사 스킬 3개가 있습니다. 게이트웨이는 개인 API 키 없이 쓸 수 있습니다.
 
 사용하는 앱에 플러그인을 설치한 뒤, 동티모르의 보건지표를 조회해 연결을 확인하세요.
 
@@ -167,7 +167,7 @@ oda_map_project_detail { "project_id": "iati:KR-GOV-110-201917011048" }
 | `list_attachments` | 별표·별지 목록을 제목·발췌와 함께 반환하며 규정·유형·종류로 필터링합니다. 응답 예산에 맞춰 잘리지만 `total`이 언제나 실제 총계를 담습니다 | `source`, `category`, `kind`, `include_deleted` |
 | `find_references` | 조문 하나의 인용 관계 그래프. 이 조문이 인용한 곳(`outgoing`)과 이 조문을 인용한 곳(`incoming`)을 각각 `same_regulation`, `cross_regulation`, `external`로 표시합니다. `include_mermaid: true`면 인용망 flowchart 코드가 함께 실립니다. 조문을 찾지 못해도 오류가 아니라 빈 그래프를 반환합니다 | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | 정비 레이더 — 모규정이 더 최근에 개정된 시행세칙·지침을 `review_needed` / `ok` / `unknown` / `no_parent`로 플래그합니다 | `source` |
-| `verify_citation` | 텍스트 안의 모든 `{규정명} 제N조` 인용을 색인과 대조해 `ok`, `not_found`, `unknown_source`로 분류합니다 | **`text`** |
+| `verify_citation` | 색인에서 규정명과 조문 번호를 확인합니다. 조문 제목을 인용하면 `title_verified`로 제목 검증 여부를 확인하고, `content_mismatch`이면 공식 원문과 대조합니다 | **`text`** |
 
 ## 통제된 업데이트
 

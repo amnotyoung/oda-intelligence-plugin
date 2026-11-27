@@ -2,7 +2,7 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.38 includes 22 read-only tools and three research skills. The gateway requires no personal API key.
+**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.39 includes 22 read-only tools and three research skills. The gateway requires no personal API key.
 
 Choose the instructions for your app, then run the Timor-Leste example to check the connection.
 
@@ -170,7 +170,7 @@ The table specifies two-letter (ISO2) and three-letter (ISO3) country codes. For
 | `list_attachments` | The annex/form index (별표·별지) with titles and excerpts, filterable by regulation, category, and kind. Truncates to the response budget; `total` always states the true count | `source`, `category`, `kind`, `include_deleted` |
 | `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. `include_mermaid: true` adds a flowchart of the graph. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | Revision-lag radar: flags implementation rules and guidelines whose parent regulation was revised more recently (`review_needed` / `ok` / `unknown` / `no_parent`) | `source` |
-| `verify_citation` | Cross-checks every `{regulation} 제N조` citation in a text against the index and marks each `ok`, `not_found`, or `unknown_source` | **`text`** |
+| `verify_citation` | Checks the regulation name and article number against the index. For a cited title, inspect `title_verified` and resolve any `content_mismatch` against the official text | **`text`** |
 
 ## Controlled updates
 
