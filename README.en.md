@@ -2,7 +2,7 @@
 
 [한국어](README.md) | [English](README.en.md)
 
-**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.40 includes 22 read-only tools and three research skills. The gateway requires no personal API key. It installs in Claude, Codex, Antigravity, and ChatGPT.
+**ODA Intelligence** lets you look up Korean ODA project locations, OECD development finance, WHO and World Bank indicators, hazard and humanitarian data, and KOICA regulations. Public version 0.2.41 includes 24 read-only tools and three research skills. The gateway requires no personal API key. It installs in Claude, Codex, Antigravity, and ChatGPT.
 
 Choose the instructions for your app, then run the Timor-Leste example to check the connection.
 
@@ -154,15 +154,15 @@ After installation, open a new conversation and ask:
 
 If you cannot see the call, check the `oda-intelligence` connection in your app and try again in a new conversation.
 
-## Public catalog of 22 tools
+## Public catalog of 24 tools
 
-For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Use regulation discovery and citation checks with the official publication for full text. Country summaries mark IATI Datastore, Korean Ministry of Foreign Affairs travel advisories, HDX HAPI, ReliefWeb and ACLED as `disabled`. This means the source was not queried.
+For maternal, neonatal or under-five mortality in a given year, request the country, indicator and year. Check the source URL, retrieval time, unit and original row. Search regulations and read the extracted Markdown of articles, annexes and forms directly through the gateway. Each match identifies the indexed revision. Country summaries mark IATI Datastore, Korean Ministry of Foreign Affairs travel advisories, HDX HAPI, ReliefWeb and ACLED as `disabled`. This means the source was not queried.
 
 - **Development and health indicators** · `country_indicator_data_status`, `get_country_indicator_snapshot`, `search_development_indicator_catalog`, `get_health_observation_by_year`
 - **Korean project map** · `oda_map_country_context`, `oda_map_data_status`, `oda_map_project_detail`, `oda_map_projects`
 - **OECD development finance** · `dac_purpose_code_lookup`, `oecd_crs_query_country`
 - **Country, hazard and humanitarian context** · `country_data_status`, `country_hazard_snapshot`, `country_humanitarian_context`, `country_list`, `country_map_outline`, `country_report_context`
-- **KOICA regulations** · `compliance_radar`, `find_references`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
+- **KOICA regulations** · `compliance_radar`, `find_references`, `get_article`, `get_attachment`, `list_attachments`, `list_sources`, `search_regulation`, `verify_citation`
 
 ### Korean ODA projects — `korean-oda-map`
 
@@ -213,11 +213,15 @@ The table specifies two-letter (ISO2) and three-letter (ISO3) country codes. For
 | Tool | What it returns | Inputs |
 |---|---|---|
 | `search_regulation` | Regulation metadata and article snippets with a relevance score. `include_attachments: true` searches annex tables and forms (별표·별지) too, and `mode` picks hybrid (default), keyword, or semantic retrieval | **`query`**, `category`, `source`, `limit`, `fuzzy`, `include_attachments`, `mode` |
+| `get_article` | Extracted Markdown of an article, with its title and indexed revision | **`source`** (exact regulation name), **`article`**, `cursor` |
+| `get_attachment` | Extracted Markdown of an annex or form, with its label, title and indexed revision | **`source`** (exact regulation name), **`label`**, `cursor` |
 | `list_sources` | The indexed current regulations with category, revision date, and article count | `category` |
 | `list_attachments` | The annex/form index (별표·별지) with titles and excerpts, filterable by regulation, category, and kind. Truncates to the response budget; `total` always states the true count | `source`, `category`, `kind`, `include_deleted` |
 | `find_references` | Citation graph for one article: what it cites (`outgoing`) and what cites it (`incoming`), each marked `same_regulation`, `cross_regulation`, or `external`. `include_mermaid: true` adds a flowchart of the graph. An article that is not found returns an empty graph, not an error | **`source`**, **`article`**, `limit`, `include_mermaid` |
 | `compliance_radar` | Revision-lag radar: flags implementation rules and guidelines whose parent regulation was revised more recently (`review_needed` / `ok` / `unknown` / `no_parent`) | `source` |
-| `verify_citation` | Checks the regulation name and article number against the index. For a cited title, inspect `title_verified` and resolve any `content_mismatch` against the official text | **`text`** |
+| `verify_citation` | Checks the regulation name and article number against the index. For a cited title, inspect `title_verified` and resolve any `content_mismatch` against the article title returned by `get_article` | **`text`** |
+
+For example, call `get_article({"source":"인사규정","article":"제1조"})` for an article or `get_attachment({"source":"인사규정","label":"[별표 1]"})` for an annex. For long text, repeat the same lookup with the returned `next_cursor` as `cursor`. Append `result[0].body` in page order for each `match_index` until `next_cursor` is null.
 
 ## Controlled updates
 
