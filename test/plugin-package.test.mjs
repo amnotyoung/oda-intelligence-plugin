@@ -322,8 +322,11 @@ test("named-geography project questions gather local evidence before DAC and CRS
   assert.match(internationalAgent, /Classify and trace projects with OECD, CRS, and IATI evidence/u);
   assert.match(portfolioSkill, /do not hand off before reading the project/u);
   assert.match(portfolioProtocol, /cannot prove an officially reported five-digit CRS assignment/u);
-  assert.match(portfolioProtocol, /empty `transaction_sector_code`[\s\S]+no sector absence/u);
-  assert.match(portfolioProtocol, /miss for `311`[\s\S]+`31120`/u);
+  assert.match(portfolioProtocol, /public IATI XML/u);
+  assert.match(portfolioProtocol, /inspect its transactions/u);
+  assert.doesNotMatch(portfolioProtocol, /collection: "activity"|total_found|activity_sectors_truncated/u);
+  assert.match(internationalSkill, /call `oecd_crs_query_country`/u);
+  assert.match(internationalSkill, /exact match[^\n]*`311`[^\n]*`31120`/u);
 
   assert.ok(gatewayContract.tools.oda_map_project_detail);
   assert.ok(gatewayContract.tools.dac_purpose_code_lookup);

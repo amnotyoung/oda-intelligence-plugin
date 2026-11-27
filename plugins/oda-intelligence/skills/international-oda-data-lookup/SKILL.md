@@ -24,12 +24,14 @@ design facts before the official code list can be interpreted.
    `country_data_status`, then call `country_report_context`. Label the OECD observations as DAC2A,
    not CRS.
 4. For a publisher's current IATI-reported sector, open the publisher's public IATI XML or d-portal activity record. Verify the activity identifier, recipient, sector vocabulary and percentages at activity and transaction level. Label unavailable fields as unverified.
-5. **OECD CRS donor, sector, channel, activity detail, or annual project history** — use the current
-   official OECD Data Explorer or OECD API through an available web or browser tool. For a named
-   project's reported-code history, follow `Historical reported-code verification` below and use
-   project/programme microdata (`MD_DIM=DD`), not an aggregate sector series. The gateway has no
-   dedicated CRS detail query. An IATI sector does not by itself prove what was submitted to the OECD
-   CRS database; do not substitute an IATI count or record for OECD CRS evidence.
+5. **OECD CRS donor, sector, channel, activity detail, or annual project history** — for Korea’s
+   reporting on a supported recipient and year, call `oecd_crs_query_country` with the ISO2
+   `countryCode` and `year`. The optional `sectorCode` filter uses an exact match (e.g., `311` and `31120` are distinct).
+   Use `breakdown: "activity"` for activity observations. Inspect
+   `activities_truncated` or `purpose_codes_truncated` before describing coverage.
+   For other donors, channel detail, or a named project that needs title matching, use the
+   official OECD Data Explorer or API. Follow `Historical reported-code verification` below
+   for project/programme microdata and reporting-year evidence.
 
 For a specified year of maternal, neonatal or under-five mortality call `get_health_observation_by_year`, retain the source row and cite the API URL and retrieval time.
 
@@ -41,8 +43,7 @@ For a specified year of maternal, neonatal or under-five mortality call `get_hea
 If `dac_purpose_code_lookup` is absent from the current tool snapshot, explain that the gateway
 upgrade is not active in this conversation and consult the `Purpose codes` sheet in the
 [official OECD workbook](https://webfs.oecd.org/oda/DataCollection/Resources/DAC-CRS-CODES.xlsx) for code definitions.
-If the user explicitly requires gateway-only evidence for route 5, state the unsupported operation directly. Do not search an unrelated gateway source, invent a result, or
-imply that an empty response proves the code or flow does not exist.
+For a gateway-only request, report the CRS evidence available for the requested donor and recipient. Identify any unsupported breakdown or unverified project match.
 
 ## Geography-first applied classification
 
@@ -134,11 +135,9 @@ name any external archive used; do not silently substitute OECD annual records f
 - Treat annual OECD CRS project rows as official reporting-year evidence after exact project
   matching. They are stronger than IATI for an OECD submission claim, but the current historical
   series still does not preserve every superseded database revision.
-- IATI permits sector reporting either at activity level or for every transaction. A missing
-  `transaction_sector_code` on an activity response is not activity-sector evidence, while an empty
-  `activity_sectors` array requires a transaction-level check before any absence conclusion.
-- Treat `activity_sectors_truncated: true` as an explicitly partial result, not a complete sector
-  list.
+- Read sector elements from the publisher’s activity record. When activity-level sectors are
+  absent, check transaction-level sector elements. Identify incomplete source records and
+  report only the codes and percentages that can be verified.
 - Never treat a development-document category, an ODA Map sector label, or a missing IATI
   `sector_code` as the officially reported CRS purpose code.
 - When the user provides a label but no code, resolve it with `dac_purpose_code_lookup.query`

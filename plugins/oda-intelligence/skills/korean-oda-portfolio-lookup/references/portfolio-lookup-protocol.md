@@ -15,29 +15,16 @@ Use the ODA Map for Korean project inventory.
 
 For a CRS question about one named Korean project, preserve that same source order. Read the
 project's `description` and detail before looking up candidate codes. The map's sector label can
-describe the source category but cannot prove an officially reported five-digit CRS assignment;
-neither can an empty IATI `sector_code`. Use the OECD codelist to verify meanings, and label the
-result as a recommendation unless an activity-level official source records the assignment.
+describe the source category but cannot prove an officially reported five-digit CRS assignment.
+Use the OECD codelist to verify meanings, and label the result as a recommendation unless an activity-level official source records the assignment.
 
-When the question asks what the publisher currently reports in IATI, use the map only to resolve a
-verified stable activity identifier. Remove only a literal leading `iati:` namespace from the map
-`project_id`; never synthesize a reporting-organisation prefix. Pass that value to an identifier-
-scoped `collection: "activity"` query, require `total_found: 1`, and verify the returned canonical
-`iati_identifier`, title, and recipient before reading `activity_sectors` and
-`activity_sectors_truncated`. Report every vocabulary
-`1` code and percentage; vocabulary `1` may be explicit or the IATI default. This proves the current
-IATI-reported sector, not an OECD CRS database submission or the first historical submission.
-
-If `activity_sectors_truncated` is true, label the list partial and inspect the publisher XML before
-claiming completeness. A transaction collection's flattened `transaction_sector_code` does not
-preserve vocabulary association, so verify the structured code and vocabulary together in publisher
-XML or d-portal before calling a transaction-level value CRS.
-
-The `sectorCode` filter is exact, so a miss for `311` says nothing about a record filed as `31120`.
-An empty `transaction_sector_code` in an activity response proves no sector absence. If
-`activity_sectors` is absent, open the matched publisher XML or d-portal activity HTML/XML. If it is
-present but empty, check the exact activity's transactions because IATI permits sector reporting at
-activity level or for every transaction. Do not guess candidate codes at either level.
+For the publisher’s current IATI sector, take the verified map `project_id`, remove only a literal
+leading `iati:` and preserve the rest of the identifier. Open the publisher’s public IATI XML
+or d-portal activity record. Match the exact identifier, title and recipient. Read each
+vocabulary 1 sector code and its reported percentage (vocabulary 1 may be the default).
+If the activity has no sector elements, inspect its transactions for sector elements and
+vocabularies. Cite the matched record and flag any missing or partial evidence. Use official OECD
+activity records for claims about annual CRS submissions.
 
 ## Source attribution
 
@@ -50,18 +37,18 @@ gateway itself declares for that source, and it stays right when this table fall
 tables below are the fallback for responses that do not carry the field, and the answer to a
 question about a source you have not called.
 
-Every gateway tool declares its domain in its description as `[Source: ...]`. These are the public
-addresses for those domains:
+Use the domain tag in the tool description when present. For tools such as
+`get_health_observation_by_year`, cite the provider and source URL returned with the observation.
 
 | Tool domain | What it holds | Public address |
 |---|---|---|
 | `korean-oda-map` | An independent, unofficial map of Korean development cooperation locations and its reviewed-correction layer. No agency published it | https://oda-map-lab.pages.dev |
-| `international-data` | IATI, World Bank, OECD, hazard, and humanitarian feeds, keyed per source below | Per source below |
+| `international-data` | Country data from World Bank, OECD, hazard and humanitarian sources, with availability reported per source | Per source below |
 | `koica-regulations` | Indexed KOICA regulation text | https://github.com/amnotyoung/koica-reg-mcp |
-| `partner-country-procurement` | Partner-country procurement models | https://amnotyoung.github.io/overseas-procurement-100/ (per-model address in the `model_url` response field) |
 
-`country_data_status` and `country_report_context` return `sources[].source` keys inside the
-`international-data` domain. Attribute the key, not the domain:
+For map responses, read `data.source_status.sources[]`. For international evidence,
+`country_data_status` returns `sources[]`, and `country_report_context` returns
+`source_status[]`. Cite the `source`, `public_url`, status and date of the entry used.
 
 | Source key | Public address |
 |---|---|
@@ -84,12 +71,8 @@ Rules:
 - Attribute the sources the answer actually rests on. A source that was called and returned nothing
   usable is still worth naming with its status, because that is what the reader needs to judge the
   gap.
-- Carry the observation time with the address. `https://oda-map-lab.pages.dev` shows the map as it
-  stands now, and the answer was computed from a build observed at `observed_at`.
-- Never construct an address that is not in these tables. Inventing a portal URL sends the reader
-  somewhere that does not hold the evidence, and a government portal whose name resembles a source
-  holds something else. A procurement answer quotes the `model_url` the model itself carries, which
-  is more precise than the site address.
+- Use the source’s returned URL and observation date. If the URL is missing, use the
+  corresponding public address above.
 - When the user asks where a source can be seen, answer with the address rather than searching the
   web for a government portal that resembles it.
 - Never construct a publisher name either. Call the map `한국 ODA 사업 위치 지도(비공식)` and leave its
@@ -142,8 +125,9 @@ says nothing about whether the evidence exists — the source status for the sam
 sample, or a different tool covering the same field. Record only the fields still missing after
 that, and tell the reader it is a gateway limitation rather than a data gap.
 
-`observed_at` on the ODA Map source is the map asset build time, not the observation time of each
-underlying project record. Say so when the age of an individual project matters.
+For the `korean-oda-map` source, `observed_at` is the earliest known reference date among the
+underlying sources. The map’s build timestamp is `generated_at` when available. Use `as_of`
+for the date used to calculate project status. Read each layer’s own dates and caveats.
 
 ## Selecting fields
 
@@ -164,21 +148,18 @@ Seven of the fourteen the schema allows are therefore absent by default — `des
   is installed, who gets trained. That is what a question about project content is asking for, and
   what makes two projects comparable or not. The field is populated; the default call drops it
   without saying so. Request it by name whenever the answer describes what a project does.
-- `amounts` carries `budget` and `spent`. A default call returns neither, so an answer that quotes a
-  figure without having requested `amounts` is quoting something else — usually the amount embedded
-  in the project name, which is name text rather than a validated field.
-- A response echoes the `fields` it applied. Read that echo back before concluding a field is empty:
-  an absent key in the items means the field was not requested, not that the source lacks a value.
+- Request `amounts` for `budget`, `spent` and `currency`. If
+  `values_consistent_across_locations` is false, flag the conflicting records.
+- Check the echoed `fields` to distinguish an unrequested field from a requested value
+  that is missing. A null budget or expenditure is unknown.
 - Request `locations` with `include_coordinates` only when the answer needs geography, and carry the
   `coordinate_provenance` and `coordinate_scope` caveats with any location claim.
 
 ## Filtering and paging
 
-- `country` is required on `oda_map_data_status`, `oda_map_country_context`, and
-  `oda_map_projects`. A
-  comparison, precedent, or benchmark question is answered by repeated per-country calls over a
-  country set you chose — and the answer has to name that set. A bounded search reported without its
-  boundary reads as an exhaustive one.
+- `oda_map_data_status` accepts an empty input for map-wide status. Supply `country` for a
+  country assessment. Both `oda_map_country_context` and `oda_map_projects` require one
+  country per call. Name the countries searched in a comparison.
 - `agency` matches the agency label the source returns, such as `한국국제협력단(KOICA)`. Confirm the
   label from the `agencies` section of `oda_map_country_context` before filtering, and prefer the
   `koica_project_count` field over a hand-rolled count. The labels are not normalised: one country
@@ -195,7 +176,7 @@ Seven of the fourteen the schema allows are therefore absent by default — `des
 
 ## What not to infer
 
-- Do not infer a budget figure, a currency, or a total spend from the map dataset.
+- Give a reported amount in the currency supplied for that amount. Label portfolio budget totals with the number of projects covered and the number with unknown or conflicting budgets.
 - Do not read the amount embedded in a project name as its budget. `('25-'29/880만불)` is part of
   the name string and can disagree with `amounts` on the same record.
 - Do not infer that an `active` project has an approved current-year budget, a solicitation, or a
