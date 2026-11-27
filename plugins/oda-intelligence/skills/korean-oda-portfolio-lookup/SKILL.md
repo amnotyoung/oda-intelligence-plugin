@@ -72,10 +72,10 @@ the pages searched and location coverage. A national fallback point does not est
 ## Country-level workflow
 
 1. Resolve the country name. The ODA Map tools accept the Korean or English official name and
-   return the canonical name with its aliases; pass the user's wording and read `country.canonical`
+   return the canonical name with its aliases; pass the user's wording and read `data.country.canonical`
    back. Use `country_list` only to identify the responsible KOICA office and its jurisdiction role
    — it carries no portfolio data.
-2. Call `oda_map_data_status`. Record `status`, `coverage`, `record_count`, and the per-source
+2. Call `oda_map_data_status` with the country name. In the returned `data` object, record `status`, `coverage`, `record_count`, and the per-source
    `observed_at`. Stop here and report `판단 불충분` if the status is not usable.
 3. Call `oda_map_country_context` for the shape of the portfolio. Request only the sections the
    question needs: `portfolio`, `agencies`, `sectors`, `map_layers`, `locations`, `samples`,
@@ -120,9 +120,10 @@ source and keep it out of the count.
 
 ## Counting rules
 
-- `total` and `distinct_project_count` are unique activity identifiers with the location suffix
-  removed. `map_feature_count`, `map_entity_count`, and `mapped_project_entity_count` are map
-  pins. Never present a pin count as a project count.
+- Use the list’s `total` for distinct activities matching the filters, or the country portfolio’s
+  `distinct_project_count` for all projects. In `map_layers`, `map_position_count` counts positions
+  and `source_entity_count` counts entities across layers, including offices and embassies.
+  `mapped_project_entity_count` counts project entities. Several entities can share a position.
 - `koica_project_count` and `other_agency_project_count` partition the portfolio. Use
   `koica_project_count` for a KOICA-specific answer rather than filtering and re-counting by hand.
 - Agency and sector labels are not normalised, and a ranked list built from them can be wrong. In
@@ -133,9 +134,10 @@ source and keep it out of the count.
   merge them and say you did or state that near-duplicate labels are counted separately.
 - Project status is recomputed from start and end dates at `as_of`, independently of the map layer.
   `unknown` means the dates could not support a judgement — not zero and not inactive.
-- The map dataset does not encode a budget currency. Do not state
-  `budget_total_deduplicated` as a won or dollar figure, and do not convert it. Report it only as an
-  uncurrencied source field, or omit it and say the currency is unconfirmed.
+- Report `portfolio.budget_total_deduplicated` with its `budget_currency`, the
+  `budget_known_project_count` and the `budget_unknown_or_conflicting_project_count`.
+  For individual projects, read `amounts.budget`, `amounts.spent` and `amounts.currency`.
+  If a value or currency is missing, identify the missing field. Keep repeated locations out of sums.
 - Project names frequently embed a period and an amount, as in `('25-'29/880만불)`. That is name
   text the source recorded, not a validated field, and it can disagree with `dates` and `amounts` on
   the same record. Quote it as part of the name where it helps; do not present it as the project's
@@ -155,10 +157,8 @@ limitations that change interpretation.
   any other agency name in front of it, and never give it a product name of your own. It draws on
   Korean ODA project data, but naming an agency as its publisher presents a private compilation as
   an official record.
-- Close with the sources the answer used — the tool domain or the `sources[].source` key, its
-  status, and its observation time. `references/portfolio-lookup-protocol.md` holds the public
-  address for each one. Give the listed address rather than a government portal that merely
-  resembles the source.
+- For map evidence, cite the source, public URL, status and observation date from
+  `data.source_status.sources[]`. For country context, use the source paths in the reference protocol.
 - Give project names as the source gives them, Korean and English where both exist.
 - For a comparison answer, state the countries searched beside the matches, and describe each match
   from its `description` rather than from its title. What makes two projects comparable is what they
